@@ -1,0 +1,71 @@
+logging {
+    level = "debug"
+    format = "logfmt"
+}
+
+otelcol.auth.basic "otel_creds" {
+  username = "username"
+  password = "password"
+}
+
+otelcol.auth.bearer "otel_bearer" {
+  token = "mysupertoken"
+}
+
+
+otelcol.receiver.otlp "default" {
+    grpc {
+        endpoint = "0.0.0.0:4317"
+        auth = otelcol.auth.basic.otel_creds.handler
+    }
+    http {
+        endpoint = "0.0.0.0:4318"
+        auth = otelcol.auth.basic.otel_creds.handler
+    }
+
+    output {
+        metrics = [otelcol.processor.batch.default.input]
+    }
+}
+
+otelcol.processor.batch "default" {
+    output {
+        metrics = [otelcol.exporter.prometheus.mimir.input]
+    }
+}
+
+otelcol.exporter.prometheus "mimir" {
+    forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+    endpoint {
+        url = "http://localhost:9009/api/v1/push"
+    }
+}
+
+prometheus.exporter.self "default" {
+}
+
+prometheus.relabel "self_monitor_relabel" {
+    forward_to = [prometheus.remote_write.mimir.receiver]
+
+
+    rule {
+        action        = "replace"
+        target_label  = "job"
+        replacement   = "alloy"
+    }
+
+    rule {
+        action        = "replace"
+        target_label  = "service_name"
+        replacement   = "alloy"
+    }
+}
+
+prometheus.scrape "metamonitoring" {
+    targets    = prometheus.exporter.self.default.targets
+    forward_to = [prometheus.relabel.self_monitor_relabel.receiver]
+}
+

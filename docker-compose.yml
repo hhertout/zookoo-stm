@@ -1,0 +1,118 @@
+services:
+  rustbox:
+    build: .
+    ports:
+      - "8888:8888"
+  otel:
+    image: otel/opentelemetry-collector-contrib:latest
+    volumes:
+      - ./dev/otel.yml:/etc/otel/config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    command: ["--config", "/etc/otel/config.yaml"]
+    
+  mimir:
+    image: grafana/mimir:latest
+    command:
+      [
+        "-ingester.native-histograms-ingestion-enabled=true",
+        "-config.file=/etc/mimir.yaml",
+      ]
+    ports:
+      - "9009:9009"
+    volumes:
+      - "./dev/mimir.yaml:/etc/mimir.yaml"
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_FEATURE_TOGGLES_ENABLE=flameGraph traceqlSearch correlations traceQLStreaming metricsSummary traceqlEditor traceToMetrics traceToProfiles datatrails
+      - GF_INSTALL_PLUGINS=grafana-lokiexplore-app,grafana-exploretraces-app,grafana-pyroscope-app
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - "grafana-data:/var/lib/grafana"
+      - "./dev/grafana/definitions:/var/lib/grafana/dashboards"
+      - "./dev/grafana/provisioning:/etc/grafana/provisioning"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mimir
+    user: root
+
+  alloy:
+    image: grafana/alloy:v1.7.5
+    volumes:
+      - ./dev/config.alloy:/etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+      - "4317:4317"
+      - "4318:4318"
+    command: "run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy --stability.level public-preview"
+
+  influxdb:
+    image: influxdb:latest
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    
+  timescaledb:
+    image: timescale/timescaledb:latest-pg17
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+
+  kafka:
+    image: apache/kafka:latest
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+
+volumes:
+    influxdb_data:
+    mongo_data:
+    postgres_data:
+    timescaledb_data:
+    kafka_data:
+    grafana-data:

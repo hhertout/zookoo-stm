@@ -1,0 +1,22 @@
+[
+  {
+    "url": "http://localhost:8080",
+    "headers": { "content-type": "application/json" },
+    "scrap_interval": "1m"
+  },
+  {
+    "url": "http://localhost:8081",
+    "headers": { "content-type": "application/json" },
+    "scrap_interval": "1m"
+  },
+  {
+    "url": "http://localhost:8082",
+    "headers": { "content-type": "application/json" },
+    "scrap_interval": "1m"
+  },
+  {
+    "url": "http://localhost:8083",
+    "headers": { "content-type": "application/json" },
+    "scrap_interval": "1m"
+  }
+]

@@ -1,0 +1,15 @@
+[package]
+name = "rustbox"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+configuration = { path = "configuration" }
+prober = { path = "prober" }
+exporter = { path = "exporter" }
+env_logger = "0.11.8"
+env = "1.0.1"
+dotenv = "0.15.0"
+log = "0.4.27"
+clap = { version = "4.5.40", features = ["derive", "env"] }
+tokio = "1.45.1"
