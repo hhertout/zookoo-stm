@@ -2,9 +2,13 @@
 sidebar_position: 1
 ---
 
-# Define Target
+# Targets Configuration
 
-## From the config file
+## Source
+
+ZookooZookoo can scrape metrics from various HTTP endpoints. You can define these targets in the configuration file or load them from a JSON file.
+
+### From the config file
 
 ```toml
 [http]
@@ -14,7 +18,7 @@ targets = [
 ]
 ```
 
-## From a JSON file
+### From a JSON file
 
 ```toml
 [http]

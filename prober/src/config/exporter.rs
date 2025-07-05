@@ -27,7 +27,7 @@ pub struct MetricsExporterConfiguration {
 
 #[derive(Debug, Clone)]
 pub struct AuthConfiguration {
-    pub user: Option<String>,
+    pub username: Option<String>,
     pub password: Option<String>,
     pub bearer: Option<String>,
 }
@@ -80,7 +80,7 @@ impl From<configuration::model::exporter::MetricsExporterConfiguration>
 impl From<configuration::model::exporter::AuthConfiguration> for AuthConfiguration {
     fn from(value: configuration::model::exporter::AuthConfiguration) -> Self {
         AuthConfiguration {
-            user: value.user,
+            username: value.username,
             password: value.password,
             bearer: value.bearer,
         }
@@ -90,7 +90,7 @@ impl From<configuration::model::exporter::AuthConfiguration> for AuthConfigurati
 impl Into<exporter::config::AuthConfiguration> for AuthConfiguration {
     fn into(self) -> exporter::config::AuthConfiguration {
         exporter::config::AuthConfiguration {
-            user: self.user,
+            username: self.username,
             password: self.password,
             bearer: self.bearer,
         }

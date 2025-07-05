@@ -19,7 +19,7 @@ pub mod metrics;
 
 pub enum AuthHeader {
     Bearer(String),
-    Basic { user: String, password: String },
+    Basic { username: String, password: String },
 }
 
 impl AuthHeader {
@@ -27,8 +27,8 @@ impl AuthHeader {
         let mut metadata = MetadataMap::new();
         let header_value = match self {
             AuthHeader::Bearer(token) => format!("Bearer {}", token),
-            AuthHeader::Basic { user, password } => {
-                let credentials = format!("{}:{}", user, password);
+            AuthHeader::Basic { username, password } => {
+                let credentials = format!("{}:{}", username, password);
                 let encoded = general_purpose::STANDARD.encode(credentials);
                 format!("Basic {}", encoded)
             }

@@ -3,14 +3,6 @@ services:
     build: .
     ports:
       - "8888:8888"
-  otel:
-    image: otel/opentelemetry-collector-contrib:latest
-    volumes:
-      - ./dev/otel.yml:/etc/otel/config.yaml
-    ports:
-      - "4317:4317"
-      - "4318:4318"
-    command: ["--config", "/etc/otel/config.yaml"]
     
   mimir:
     image: grafana/mimir:latest
@@ -23,6 +15,20 @@ services:
       - "9009:9009"
     volumes:
       - "./dev/mimir.yaml:/etc/mimir.yaml"
+
+  tempo:
+    image: grafana/tempo:2.7.1
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - "./dev/tempo.yaml:/etc/tempo.yaml"
+
+  loki:
+    image: grafana/loki:3.4
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    ports:
+      - "3100:3100"
+    volumes:
+      - "./dev/loki.yaml:/etc/loki/loki.yaml"
 
   grafana:
     image: grafana/grafana:latest
@@ -50,7 +56,14 @@ services:
       - "12345:12345"
       - "4317:4317"
       - "4318:4318"
+      - "9999:9999"
     command: "run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy --stability.level public-preview"
+
+  pyroscope:
+    image: grafana/pyroscope:1.8.0
+    ports:
+      - "4040:4040"
+    command: ["server"]
 
   influxdb:
     image: influxdb:latest

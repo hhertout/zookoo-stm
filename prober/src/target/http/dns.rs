@@ -1,7 +1,14 @@
 use std::time::{Duration, Instant};
 
+use opentelemetry::{
+    Context, KeyValue,
+    global::ObjectSafeSpan,
+    trace::{Status, TraceContextExt},
+};
 use serde::Serialize;
 use tokio::net::lookup_host;
+
+use crate::{get_tracer, tracing_new_span_with_context};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DnsMetrics {
@@ -14,7 +21,13 @@ impl DnsMetrics {
     }
 }
 
-pub async fn dns_lookup(url: &str) -> Result<DnsMetrics, Box<dyn std::error::Error>> {
+pub async fn dns_lookup(url: &str, cx: Context) -> Result<DnsMetrics, Box<dyn std::error::Error>> {
+    let mut span =
+        tracing_new_span_with_context(get_tracer(), String::from("dns_lookup"), cx.clone());
+    span.set_attribute(KeyValue::new("url", url.to_string()));
+    let cx_with_span = cx.with_span(span);
+    let span_ref = cx_with_span.span();
+
     let parsed_url = url::Url::parse(url)?;
     let host = parsed_url.host_str().ok_or("Invalid host in URL")?;
 
@@ -28,6 +41,9 @@ pub async fn dns_lookup(url: &str) -> Result<DnsMetrics, Box<dyn std::error::Err
         .ok_or("no_ipv4")?;
 
     let total = start.elapsed();
+
+    span_ref.set_status(Status::Ok);
+    span_ref.end();
 
     Ok(DnsMetrics { duration: total })
 }

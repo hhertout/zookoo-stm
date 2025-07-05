@@ -29,7 +29,7 @@ pub struct MetricsExporterConfiguration {
 
 #[derive(Debug, Clone)]
 pub struct AuthConfiguration {
-    pub user: Option<String>,
+    pub username: Option<String>,
     pub password: Option<String>,
     pub bearer: Option<String>,
 }
@@ -39,9 +39,9 @@ impl OtelGrpcExporterConfiguration {
         self.auth.as_ref().and_then(|auth| {
             if let Some(bearer) = &auth.bearer {
                 Some(AuthHeader::Bearer(bearer.clone()))
-            } else if let (Some(user), Some(password)) = (&auth.user, &auth.password) {
+            } else if let (Some(username), Some(password)) = (&auth.username, &auth.password) {
                 Some(AuthHeader::Basic {
-                    user: user.clone(),
+                    username: username.clone(),
                     password: password.clone(),
                 })
             } else {

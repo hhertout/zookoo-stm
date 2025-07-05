@@ -11,7 +11,7 @@ datasources:
     type: tempo
     access: proxy
     uid: tempo
-    url: http://tempo:3200
+    url: http://tempo:3100
     jsonData:
       nodeGraph:
         enabled: true

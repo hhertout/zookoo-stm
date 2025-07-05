@@ -2,6 +2,12 @@
 sidebar_position: 4
 ---
 
-# Get the data in Grafana
+# Get the Data
 
-If you have already one, you can skip this section.
+Go to your Grafana instance.
+
+## Explore metrics
+
+1. Go to **Explore**.
+2. Select the **Prometheus** data source.
+3. You can review all the metrics collected by ZookooZookoo by filtering with prefix. By default, all the metrics have the prefix is **`probe_`**.

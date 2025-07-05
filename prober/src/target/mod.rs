@@ -1,5 +1,7 @@
 use std::io::Error;
 
+use opentelemetry::Context;
+
 use crate::config::target::HttpTarget;
 
 pub mod http;
@@ -21,5 +23,9 @@ impl ToString for TargetType {
 
 pub trait Scraping {
     fn scrape(&self) -> impl Future<Output = Result<(), Error>> + Send;
-    fn send_request(&self, target: &HttpTarget) -> impl Future<Output = Result<(), Error>> + Send;
+    fn send_request(
+        &self,
+        target: &HttpTarget,
+        cx: Context,
+    ) -> impl Future<Output = Result<(), Error>> + Send;
 }

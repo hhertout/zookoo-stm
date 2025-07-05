@@ -13,6 +13,7 @@
 
 # On going
 
+- Need to test authentication with exporter
 - metric probe http redirect
 - Unit Tests...
 - Expected content
@@ -20,11 +21,11 @@
 - Skip tls option on requests
 - Proxy configuration
 - Adding timeout on http request
-- adding log level configuration
 - Adding default parameters (headers, timeout, Probe location etc...)
 - ICMP request handler
 - GRPC request handler
 - UI
+- Massive load testing
 - target hot reload
 - HTTP API request to get the target list
 - Process Operator to add / restart the process via api

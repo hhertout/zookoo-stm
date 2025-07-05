@@ -1,0 +1,8 @@
+{
+  "label": "Monitoring",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "How to monitor Zookoo with Pyroscope and OpenTelemetry."
+  }
+}

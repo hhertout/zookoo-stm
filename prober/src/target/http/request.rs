@@ -1,9 +1,14 @@
 use std::time::{Duration, Instant};
 
+use opentelemetry::{
+    Context, KeyValue,
+    global::ObjectSafeSpan,
+    trace::{Status, TraceContextExt},
+};
 use reqwest::{Client, Version};
 use serde::Serialize;
 
-use crate::config::target::HttpTarget;
+use crate::{config::target::HttpTarget, get_tracer, tracing_new_span_with_context};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct HttpMetrics {
@@ -26,7 +31,13 @@ impl HttpMetrics {
     }
 }
 
-pub async fn http_request(target: &HttpTarget) -> Result<HttpMetrics, reqwest::Error> {
+pub async fn http_request(target: &HttpTarget, cx: Context) -> Result<HttpMetrics, reqwest::Error> {
+    let mut span =
+        tracing_new_span_with_context(get_tracer(), String::from("http_request"), cx.clone());
+    span.set_attribute(KeyValue::new("url", target.url.to_string()));
+    let cx_with_span = cx.with_span(span);
+    let span_ref = cx_with_span.span();
+
     let url = &target.url;
 
     let client = Client::builder()
@@ -54,6 +65,8 @@ pub async fn http_request(target: &HttpTarget) -> Result<HttpMetrics, reqwest::E
 
     let status = response.status();
     let version = response.version();
+
+    span_ref.set_status(Status::Ok);
 
     Ok(HttpMetrics {
         up: 1,

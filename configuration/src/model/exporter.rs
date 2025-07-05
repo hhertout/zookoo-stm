@@ -29,7 +29,7 @@ pub struct MetricsExporterConfiguration {
 
 #[derive(Debug, Deserialize)]
 pub struct AuthConfiguration {
-    pub user: Option<String>,
+    pub username: Option<String>,
     pub password: Option<String>,
     pub bearer: Option<String>,
 }

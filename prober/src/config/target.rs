@@ -50,7 +50,7 @@ pub struct HttpTarget {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct AuthConfiguration {
-    pub user: Option<String>,
+    pub username: Option<String>,
     pub password: Option<String>,
     pub bearer: Option<String>,
 }
@@ -85,7 +85,7 @@ impl From<configuration::model::target::HttpTarget> for HttpTarget {
 impl From<configuration::model::target::AuthConfiguration> for AuthConfiguration {
     fn from(value: configuration::model::target::AuthConfiguration) -> Self {
         AuthConfiguration {
-            user: value.user,
+            username: value.username,
             password: value.password,
             bearer: value.bearer,
         }

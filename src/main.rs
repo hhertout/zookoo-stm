@@ -2,13 +2,31 @@ use clap::Parser;
 use configuration::{ConfigParser, Parse};
 use dotenv::dotenv;
 use prober::scrap_config::ProbeConfig;
-use std::{env, io::Error};
+use pyroscope::{
+    PyroscopeAgent,
+    pyroscope::{PyroscopeAgentReady, PyroscopeAgentRunning},
+};
+use pyroscope_pprofrs::{PprofConfig, pprof_backend};
+use std::{env, io::Error, vec};
 
 mod cli;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() {
     dotenv().ok();
+
+    // Enable pyroscope monitoring
+    let mut pyroscope_agent: Option<PyroscopeAgent<PyroscopeAgentRunning>> = None;
+    if env::var("ENABLE_SELF_MONITORING").unwrap_or(String::from("false")) == String::from("true") {
+        if let Ok(pyroscope_endpoint) = env::var("PYRSCOPE_ENDPOINT") {
+            if let Ok(agent) = start_pyrsocope(&pyroscope_endpoint, "ZookooZookoo") {
+                println!("pyroscope agent is starting");
+                pyroscope_agent = Some(agent.start().unwrap());
+            } else {
+                println!("fail to start pyroscope agent")
+            };
+        }
+    }
 
     let default_config_file_path = match env::var("RUST_ENV").as_deref() {
         Ok("production") => "/etc/rustbox/config.toml",
@@ -49,6 +67,11 @@ async fn main() {
     log::info!("Starting the probe...");
 
     prober::start_probe(ProbeConfig::from(config)).await;
+
+    if let Some(agent) = pyroscope_agent {
+        let closed_agent = agent.stop().unwrap();
+        closed_agent.shutdown();
+    }
 }
 
 /// Configure the log level and update env logger accordingly
@@ -65,7 +88,7 @@ fn set_log_level(log_level: String) {
     }
 
     unsafe {
-        env::set_var("RUST_LOG", log_level_to_apply);
+        std::env::set_var("RUST_LOG", log_level_to_apply);
     }
 
     if let Err(err) = env_logger::try_init() {
@@ -75,4 +98,27 @@ fn set_log_level(log_level: String) {
 
 fn check_config() -> Result<(), Error> {
     Ok(())
+}
+
+fn start_pyrsocope(
+    endpoint: &str,
+    application_name: &str,
+) -> Result<PyroscopeAgent<PyroscopeAgentReady>, Box<dyn std::error::Error>> {
+    let pprof_config = PprofConfig::new()
+        .report_thread_id()
+        .report_thread_name()
+        .sample_rate(100);
+    let backend_impl = pprof_backend(pprof_config);
+
+    let mut pyroscope = PyroscopeAgent::builder(endpoint, application_name).backend(backend_impl);
+    let hostname = hostname::get()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+
+    pyroscope = pyroscope.tags(vec![("host", &hostname)]);
+
+    let agent = pyroscope.build()?;
+
+    Ok(agent)
 }
