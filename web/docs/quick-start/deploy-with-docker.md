@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Deploy with docker
 
-The easiest way to test ZookooZookoo is to run it with docker
+The easiest way to test Zookoo is to run it with docker
 
 ```bash
 docker run neryo/zoukouzoukou:latest -v ./config.toml:/etc/rustbox/config.toml

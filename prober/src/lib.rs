@@ -99,7 +99,7 @@ fn init_tracer_provider() -> SdkTracerProvider {
     let provider = SdkTracerProvider::builder()
         .with_resource(
             Resource::builder()
-                .with_service_name("zookoozookoo")
+                .with_service_name("zookoo")
                 .with_attribute(KeyValue::new(
                     "env",
                     env::var("RUST_ENV").unwrap_or_default(),

@@ -4,11 +4,11 @@ sidebar_position: 1
 
 # Presentation
 
-Welcome to **ZookooZookoo**, a synthetic monitoring solution designed to help you monitor your applications and services effectively.
+Welcome to **Zookoo**, a synthetic monitoring solution designed to help you monitor your applications and services effectively.
 
-ZookooZookoo is built with Rust, leveraging its performance and reliability to provide a robust monitoring solution. It is fully compliant with Open Telemetry standards, allowing you to collect and export metrics seamlessly.
+Zookoo is built with Rust, leveraging its performance and reliability to provide a robust monitoring solution. It is fully compliant with Open Telemetry standards, allowing you to collect and export metrics seamlessly.
 
-ZookooZookoo is designed to be user-friendly and easy to set up, making it accessible for developers and operations engineers alike. With a simple configuration file, you can quickly define your monitoring targets and start collecting metrics.
+Zookoo is designed to be user-friendly and easy to set up, making it accessible for developers and operations engineers alike. With a simple configuration file, you can quickly define your monitoring targets and start collecting metrics.
 
 This project provides an alternative to Blackbox, offering improved performance and greater configurability.
 
@@ -25,7 +25,7 @@ One of the biggest pain points with the Prometheus Blackbox Exporter is its frag
 And sometimes even dynamic reloading via third-party tools
 This makes deployment cumbersome, error-prone, and difficult to maintain at scale. And not user friendly at for beginners.
 
-### With ZookooZookoo, it’s different:
+### With Zookoo, it’s different:
 
 We use a single, unified config file written in clean and human-friendly TOML:
 
@@ -77,7 +77,7 @@ This tool was created to have a simpler, more flexible, and more powerful altern
 
 ## Getting Started
 
-Let's discover **ZookooZookoo in less than 5 minutes**.
+Let's discover **Zookoo in less than 5 minutes**.
 
 Get started by **creating a new scraping engine**.
 

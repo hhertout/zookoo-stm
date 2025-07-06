@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Create the configuration file
 
-For configuration of ZookooZookoo, you need to create a configuration file where you will describe your targets, and where you want to send the data generated from the scrapping.
+For configuration of Zookoo, you need to create a configuration file where you will describe your targets, and where you want to send the data generated from the scrapping.
 
 This is a simple configuration file to scrape a single target.
 

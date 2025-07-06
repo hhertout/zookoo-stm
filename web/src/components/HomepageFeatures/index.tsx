@@ -15,10 +15,10 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        ZookooZookoo is designed to be user-friendly and easy to set up. With a
+        Zookoo is designed to be user-friendly and easy to set up. With a
         simple configuration file, you can quickly define your monitoring targets
         and start collecting metrics. Whether you are a developer or an
-        operations engineer, ZookooZookoo makes synthetic monitoring accessible
+        operations engineer, Zookoo makes synthetic monitoring accessible
         and straightforward.
       </>
     ),
@@ -28,10 +28,10 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        ZookooZookoo is fully compliant with Open Telemetry standards, allowing
+        Zookoo is fully compliant with Open Telemetry standards, allowing
         you to collect and export metrics seamlessly. It supports various
         exporters, based on Prometheus metrics.
-        Experience the power of Open Telemetry with ZookooZookoo for comprehensive
+        Experience the power of Open Telemetry with Zookoo for comprehensive
         insights into your applications and services.
       </>
     ),
@@ -41,10 +41,10 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Blazingly fast and efficient, ZookooZookoo is built with Rust to
+        Blazingly fast and efficient, Zookoo is built with Rust to
         ensure high performance and low resource usage. It leverages the power of
         Rust to provide a robust and reliable synthetic monitoring solution.
-        With ZookooZookoo, you can monitor your applications and services with
+        With Zookoo, you can monitor your applications and services with
         confidence, knowing that it is built on a solid foundation that can handle
         the demands of modern software environments.
       </>

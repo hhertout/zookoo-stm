@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Enable Internal Monitoring
 
-To monitor the health and performance of ZookooZookoo, you can enable internal monitoring features. profiling, and tracing.
+To monitor the health and performance of Zookoo, you can enable internal monitoring features. profiling, and tracing.
 
 All the data is exported by using open telemetry and pyroscope.
 

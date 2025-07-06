@@ -10,4 +10,4 @@ Go to your Grafana instance.
 
 1. Go to **Explore**.
 2. Select the **Prometheus** data source.
-3. You can review all the metrics collected by ZookooZookoo by filtering with prefix. By default, all the metrics have the prefix is **`probe_`**.
+3. You can review all the metrics collected by Zookoo by filtering with prefix. By default, all the metrics have the prefix is **`probe_`**.

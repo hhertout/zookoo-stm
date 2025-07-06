@@ -6,7 +6,7 @@ sidebar_position: 1
 
 ## Source
 
-ZookooZookoo can scrape metrics from various HTTP endpoints. You can define these targets in the configuration file or load them from a JSON file.
+Zookoo can scrape metrics from various HTTP endpoints. You can define these targets in the configuration file or load them from a JSON file.
 
 ### From the config file
 

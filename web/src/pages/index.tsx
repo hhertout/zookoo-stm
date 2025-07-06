@@ -21,7 +21,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/category/quick-start">
-            ZookooZookoo Tutorial - 5min ⏱️
+            Zookoo Tutorial - 5min ⏱️
           </Link>
         </div>
       </div>

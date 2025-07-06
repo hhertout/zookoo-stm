@@ -19,7 +19,7 @@ async fn main() {
     let mut pyroscope_agent: Option<PyroscopeAgent<PyroscopeAgentRunning>> = None;
     if env::var("ENABLE_SELF_MONITORING").unwrap_or(String::from("false")) == String::from("true") {
         if let Ok(pyroscope_endpoint) = env::var("PYRSCOPE_ENDPOINT") {
-            if let Ok(agent) = start_pyrsocope(&pyroscope_endpoint, "ZookooZookoo") {
+            if let Ok(agent) = start_pyrsocope(&pyroscope_endpoint, "zookoo") {
                 println!("pyroscope agent is starting");
                 pyroscope_agent = Some(agent.start().unwrap());
             } else {

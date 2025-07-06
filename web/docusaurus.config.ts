@@ -5,7 +5,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: "ZookooZookoo",
+  title: "Zookoo",
   tagline: "Synthetic Monitoring tool written in Rust",
   favicon: "img/favicon.ico",
 
@@ -54,9 +54,9 @@ const config: Config = {
     // Replace with your project's social card
     image: "img/docusaurus-social-card.jpg",
     navbar: {
-      title: "ZookooZookoo",
+      title: "Zookoo",
       logo: {
-        alt: "ZookooZookoo Logo",
+        alt: "Zookoo Logo",
         src: "img/logo.svg",
       },
       items: [
