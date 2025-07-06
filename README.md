@@ -1,6 +1,7 @@
 <p align="center">
-  <img src=".github/assets/rust_box.png" width="250">
-  <h1 align="center">Rustbox</h1>
+  <img src=".github/assets/zookoo.png" width="250">
+
+  <h1 align="center">Zookoo</h1>
     <p align="center">Scrape your target and export your metrics !</p>
 </p>
 
@@ -13,7 +14,9 @@
 
 # On going
 
-- Need to test authentication with exporter
+- Self monitoring should come from the config file and not the env vars
+- Labels on ICMP targets
+- DNS test and expiration date of a dns name
 - metric probe http redirect
 - Unit Tests...
 - Expected content
@@ -31,6 +34,9 @@
 - Process Operator to add / restart the process via api
 - Clusterting - Ring to handle multi containerization / k8s with the same config target
 - Referential building
+
+Caution : Icmp scraping requires root privileges to run properly, as it uses the ping command under the hood.
+Run in sudo...
 
 # Presentation
 

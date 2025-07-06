@@ -1,14 +1,11 @@
-use std::time::{Duration, Instant};
-
+use crate::{child_span_from_context, config::target::HttpTarget};
 use opentelemetry::{
     Context, KeyValue,
-    global::ObjectSafeSpan,
     trace::{Status, TraceContextExt},
 };
 use reqwest::{Client, Version};
 use serde::Serialize;
-
-use crate::{config::target::HttpTarget, get_tracer, tracing_new_span_with_context};
+use std::time::{Duration, Instant};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct HttpMetrics {
@@ -22,20 +19,19 @@ pub struct HttpMetrics {
 impl HttpMetrics {
     pub fn to_logfmt(&self) -> String {
         format!(
-            "up={} duration={:?} status_code={} http_version={:?}",
+            "up={} duration={:?} status_code={} http_version={:?} success={}",
             self.up,
             self.duration.as_millis(),
             self.status_code,
-            self.http_version
+            self.http_version,
+            self.success,
         )
     }
 }
 
 pub async fn http_request(target: &HttpTarget, cx: Context) -> Result<HttpMetrics, reqwest::Error> {
-    let mut span =
-        tracing_new_span_with_context(get_tracer(), String::from("http_request"), cx.clone());
-    span.set_attribute(KeyValue::new("url", target.url.to_string()));
-    let cx_with_span = cx.with_span(span);
+    let span_attr = vec![KeyValue::new("url", target.url.to_string())];
+    let cx_with_span = child_span_from_context("http_request", cx.clone(), span_attr);
     let span_ref = cx_with_span.span();
 
     let url = &target.url;
@@ -62,17 +58,17 @@ pub async fn http_request(target: &HttpTarget, cx: Context) -> Result<HttpMetric
     };
 
     let duration = start.elapsed();
-
-    let status = response.status();
-    let version = response.version();
-
     span_ref.set_status(Status::Ok);
+
+    let status_code = response.status();
+    let version = response.version();
+    let status = status_code_match(status_code.as_u16(), target.expected_status_code) as u8;
 
     Ok(HttpMetrics {
         up: 1,
-        success: (status_code_match(status.as_u16(), target.expected_status_code)) as u8,
+        success: status,
         duration: duration,
-        status_code: status.as_u16(),
+        status_code: status_code.as_u16(),
         http_version: version_to_float(version),
     })
 }

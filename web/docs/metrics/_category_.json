@@ -1,0 +1,8 @@
+{
+  "label": "Exported Metrics",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Exported metrics from the RustBox exporter."
+  }
+}

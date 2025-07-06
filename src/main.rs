@@ -66,7 +66,7 @@ async fn main() {
     log::debug!("{:?}", config);
     log::info!("Starting the probe...");
 
-    prober::start_probe(ProbeConfig::from(config)).await;
+    prober::run(ProbeConfig::from(config)).await;
 
     if let Some(agent) = pyroscope_agent {
         let closed_agent = agent.stop().unwrap();

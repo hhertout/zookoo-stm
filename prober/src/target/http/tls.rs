@@ -1,8 +1,8 @@
+use crate::child_span_from_context;
 use chrono::TimeZone;
 use chrono::{NaiveDateTime, Utc};
 use native_tls::TlsConnector as NativeTls;
 use openssl::x509::X509NameRef;
-use opentelemetry::global::ObjectSafeSpan;
 use opentelemetry::trace::{Status, TraceContextExt};
 use opentelemetry::{Context, KeyValue};
 use serde::Serialize;
@@ -11,8 +11,6 @@ use std::time::{Duration, Instant};
 use tokio::net::{TcpStream, lookup_host};
 use tokio::time::timeout;
 use tokio_native_tls::TlsConnector;
-
-use crate::{get_tracer, tracing_new_span_with_context};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct TlsMetrics {
@@ -79,10 +77,8 @@ impl TlsMetrics {
 }
 
 pub async fn inspect_tls(url: &str, cx: Context) -> Result<TlsMetrics, Box<dyn std::error::Error>> {
-    let mut span =
-        tracing_new_span_with_context(get_tracer(), String::from("inspect_tls"), cx.clone());
-    span.set_attribute(KeyValue::new("url", url.to_string()));
-    let cx_with_span = cx.with_span(span);
+    let span_attr = vec![KeyValue::new("url", url.to_string())];
+    let cx_with_span = child_span_from_context("inspect_tls", cx.clone(), span_attr);
     let span_ref = cx_with_span.span();
 
     let parsed_url = url::Url::parse(url)?;

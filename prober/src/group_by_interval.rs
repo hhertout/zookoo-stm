@@ -1,4 +1,4 @@
-use crate::config::scrap_interval::ScrapInterval;
+use crate::config::scrape_interval::ScrapeInterval;
 
 #[derive(Debug, Clone)]
 pub struct GroupByInterval<T> {
@@ -17,23 +17,23 @@ pub struct GroupByInterval<T> {
 }
 
 impl<T> IntoIterator for GroupByInterval<T> {
-    type Item = (ScrapInterval, Vec<T>);
+    type Item = (ScrapeInterval, Vec<T>);
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
         vec![
-            (ScrapInterval::S5, self.s5),
-            (ScrapInterval::S10, self.s10),
-            (ScrapInterval::S30, self.s30),
-            (ScrapInterval::M1, self.m1),
-            (ScrapInterval::M5, self.m5),
-            (ScrapInterval::M10, self.m10),
-            (ScrapInterval::M30, self.m30),
-            (ScrapInterval::H1, self.h1),
-            (ScrapInterval::H12, self.h12),
-            (ScrapInterval::D1, self.d1),
-            (ScrapInterval::D7, self.d7),
-            (ScrapInterval::D30, self.d30),
+            (ScrapeInterval::S5, self.s5),
+            (ScrapeInterval::S10, self.s10),
+            (ScrapeInterval::S30, self.s30),
+            (ScrapeInterval::M1, self.m1),
+            (ScrapeInterval::M5, self.m5),
+            (ScrapeInterval::M10, self.m10),
+            (ScrapeInterval::M30, self.m30),
+            (ScrapeInterval::H1, self.h1),
+            (ScrapeInterval::H12, self.h12),
+            (ScrapeInterval::D1, self.d1),
+            (ScrapeInterval::D7, self.d7),
+            (ScrapeInterval::D30, self.d30),
         ]
         .into_iter()
     }
@@ -57,54 +57,54 @@ impl<T: Clone> GroupByInterval<T> {
         }
     }
 
-    pub fn get_mut(&mut self, interval: &ScrapInterval) -> &mut Vec<T> {
+    pub fn get_mut(&mut self, interval: &ScrapeInterval) -> &mut Vec<T> {
         match interval {
-            ScrapInterval::S5 => &mut self.s5,
-            ScrapInterval::S10 => &mut self.s10,
-            ScrapInterval::S30 => &mut self.s30,
-            ScrapInterval::M1 => &mut self.m1,
-            ScrapInterval::M5 => &mut self.m5,
-            ScrapInterval::M10 => &mut self.m10,
-            ScrapInterval::M30 => &mut self.m30,
-            ScrapInterval::H1 => &mut self.h1,
-            ScrapInterval::H12 => &mut self.h12,
-            ScrapInterval::D1 => &mut self.d1,
-            ScrapInterval::D7 => &mut self.d7,
-            ScrapInterval::D30 => &mut self.d30,
+            ScrapeInterval::S5 => &mut self.s5,
+            ScrapeInterval::S10 => &mut self.s10,
+            ScrapeInterval::S30 => &mut self.s30,
+            ScrapeInterval::M1 => &mut self.m1,
+            ScrapeInterval::M5 => &mut self.m5,
+            ScrapeInterval::M10 => &mut self.m10,
+            ScrapeInterval::M30 => &mut self.m30,
+            ScrapeInterval::H1 => &mut self.h1,
+            ScrapeInterval::H12 => &mut self.h12,
+            ScrapeInterval::D1 => &mut self.d1,
+            ScrapeInterval::D7 => &mut self.d7,
+            ScrapeInterval::D30 => &mut self.d30,
         }
     }
 
-    pub fn get(&self, interval: &ScrapInterval) -> &Vec<T> {
+    pub fn get(&self, interval: &ScrapeInterval) -> &Vec<T> {
         match interval {
-            ScrapInterval::S5 => &self.s5,
-            ScrapInterval::S10 => &self.s10,
-            ScrapInterval::S30 => &self.s30,
-            ScrapInterval::M1 => &self.m1,
-            ScrapInterval::M5 => &self.m5,
-            ScrapInterval::M10 => &self.m10,
-            ScrapInterval::M30 => &self.m30,
-            ScrapInterval::H1 => &self.h1,
-            ScrapInterval::H12 => &self.h12,
-            ScrapInterval::D1 => &self.d1,
-            ScrapInterval::D7 => &self.d7,
-            ScrapInterval::D30 => &self.d30,
+            ScrapeInterval::S5 => &self.s5,
+            ScrapeInterval::S10 => &self.s10,
+            ScrapeInterval::S30 => &self.s30,
+            ScrapeInterval::M1 => &self.m1,
+            ScrapeInterval::M5 => &self.m5,
+            ScrapeInterval::M10 => &self.m10,
+            ScrapeInterval::M30 => &self.m30,
+            ScrapeInterval::H1 => &self.h1,
+            ScrapeInterval::H12 => &self.h12,
+            ScrapeInterval::D1 => &self.d1,
+            ScrapeInterval::D7 => &self.d7,
+            ScrapeInterval::D30 => &self.d30,
         }
     }
 
-    pub fn iter(&self) -> Vec<(ScrapInterval, &Vec<T>)> {
+    pub fn iter(&self) -> Vec<(ScrapeInterval, &Vec<T>)> {
         vec![
-            (ScrapInterval::S5, &self.s5),
-            (ScrapInterval::S10, &self.s10),
-            (ScrapInterval::S30, &self.s30),
-            (ScrapInterval::M1, &self.m1),
-            (ScrapInterval::M5, &self.m5),
-            (ScrapInterval::M10, &self.m10),
-            (ScrapInterval::M30, &self.m30),
-            (ScrapInterval::H1, &self.h1),
-            (ScrapInterval::H12, &self.h12),
-            (ScrapInterval::D1, &self.d1),
-            (ScrapInterval::D7, &self.d7),
-            (ScrapInterval::D30, &self.d30),
+            (ScrapeInterval::S5, &self.s5),
+            (ScrapeInterval::S10, &self.s10),
+            (ScrapeInterval::S30, &self.s30),
+            (ScrapeInterval::M1, &self.m1),
+            (ScrapeInterval::M5, &self.m5),
+            (ScrapeInterval::M10, &self.m10),
+            (ScrapeInterval::M30, &self.m30),
+            (ScrapeInterval::H1, &self.h1),
+            (ScrapeInterval::H12, &self.h12),
+            (ScrapeInterval::D1, &self.d1),
+            (ScrapeInterval::D7, &self.d7),
+            (ScrapeInterval::D30, &self.d30),
         ]
     }
 

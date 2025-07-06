@@ -1,7 +1,11 @@
 use std::process::exit;
 
 use crate::{
-    config::{self, scrap_interval::ScrapInterval, target::HttpTarget},
+    config::{
+        self,
+        scrape_interval::ScrapeInterval,
+        target::{HttpTarget, IcmpTarget},
+    },
     file::json_parser,
     group_by_interval::GroupByInterval,
 };
@@ -16,24 +20,50 @@ impl ProbeConfig {
         return ProbeConfig { config };
     }
 
+    pub fn icmp_group_by_interval(&self) -> GroupByInterval<IcmpTarget> {
+        let mut group_by: GroupByInterval<IcmpTarget> = GroupByInterval::new();
+        let _ = self.config.icmp.as_ref().map(|icmp_target| {
+            if let Some(targets) = icmp_target.targets.clone() {
+                for target in targets {
+                    match target.scrape_interval {
+                        ScrapeInterval::S5 => group_by.s5.push(target),
+                        ScrapeInterval::S10 => group_by.s10.push(target),
+                        ScrapeInterval::S30 => group_by.s30.push(target),
+                        ScrapeInterval::M1 => group_by.m1.push(target),
+                        ScrapeInterval::M5 => group_by.m5.push(target),
+                        ScrapeInterval::M10 => group_by.m10.push(target),
+                        ScrapeInterval::M30 => group_by.m30.push(target),
+                        ScrapeInterval::H1 => group_by.h1.push(target),
+                        ScrapeInterval::H12 => group_by.h12.push(target),
+                        ScrapeInterval::D1 => group_by.d1.push(target),
+                        ScrapeInterval::D7 => group_by.d7.push(target),
+                        ScrapeInterval::D30 => group_by.d30.push(target),
+                    }
+                }
+            }
+        });
+
+        return group_by;
+    }
+
     pub fn http_group_by_interval(&self) -> GroupByInterval<HttpTarget> {
         let mut group_by: GroupByInterval<HttpTarget> = GroupByInterval::new();
         let _ = self.config.http.as_ref().map(|http_target| {
             if let Some(targets) = http_target.targets.clone() {
                 for target in targets {
-                    match target.scrap_interval {
-                        ScrapInterval::S5 => group_by.s5.push(target),
-                        ScrapInterval::S10 => group_by.s10.push(target),
-                        ScrapInterval::S30 => group_by.s30.push(target),
-                        ScrapInterval::M1 => group_by.m1.push(target),
-                        ScrapInterval::M5 => group_by.m5.push(target),
-                        ScrapInterval::M10 => group_by.m10.push(target),
-                        ScrapInterval::M30 => group_by.m30.push(target),
-                        ScrapInterval::H1 => group_by.h1.push(target),
-                        ScrapInterval::H12 => group_by.h12.push(target),
-                        ScrapInterval::D1 => group_by.d1.push(target),
-                        ScrapInterval::D7 => group_by.d7.push(target),
-                        ScrapInterval::D30 => group_by.d30.push(target),
+                    match target.scrape_interval {
+                        ScrapeInterval::S5 => group_by.s5.push(target),
+                        ScrapeInterval::S10 => group_by.s10.push(target),
+                        ScrapeInterval::S30 => group_by.s30.push(target),
+                        ScrapeInterval::M1 => group_by.m1.push(target),
+                        ScrapeInterval::M5 => group_by.m5.push(target),
+                        ScrapeInterval::M10 => group_by.m10.push(target),
+                        ScrapeInterval::M30 => group_by.m30.push(target),
+                        ScrapeInterval::H1 => group_by.h1.push(target),
+                        ScrapeInterval::H12 => group_by.h12.push(target),
+                        ScrapeInterval::D1 => group_by.d1.push(target),
+                        ScrapeInterval::D7 => group_by.d7.push(target),
+                        ScrapeInterval::D30 => group_by.d30.push(target),
                     }
                 }
             }
@@ -56,19 +86,19 @@ impl ProbeConfig {
                     };
 
                     for target in targets {
-                        match target.scrap_interval {
-                            ScrapInterval::S5 => group_by.s5.push(target),
-                            ScrapInterval::S10 => group_by.s10.push(target),
-                            ScrapInterval::S30 => group_by.s30.push(target),
-                            ScrapInterval::M1 => group_by.m1.push(target),
-                            ScrapInterval::M5 => group_by.m5.push(target),
-                            ScrapInterval::M10 => group_by.m10.push(target),
-                            ScrapInterval::M30 => group_by.m30.push(target),
-                            ScrapInterval::H1 => group_by.h1.push(target),
-                            ScrapInterval::H12 => group_by.h12.push(target),
-                            ScrapInterval::D1 => group_by.d1.push(target),
-                            ScrapInterval::D7 => group_by.d7.push(target),
-                            ScrapInterval::D30 => group_by.d30.push(target),
+                        match target.scrape_interval {
+                            ScrapeInterval::S5 => group_by.s5.push(target),
+                            ScrapeInterval::S10 => group_by.s10.push(target),
+                            ScrapeInterval::S30 => group_by.s30.push(target),
+                            ScrapeInterval::M1 => group_by.m1.push(target),
+                            ScrapeInterval::M5 => group_by.m5.push(target),
+                            ScrapeInterval::M10 => group_by.m10.push(target),
+                            ScrapeInterval::M30 => group_by.m30.push(target),
+                            ScrapeInterval::H1 => group_by.h1.push(target),
+                            ScrapeInterval::H12 => group_by.h12.push(target),
+                            ScrapeInterval::D1 => group_by.d1.push(target),
+                            ScrapeInterval::D7 => group_by.d7.push(target),
+                            ScrapeInterval::D30 => group_by.d30.push(target),
                         }
                     }
                 }

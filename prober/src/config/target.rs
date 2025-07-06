@@ -2,10 +2,10 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::config::scrap_interval::ScrapInterval;
+use crate::config::scrape_interval::ScrapeInterval;
 
-fn default_scrape_interval() -> ScrapInterval {
-    return ScrapInterval::M5;
+fn default_scrape_interval() -> ScrapeInterval {
+    return ScrapeInterval::M5;
 }
 
 fn default_follow_redirect() -> bool {
@@ -41,7 +41,7 @@ pub struct HttpTarget {
     pub labels: Option<HashMap<String, String>>,
     pub auth: Option<AuthConfiguration>,
     #[serde(default = "default_scrape_interval")]
-    pub scrap_interval: ScrapInterval,
+    pub scrape_interval: ScrapeInterval,
     #[serde(default = "default_follow_redirect")]
     pub follow_redirect: bool,
     #[serde(default = "default_skip_tls")]
@@ -53,6 +53,41 @@ pub struct AuthConfiguration {
     pub username: Option<String>,
     pub password: Option<String>,
     pub bearer: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct IcmpConfiguration {
+    pub target_file: Option<Vec<String>>,
+    pub targets: Option<Vec<IcmpTarget>>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct IcmpTarget {
+    pub ipv4: Option<String>,
+    pub labels: Option<HashMap<String, String>>,
+    #[serde(default = "default_scrape_interval")]
+    pub scrape_interval: ScrapeInterval,
+}
+
+impl From<configuration::model::target::IcmpConfiguration> for IcmpConfiguration {
+    fn from(value: configuration::model::target::IcmpConfiguration) -> Self {
+        IcmpConfiguration {
+            target_file: value.target_file,
+            targets: value
+                .targets
+                .map(|targets| targets.into_iter().map(IcmpTarget::from).collect()),
+        }
+    }
+}
+
+impl From<configuration::model::target::IcmpTarget> for IcmpTarget {
+    fn from(value: configuration::model::target::IcmpTarget) -> Self {
+        IcmpTarget {
+            ipv4: value.ipv4,
+            labels: value.labels,
+            scrape_interval: ScrapeInterval::from(value.scrape_interval),
+        }
+    }
 }
 
 impl From<configuration::model::target::HttpConfiguration> for HttpConfiguration {
@@ -75,7 +110,7 @@ impl From<configuration::model::target::HttpTarget> for HttpTarget {
             headers: value.headers,
             labels: value.labels,
             auth: value.auth.map(AuthConfiguration::from),
-            scrap_interval: ScrapInterval::from(value.scrap_interval),
+            scrape_interval: ScrapeInterval::from(value.scrape_interval),
             follow_redirect: value.follow_redirect,
             skip_tls: value.skip_tls,
         }

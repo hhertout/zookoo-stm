@@ -26,7 +26,7 @@ impl MetricExportable for HttpRequestMetrics {
             Some(tls_metrics) => {
                 // https request with tls metrics
                 labels.extend(tls_metrics.to_labels());
-                labels.insert(String::from("tls_veriosn"), tls_metrics.version.to_string());
+                labels.insert(String::from("tls_version"), tls_metrics.version.to_string());
 
                 if let Some(l) = self.labels.clone() {
                     labels.extend(l);
@@ -36,6 +36,7 @@ impl MetricExportable for HttpRequestMetrics {
 
                 exporter.export_metrics(
                     self.http.up,
+                    self.http.success,
                     self.dns.duration.as_millis(),
                     self.http.status_code,
                     self.http.duration.as_millis(),
@@ -54,6 +55,7 @@ impl MetricExportable for HttpRequestMetrics {
                 let exporter = exporter::otel::metrics::MetricsExporter::new(labels);
                 exporter.export_metrics(
                     self.http.up,
+                    self.http.success,
                     self.dns.duration.as_millis(),
                     self.http.status_code,
                     self.http.duration.as_millis(),

@@ -62,6 +62,130 @@ service:
       exporters: [debug]
 ```
 
+Or
+
+```hcl
+// config.alloy
+logging {
+    level = "info"
+    format = "logfmt"
+}
+
+otelcol.auth.basic "otel_creds" {
+  username = "username"
+  password = "password"
+}
+
+otelcol.auth.bearer "otel_bearer" {
+  token = "mysupertoken"
+}
+
+otelcol.receiver.otlp "default" {
+    grpc {
+        endpoint = "0.0.0.0:4317"
+    }
+    http {
+        endpoint = "0.0.0.0:4318"
+    }
+
+    output {
+        metrics = [otelcol.processor.batch.default.input]
+        traces  = [otelcol.processor.batch.default.input]
+    }
+}
+
+otelcol.processor.batch "default" {
+    output {
+        metrics = [otelcol.exporter.prometheus.mimir.input]
+        logs    = [otelcol.exporter.loki.default.input]
+        traces  = [otelcol.exporter.otlp.tempo.input]
+    }
+}
+
+otelcol.exporter.otlp "tempo" {
+    client {
+        endpoint = "tempo:4317"
+        tls {
+            insecure = true
+        }
+    }
+}
+
+otelcol.exporter.loki "default" {
+    forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+    endpoint {
+        url = "http://loki:3100/loki/api/v1/push"
+
+        tls_config {
+            insecure_skip_verify = true
+        }
+    }
+}
+
+otelcol.exporter.prometheus "mimir" {
+    forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+    endpoint {
+        url = "http://mimir:9009/api/v1/push"
+    }
+}
+
+prometheus.exporter.self "default" {
+}
+
+prometheus.relabel "self_monitor_relabel" {
+    forward_to = [prometheus.remote_write.mimir.receiver]
+
+
+    rule {
+        action        = "replace"
+        target_label  = "job"
+        replacement   = "alloy"
+    }
+
+    rule {
+        action        = "replace"
+        target_label  = "service_name"
+        replacement   = "alloy"
+    }
+}
+
+prometheus.scrape "metamonitoring" {
+    targets    = prometheus.exporter.self.default.targets
+    forward_to = [prometheus.relabel.self_monitor_relabel.receiver]
+}
+
+pyroscope.receive_http "default" {
+   http {
+       listen_address = "0.0.0.0"
+       listen_port = 9999
+   }
+
+   forward_to = [pyroscope.relabel.filter_profiles.receiver]
+}
+
+pyroscope.relabel "filter_profiles" {
+    forward_to = [pyroscope.write.backend.receiver]
+
+    rule {
+        action = "labeldrop"
+        regex = "service_name"
+    }
+}
+
+pyroscope.write "backend" {
+   endpoint {
+       url = "http://pyroscope:4040"
+   }
+}
+
+```
+
 ## Grafana Stack
 
 ### Mimir configuration

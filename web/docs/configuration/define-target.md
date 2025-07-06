@@ -13,8 +13,8 @@ ZookooZookoo can scrape metrics from various HTTP endpoints. You can define thes
 ```toml
 [http]
 targets = [
-    { url = "https://google.com/", labels = { "env" = "test", "service_name" = "test" }, scrap_interval = "10s" },
-    { url = "https://chatgpt.com/", labels = { "env" = "chat_gpt", "service_name" = "d4x" }, scrap_interval = "5s" },
+    { url = "https://google.com/", labels = { "env" = "dev", "service_name" = "google" }, scrape_interval = "10s" },
+    { url = "https://chatgpt.com/", labels = { "env" = "dev", "service_name" = "chatgpt" }, scrape_interval = "5s" },
 ]
 ```
 

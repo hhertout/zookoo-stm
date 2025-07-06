@@ -15,9 +15,28 @@ impl MetricsExporter {
         }
     }
 
+    pub fn export_icmp_metrics(&self, up: u8, duration: u128) {
+        self.set_gauge_metrics(
+            String::from(format!("{}target_up", self.prefix)),
+            None,
+            String::from("target is up or down - 0 is down 1 is up"),
+            up as u64,
+            &self.labels,
+        );
+
+        self.set_gauge_metrics(
+            String::from(format!("{}ping_duration", self.prefix)),
+            Some(String::from("ms")),
+            String::from("dns lookup duration"),
+            duration as u64,
+            &self.labels,
+        );
+    }
+
     pub fn export_metrics(
         &self,
         up: u8,
+        success: u8,
         dns_lookup_duration: u128,
         http_status_code: u16,
         http_request_duration: u128,
@@ -47,8 +66,8 @@ impl MetricsExporter {
         self.set_gauge_metrics(
             String::from(format!("{}target_success", self.prefix)),
             None,
-            String::from("target match the expected status code"),
-            up as u64,
+            String::from("target match the expected requirements"),
+            success as u64,
             &self.labels,
         );
 

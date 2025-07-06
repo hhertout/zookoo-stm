@@ -1,15 +1,13 @@
-use std::io::Error;
-
 use opentelemetry::Context;
 
-use crate::config::target::HttpTarget;
-
 pub mod http;
+pub mod icmp;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TargetType {
     HTTP,
     HTTPS,
+    IPV4,
 }
 
 impl ToString for TargetType {
@@ -17,15 +15,12 @@ impl ToString for TargetType {
         match self {
             TargetType::HTTP => String::from("HTTP"),
             TargetType::HTTPS => String::from("HTTPS"),
+            TargetType::IPV4 => String::from("ipv4"),
         }
     }
 }
 
-pub trait Scraping {
-    fn scrape(&self) -> impl Future<Output = Result<(), Error>> + Send;
-    fn send_request(
-        &self,
-        target: &HttpTarget,
-        cx: Context,
-    ) -> impl Future<Output = Result<(), Error>> + Send;
+pub trait Scraping<T> {
+    fn scrape(&self) -> impl Future<Output = Result<(), ()>> + Send;
+    fn send_request(&self, target: &T, cx: Context) -> impl Future<Output = Result<(), ()>> + Send;
 }

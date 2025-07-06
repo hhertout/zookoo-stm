@@ -20,10 +20,18 @@ jobs:
     - name: Build and push API image - latest
       uses: docker/build-push-action@v5
       with:
-        context: ./backend
-        file: ./backend/prod.dockerfile
+        context: ./
+        file: ./.docker/deb.dockerfile
         push: true
-        tags: neryolo/zookoozookoo:latest
+        tags: neryolo/zookoo:latest
+
+    - name: Build and push API image - latest | Alpine
+      uses: docker/build-push-action@v5
+      with:
+        context: ./
+        file: ./.docker/alpine.dockerfile
+        push: true
+        tags: neryolo/zookoo:latest-alpine
 
     - name: Get latest git tag
       id: get_tag
@@ -32,7 +40,15 @@ jobs:
     - name: Build and push API image - with version
       uses: docker/build-push-action@v5
       with:
-        context: ./backend
-        file: ./backend/prod.dockerfile
+        context: ./
+        file: ./.docker/deb.dockerfile
         push: true
-        tags: neryolo/zookoozookoo:${{ steps.get_tag.outputs.tag }}
+        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}
+
+    - name: Build and push API image - latest | Alpine
+      uses: docker/build-push-action@v5
+      with:
+        context: ./
+        file: ./.docker/alpine.dockerfile
+        push: true
+        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}-alpine

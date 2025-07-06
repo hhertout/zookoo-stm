@@ -2,10 +2,10 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::model::scrap_interval::ScrapInterval;
+use crate::model::scrape_interval::ScrapeInterval;
 
-fn default_scrape_interval() -> ScrapInterval {
-    return ScrapInterval::M5;
+fn default_scrape_interval() -> ScrapeInterval {
+    return ScrapeInterval::M1;
 }
 
 fn default_follow_redirect() -> bool {
@@ -41,7 +41,7 @@ pub struct HttpTarget {
     pub labels: Option<HashMap<String, String>>,
     pub auth: Option<AuthConfiguration>,
     #[serde(default = "default_scrape_interval")]
-    pub scrap_interval: ScrapInterval,
+    pub scrape_interval: ScrapeInterval,
     #[serde(default = "default_follow_redirect")]
     pub follow_redirect: bool,
     #[serde(default = "default_skip_tls")]
@@ -53,4 +53,18 @@ pub struct AuthConfiguration {
     pub username: Option<String>,
     pub password: Option<String>,
     pub bearer: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct IcmpConfiguration {
+    pub target_file: Option<Vec<String>>,
+    pub targets: Option<Vec<IcmpTarget>>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct IcmpTarget {
+    pub ipv4: Option<String>,
+    pub labels: Option<HashMap<String, String>>,
+    #[serde(default = "default_scrape_interval")]
+    pub scrape_interval: ScrapeInterval,
 }
