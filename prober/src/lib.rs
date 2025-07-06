@@ -1,3 +1,27 @@
+//! # Prober crate
+//!
+//! This crate is responsible of the scraping process of the different targets define in the configuration file
+//!
+//! ## Behavior
+//!
+//! Powered by the `probe_engine` function
+//!  
+//! for each interval:
+//!
+//! - launch one job per interval
+//! - each interval launch one job per target
+//! - each target job complete send metrics in the same job
+//!
+//! ## Usage
+//!
+//! To start a scraping session, simply run
+//!
+//! ```rust
+//! prober::run(ProbeConfig::from(config)).await;
+//! ```
+//!
+//! The configuration should be complient with the `configuration` crate already present in the repository.
+
 use std::env;
 use std::sync::OnceLock;
 
@@ -9,9 +33,11 @@ use opentelemetry_sdk::{Resource, propagation::TraceContextPropagator, trace::Sd
 use tokio::sync::mpsc;
 
 use crate::config::exporter::OtelGrpcExporterConfiguration;
+use crate::config::target::{HttpTarget, IcmpTarget};
 use crate::scrap_config::ProbeConfig;
-use crate::target::http::http_scrape_with_shutdown;
-use crate::target::icmp::icmp_scrape_with_shutdown;
+use crate::target::http::scrape::HttpScrapper;
+use crate::target::icmp::scrape::IcmpScrapper;
+use crate::target::scrape_with_shutdown;
 
 pub(crate) mod config;
 pub(crate) mod file;
@@ -47,15 +73,33 @@ pub async fn probe_engine(config: ProbeConfig) {
     let (icmp_shutdown_tx, icmp_shutdown_rx) = mpsc::channel::<()>(1);
     let (http_shutdown_tx, http_shutdown_rx) = mpsc::channel::<()>(1);
 
-    let scrape_task = tokio::spawn(icmp_scrape_with_shutdown(config.clone(), icmp_shutdown_rx));
-    let _ = tokio::spawn(http_scrape_with_shutdown(config.clone(), http_shutdown_rx));
+    // group by interval to spawn one job for each
+    let icmp_group_by = config.icmp_group_by_interval();
+    let http_group_by = config.http_group_by_interval();
 
+    // launch the scraping process
+    // for each interval -
+    // |_ launch 1 job per interval
+    //    |_ each interval launch one job per target
+    //    |_ each target job complete send metrics in the same job
+    //
+    let scrape_task = tokio::spawn(scrape_with_shutdown::<HttpScrapper, HttpTarget>(
+        http_group_by,
+        http_shutdown_rx,
+    ));
+    let _ = tokio::spawn(scrape_with_shutdown::<IcmpScrapper, IcmpTarget>(
+        icmp_group_by,
+        icmp_shutdown_rx,
+    ));
+
+    // waiting for the process stop
     tokio::signal::ctrl_c()
         .await
         .expect("Failed to listen for Ctrl+C");
 
     log::info!("Ctrl+C received, shutting down...");
 
+    // clean close of the jobs
     let _ = icmp_shutdown_tx.send(()).await;
     let _ = http_shutdown_tx.send(()).await;
     let _ = scrape_task.await;

@@ -12,7 +12,7 @@ use crate::{
     config::target::IcmpTarget,
     get_tracer,
     metrics::{Metrics, icmp_metrics::IcmpRequestMetrics},
-    target::{Scraping, TargetType, icmp::ping::IcmpMetrics},
+    target::{ScrapeError, Scraping, TargetType, icmp::ping::IcmpMetrics},
     tracing_new_span,
 };
 use crate::{metrics::MetricExportable, target::icmp::ping::ping_target};
@@ -23,7 +23,11 @@ pub struct IcmpScrapper {
 }
 
 impl Scraping<IcmpTarget> for IcmpScrapper {
-    async fn scrape(&self) -> Result<(), ()> {
+    fn new(targets: Vec<IcmpTarget>) -> Self {
+        IcmpScrapper { targets }
+    }
+
+    async fn scrape(&self) -> Result<(), ScrapeError> {
         let mut span = tracing_new_span(get_tracer(), "scrape_target".to_string());
         span.set_attribute(KeyValue::new("type", "icmp".to_string()));
         let cx = Context::current_with_span(span);
@@ -40,7 +44,7 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
         Ok(())
     }
 
-    async fn send_request(&self, target: &IcmpTarget, cx: Context) -> Result<(), ()> {
+    async fn send_request(&self, target: &IcmpTarget, cx: Context) -> Result<(), ScrapeError> {
         let span_attr = vec![KeyValue::new(
             "ipv4",
             target.ipv4.clone().unwrap_or("unset".to_string()),
@@ -56,7 +60,7 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
                     description: "get_target_type failed".into(),
                 });
                 span_ref.end();
-                return Err(());
+                return Err(ScrapeError::TypeError(err.to_string()));
             }
         };
 
@@ -102,7 +106,7 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
 impl IcmpScrapper {
     async fn build_icmp_metrics(
         &self,
-        kind: TargetType,
+        _: TargetType,
         target: &IcmpTarget,
         cx: Context,
     ) -> Option<IcmpMetrics> {
@@ -149,7 +153,7 @@ impl IcmpScrapper {
         span_ref.set_status(Status::Ok);
     }
 
-    fn get_target_type(&self, target: &IcmpTarget) -> Result<TargetType, Error> {
+    fn get_target_type(&self, _: &IcmpTarget) -> Result<TargetType, Error> {
         Ok(TargetType::IPV4)
     }
 }

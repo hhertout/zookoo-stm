@@ -4,6 +4,7 @@ use opentelemetry::{Context, KeyValue, global::ObjectSafeSpan, trace::Status};
 use std::io::{Error, ErrorKind};
 
 use crate::child_span_from_context;
+use crate::target::ScrapeError;
 use crate::{
     config::target::HttpTarget,
     get_tracer,
@@ -25,7 +26,11 @@ pub struct HttpScrapper {
 }
 
 impl Scraping<HttpTarget> for HttpScrapper {
-    async fn scrape(&self) -> Result<(), ()> {
+    fn new(targets: Vec<HttpTarget>) -> Self {
+        HttpScrapper { targets }
+    }
+
+    async fn scrape(&self) -> Result<(), ScrapeError> {
         let mut span = tracing_new_span(get_tracer(), "scrape_target".to_string());
         span.set_attribute(KeyValue::new("type", "icmp".to_string()));
         let cx = Context::current_with_span(span);
@@ -42,7 +47,7 @@ impl Scraping<HttpTarget> for HttpScrapper {
         Ok(())
     }
 
-    async fn send_request(&self, target: &HttpTarget, cx: Context) -> Result<(), ()> {
+    async fn send_request(&self, target: &HttpTarget, cx: Context) -> Result<(), ScrapeError> {
         let span_attr = vec![
             KeyValue::new("url", target.url.clone()),
             KeyValue::new("http_method", target.method.clone()),
@@ -62,7 +67,7 @@ impl Scraping<HttpTarget> for HttpScrapper {
                     description: "get_target_type failed".into(),
                 });
                 span_ref.end();
-                return Err(());
+                return Err(ScrapeError::TypeError(err.to_string()));
             }
         };
 

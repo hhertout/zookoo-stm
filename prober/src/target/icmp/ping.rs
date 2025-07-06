@@ -1,5 +1,4 @@
 use std::{
-    io::ErrorKind,
     net::{Ipv4Addr, SocketAddr},
     str::FromStr,
     time::{Duration, Instant},
@@ -13,36 +12,13 @@ use serde::Serialize;
 use tokio::{net::lookup_host, process::Command};
 use url::Url;
 
-use crate::{child_span_from_context, config::target::IcmpTarget};
+use crate::{child_span_from_context, config::target::IcmpTarget, target::ScrapeError};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct IcmpMetrics {
     pub up: u8,
     pub duration: Duration,
 }
-
-#[derive(Debug)]
-enum ResolutionError {
-    InvalidUrl(String),
-    InvalidHost,
-    NoIpv4Found,
-    LookupFailed(std::io::Error),
-    InvalidInput(String),
-}
-
-impl std::fmt::Display for ResolutionError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ResolutionError::InvalidUrl(url) => write!(f, "Invalid URL: {}", url),
-            ResolutionError::InvalidHost => write!(f, "Invalid host in URL"),
-            ResolutionError::NoIpv4Found => write!(f, "No IPv4 address found"),
-            ResolutionError::LookupFailed(err) => write!(f, "DNS lookup failed: {}", err),
-            ResolutionError::InvalidInput(msg) => write!(f, "Configuration error: {}", msg),
-        }
-    }
-}
-
-impl std::error::Error for ResolutionError {}
 
 pub async fn ping_target(
     target: &IcmpTarget,
@@ -66,7 +42,7 @@ pub async fn ping_target(
         span_ref.set_status(Status::Error {
             description: "No IPV4 or Address set in the target".into(),
         });
-        return Err(Box::new(ResolutionError::InvalidInput(
+        return Err(Box::new(ScrapeError::InvalidInput(
             "No IPV4 or Address set in the target".to_string(),
         )));
     };
@@ -81,22 +57,22 @@ pub async fn ping_target(
         Ok(_) => Ok(start.elapsed()),
         Err(err) => {
             log::error!("ping failed {:?}", err.to_string());
-            Err(Box::new(std::io::Error::new(
-                ErrorKind::HostUnreachable,
-                "ping failed".to_string(),
-            )))
+            Err(Box::new(ScrapeError::NetworkError(format!(
+                "host {:?} not reachable",
+                target
+            ))))
         }
     }
 }
 
-async fn resolve_ip_from_url(target: &IcmpTarget) -> Result<Ipv4Addr, ResolutionError> {
+async fn resolve_ip_from_url(target: &IcmpTarget) -> Result<Ipv4Addr, ScrapeError> {
     // TODO: ADAPT THIS TO THIS ICMP DEFAULT PORT
     // NOT FUNCTIONAL
     // TO ADAPT !!
     let parsed_url = Url::parse(&target.ipv4.as_ref().unwrap())
-        .map_err(|_| ResolutionError::InvalidUrl(target.ipv4.as_ref().unwrap().to_string()))?;
+        .map_err(|_| ScrapeError::InvalidUrl(target.ipv4.as_ref().unwrap().to_string()))?;
 
-    let host = parsed_url.host_str().ok_or(ResolutionError::InvalidHost)?;
+    let host = parsed_url.host_str().ok_or(ScrapeError::InvalidHost)?;
 
     let port = parsed_url
         .port()
@@ -109,7 +85,7 @@ async fn resolve_ip_from_url(target: &IcmpTarget) -> Result<Ipv4Addr, Resolution
     let start = Instant::now();
     let lookup_result = lookup_host((host, port))
         .await
-        .map_err(ResolutionError::LookupFailed)?;
+        .map_err(|_| ScrapeError::LookupFailed)?;
 
     let ipv4_addr = lookup_result
         .filter_map(|addr| match addr {
@@ -117,7 +93,10 @@ async fn resolve_ip_from_url(target: &IcmpTarget) -> Result<Ipv4Addr, Resolution
             SocketAddr::V6(_) => None,
         })
         .next()
-        .ok_or(ResolutionError::NoIpv4Found)?;
+        .ok_or(ScrapeError::InvalidInput(format!(
+            "no ipv4 found for target = {:?}",
+            target
+        )))?;
 
     let duration = start.elapsed();
     log::debug!("DNS resolution for {} took {:?}", host, duration);

@@ -1,3 +1,8 @@
+//! # Configuration crate
+//!
+//! This crate is responsible of the parsing of the configuration file
+//!
+
 use std::io::ErrorKind::InvalidInput;
 use std::{fs, io::Error};
 
