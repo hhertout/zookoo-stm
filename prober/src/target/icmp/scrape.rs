@@ -45,10 +45,10 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
     }
 
     async fn send_request(&self, target: &IcmpTarget, cx: Context) -> Result<(), ScrapeError> {
-        let span_attr = vec![KeyValue::new(
-            "ipv4",
-            target.ipv4.clone().unwrap_or("unset".to_string()),
-        )];
+        let span_attr = vec![
+            KeyValue::new("ipv4", target.ipv4.clone().unwrap_or("unset".to_string())),
+            KeyValue::new("fqdn", target.fqdn.clone().unwrap_or("unset".to_string())),
+        ];
         let cx_with_span = child_span_from_context("send_request", cx.clone(), span_attr);
 
         let kind = match self.get_target_type(target) {
@@ -65,9 +65,10 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
         };
 
         log::info!(
-            "event=request type={} ipv4={}",
+            "event=request type={} ipv4={} fqdn={}",
             kind.to_string(),
-            target.ipv4.clone().unwrap_or("unset".to_string())
+            target.ipv4.clone().unwrap_or("unset".to_string()),
+            target.fqdn.clone().unwrap_or("unset".to_string())
         );
 
         if let Some(metrics) = self
@@ -77,23 +78,25 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
             let span_ref = cx_with_span.span();
             span_ref.set_status(Status::Ok);
             log::info!(
-                "event=metrics ipv4={} job=rustbox {:?}",
+                "event=metrics ipv4={} fqdn={} job=rustbox {}",
                 target.ipv4.clone().unwrap_or("unset".to_string()),
-                metrics
+                target.fqdn.clone().unwrap_or("unset".to_string()),
+                metrics.to_logfmt()
             );
 
             self.export_metrics(
                 kind,
-                target.ipv4.clone().unwrap_or("unset".to_string()),
+                metrics.target,
                 Metrics::Icmp(IcmpRequestMetrics {
                     up: metrics.up,
                     duration: metrics.duration,
-                    labels: None,
+                    labels: target.labels.clone(),
                 }),
                 cx_with_span,
             );
         } else {
             let span_ref = cx_with_span.span();
+            log::error!("build metrics failed");
             span_ref.set_status(Status::Error {
                 description: std::borrow::Cow::Borrowed("probe failed"),
             });
@@ -110,23 +113,31 @@ impl IcmpScrapper {
         target: &IcmpTarget,
         cx: Context,
     ) -> Option<IcmpMetrics> {
-        let span_attr = vec![KeyValue::new(
-            "ipv4",
-            target.ipv4.clone().unwrap_or("unset".to_string()).clone(),
-        )];
+        let span_attr = vec![
+            KeyValue::new(
+                "ipv4",
+                target.ipv4.clone().unwrap_or("unset".to_string()).clone(),
+            ),
+            KeyValue::new(
+                "fqdn",
+                target.fqdn.clone().unwrap_or("unset".to_string()).clone(),
+            ),
+        ];
         let cx_with_span = child_span_from_context("build_icmp_metrics", cx.clone(), span_attr);
         let span_ref = cx_with_span.span();
 
         // todo
         match ping_target(target, cx_with_span.clone()).await {
-            Ok(duration) => {
+            Ok((ip, duration)) => {
                 span_ref.set_status(Status::Ok);
                 Some(IcmpMetrics {
+                    target: target.fqdn.clone().unwrap_or(ip.to_string()), // set the fqdn or the ip if it is None
                     up: 1,
                     duration: duration,
                 })
             }
             Err(err) => {
+                log::error!("ipv4={:?} fqdn={:?} err={}", target.ipv4, target.fqdn, err);
                 span_ref.set_status(Status::Error {
                     description: err.to_string().into(),
                 });
@@ -136,14 +147,14 @@ impl IcmpScrapper {
     }
 
     fn export_metrics(&self, kind: TargetType, target: String, metrics: Metrics, cx: Context) {
-        let span_attr = vec![KeyValue::new("url", target.clone())];
+        let span_attr = vec![KeyValue::new("target", target.clone())];
         let cx_with_span = child_span_from_context("export_metrics", cx.clone(), span_attr);
 
         match (kind, metrics) {
             (TargetType::IPV4, Metrics::Icmp(m)) => m.export(&target),
             _ => {
                 log::error!(
-                    "wrong exporter type, got {}, expect ipv4 or url",
+                    "wrong exporter type, got {}, expect ipv4 or fqdn",
                     kind.to_string()
                 )
             }

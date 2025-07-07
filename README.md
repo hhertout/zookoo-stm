@@ -15,6 +15,7 @@
 # On going
 
 - Self monitoring should come from the config file and not the env vars
+- Adding timeout on ping request (-t)
 - Labels on ICMP targets
 - DNS test and expiration date of a dns name
 - metric probe http redirect

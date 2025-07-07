@@ -11,6 +11,7 @@ pub struct IcmpRequestMetrics {
 impl MetricExportable for IcmpRequestMetrics {
     fn export(&self, target: &str) {
         let mut labels: HashMap<String, String> = HashMap::new();
+        labels.insert(String::from("target"), target.to_string());
 
         if let Some(l) = self.labels.clone() {
             labels.extend(l);

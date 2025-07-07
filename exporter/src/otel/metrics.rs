@@ -27,8 +27,16 @@ impl MetricsExporter {
         self.set_gauge_metrics(
             String::from(format!("{}ping_duration", self.prefix)),
             Some(String::from("ms")),
-            String::from("dns lookup duration"),
+            String::from("ping duration"),
             duration as u64,
+            &self.labels,
+        );
+
+        self.record_histogram(
+            String::from(format!("{}ping_duration", self.prefix)),
+            Some(String::from("s")),
+            String::from("ping duration repartition"),
+            duration as f64 / 1000.0,
             &self.labels,
         );
     }
@@ -63,6 +71,14 @@ impl MetricsExporter {
             &self.labels,
         );
 
+        self.record_histogram(
+            String::from(format!("{}dns_lookup_duration", self.prefix)),
+            Some(String::from("s")),
+            String::from("dns lookup duration repartition"),
+            dns_lookup_duration as f64 / 1000.0,
+            &self.labels,
+        );
+
         self.set_gauge_metrics(
             String::from(format!("{}target_success", self.prefix)),
             None,
@@ -87,12 +103,28 @@ impl MetricsExporter {
             &self.labels,
         );
 
+        self.record_histogram(
+            String::from(format!("{}http_request_duration", self.prefix)),
+            Some(String::from("s")),
+            String::from("http request total duration repartition"),
+            http_request_duration as f64 / 1000.0,
+            &self.labels,
+        );
+
         if let Some(http_tls_lookup_duration) = http_tls_lookup_duration {
             self.set_gauge_metrics(
                 String::from(format!("{}http_tls_lookup_duration", self.prefix)),
                 Some(String::from("ms")),
-                String::from("tls version"),
+                String::from("tls lookup duration"),
                 http_tls_lookup_duration as u64,
+                &self.labels,
+            );
+
+            self.record_histogram(
+                String::from(format!("{}http_tls_lookup_duration", self.prefix)),
+                Some(String::from("s")),
+                String::from("tls lookup duration repartition"),
+                http_tls_lookup_duration as f64 / 1000.0,
                 &self.labels,
             );
         }
@@ -103,6 +135,14 @@ impl MetricsExporter {
                 Some(String::from("ms")),
                 String::from("http tls handshake duration during the request"),
                 http_tls_handshake_duration as u64,
+                &self.labels,
+            );
+
+            self.record_histogram(
+                String::from(format!("{}http_tls_handshake_duration", self.prefix)),
+                Some(String::from("s")),
+                String::from("http tls handshake duration during the request repartition"),
+                http_tls_handshake_duration as f64 / 1000.0,
                 &self.labels,
             );
         }
@@ -198,5 +238,40 @@ impl MetricsExporter {
         };
 
         gauge.record(value, &attr);
+    }
+
+    pub fn record_histogram(
+        &self,
+        name: String,
+        unit: Option<String>,
+        description: String,
+        value: f64,
+        labels: &HashMap<String, String>,
+    ) {
+        let scope = InstrumentationScope::builder("basic")
+            .with_version("1.0")
+            .build();
+
+        let meter = global::meter_with_scope(scope);
+
+        let attr: Vec<KeyValue> = labels
+            .iter()
+            .map(|(key, value)| KeyValue::new(key.clone(), value.clone()))
+            .collect();
+
+        let histogram = if let Some(unit) = unit {
+            meter
+                .f64_histogram(name.clone())
+                .with_description(description)
+                .with_unit(unit)
+                .build()
+        } else {
+            meter
+                .f64_histogram(name.clone())
+                .with_description(description)
+                .build()
+        };
+
+        histogram.record(value, &attr);
     }
 }

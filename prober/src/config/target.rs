@@ -64,6 +64,7 @@ pub struct IcmpConfiguration {
 #[derive(Debug, Deserialize, Clone)]
 pub struct IcmpTarget {
     pub ipv4: Option<String>,
+    pub fqdn: Option<String>,
     pub labels: Option<HashMap<String, String>>,
     #[serde(default = "default_scrape_interval")]
     pub scrape_interval: ScrapeInterval,
@@ -84,6 +85,7 @@ impl From<configuration::model::target::IcmpTarget> for IcmpTarget {
     fn from(value: configuration::model::target::IcmpTarget) -> Self {
         IcmpTarget {
             ipv4: value.ipv4,
+            fqdn: value.fqdn,
             labels: value.labels,
             scrape_interval: ScrapeInterval::from(value.scrape_interval),
         }

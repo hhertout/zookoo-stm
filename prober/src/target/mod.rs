@@ -1,5 +1,6 @@
 //!
 //! ## Target module
+//!
 //! Made to define the behavior of the scraping process depending on the target type
 //!
 //! ### Target type supported
@@ -39,8 +40,6 @@ impl ToString for TargetType {
 pub enum ScrapeError {
     TypeError(String),
     InvalidInput(String),
-    InvalidUrl(String),
-    InvalidHost,
     LookupFailed,
     NetworkError(String),
 }
@@ -50,8 +49,6 @@ impl Display for ScrapeError {
         match self {
             Self::TypeError(s) => write!(f, "type error = {}", s),
             Self::InvalidInput(s) => write!(f, "invalid input error = {}", s),
-            Self::InvalidUrl(s) => write!(f, "invalid url = {}", s),
-            Self::InvalidHost => write!(f, "invalid host"),
             Self::LookupFailed => write!(f, "lookup failed"),
             Self::NetworkError(s) => write!(f, "network error = {}", s),
         }

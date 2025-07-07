@@ -36,12 +36,12 @@ pub async fn http_request(target: &HttpTarget, cx: Context) -> Result<HttpMetric
 
     let url = &target.url;
 
-    let client = Client::builder()
-        .danger_accept_invalid_certs(true)
+    let client_instance = Client::builder()
+        // .danger_accept_invalid_certs(true)
+        //.proxy(Proxy::https("http://localhost:4545"))
         .timeout(Duration::from_secs(15))
-        .tcp_keepalive_retries(0)
-        .build()
-        .unwrap();
+        .tcp_keepalive_retries(0);
+    let client = client_instance.build().unwrap();
 
     let start = Instant::now();
 
