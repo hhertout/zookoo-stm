@@ -78,7 +78,7 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
             let span_ref = cx_with_span.span();
             span_ref.set_status(Status::Ok);
             log::info!(
-                "event=metrics ipv4={} fqdn={} job=rustbox {}",
+                "event=metrics ipv4={} fqdn={} job=zookoo {}",
                 target.ipv4.clone().unwrap_or("unset".to_string()),
                 target.fqdn.clone().unwrap_or("unset".to_string()),
                 metrics.to_logfmt()

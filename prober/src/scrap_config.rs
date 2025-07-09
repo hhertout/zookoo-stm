@@ -12,17 +12,44 @@ use crate::{
 
 #[derive(Debug, Clone)]
 pub struct ProbeConfig {
-    pub config: config::ScrapConfiguration,
+    pub scrap_config: config::ScrapConfiguration,
 }
 
 impl ProbeConfig {
-    pub fn new(config: config::ScrapConfiguration) -> Self {
-        return ProbeConfig { config };
+    pub fn new(scrap_config: config::ScrapConfiguration) -> Self {
+        return ProbeConfig { scrap_config };
+    }
+
+    /// Apply the labels coming from the default object of the configuration
+    pub fn apply_default_labels(&mut self) -> &mut Self {
+        let default_labels = self.scrap_config.default.to_labels_hashmap();
+
+        if let Some(http_target) = self.scrap_config.http.as_mut() {
+            if let Some(targets) = http_target.targets.as_mut() {
+                for target in targets.iter_mut() {
+                    if let Some(labels) = target.labels.as_mut() {
+                        labels.extend(default_labels.clone().into_iter());
+                    }
+                }
+            }
+        }
+
+        if let Some(icmp_target) = self.scrap_config.icmp.as_mut() {
+            if let Some(target) = icmp_target.targets.as_mut() {
+                for target in target.iter_mut() {
+                    if let Some(labels) = target.labels.as_mut() {
+                        labels.extend(default_labels.clone().into_iter());
+                    }
+                }
+            }
+        }
+
+        return self;
     }
 
     pub fn icmp_group_by_interval(&self) -> GroupByInterval<IcmpTarget> {
         let mut group_by: GroupByInterval<IcmpTarget> = GroupByInterval::new();
-        let _ = self.config.icmp.as_ref().map(|icmp_target| {
+        let _ = self.scrap_config.icmp.as_ref().map(|icmp_target| {
             if let Some(targets) = icmp_target.targets.clone() {
                 for target in targets {
                     match target.scrape_interval {
@@ -48,7 +75,7 @@ impl ProbeConfig {
 
     pub fn http_group_by_interval(&self) -> GroupByInterval<HttpTarget> {
         let mut group_by: GroupByInterval<HttpTarget> = GroupByInterval::new();
-        let _ = self.config.http.as_ref().map(|http_target| {
+        let _ = self.scrap_config.http.as_ref().map(|http_target| {
             if let Some(targets) = http_target.targets.clone() {
                 for target in targets {
                     match target.scrape_interval {
@@ -74,7 +101,7 @@ impl ProbeConfig {
 
     pub fn json_http_group_by_interval(&self) -> GroupByInterval<HttpTarget> {
         let mut group_by: GroupByInterval<HttpTarget> = GroupByInterval::new();
-        let _ = self.config.http.as_ref().map(|http_target| {
+        let _ = self.scrap_config.http.as_ref().map(|http_target| {
             if let Some(paths) = http_target.target_file.clone() {
                 for path in paths {
                     let targets = match json_parser::parse_json_from_file(path) {
@@ -112,7 +139,7 @@ impl ProbeConfig {
 impl From<configuration::model::Configuration> for ProbeConfig {
     fn from(value: configuration::model::Configuration) -> Self {
         ProbeConfig {
-            config: config::ScrapConfiguration::from(value),
+            scrap_config: config::ScrapConfiguration::from(value),
         }
     }
 }

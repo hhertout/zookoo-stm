@@ -14,9 +14,14 @@
 
 # On going
 
-- Self monitoring should come from the config file and not the env vars
+- Target files parsing should be improved
+- histogram metrics doesn't work properly
 - Adding timeout on ping request (-t)
 - Labels on ICMP targets
+- Kafka exporter
+- InfluxDB exporter
+- MongoDB exporter
+- TimescaleDB / PostgreSQL exporter
 - DNS test and expiration date of a dns name
 - metric probe http redirect
 - Unit Tests...
@@ -26,7 +31,6 @@
 - Proxy configuration
 - Adding timeout on http request
 - Adding default parameters (headers, timeout, Probe location etc...)
-- ICMP request handler
 - GRPC request handler
 - UI
 - Massive load testing
@@ -55,7 +59,6 @@ It is built as a synthetic monitoring tool (STM) that allows you to scrape targe
 
 - self (via a dedicated endpoint)
 - Open telemetry (http/protobuf & grpc)
-- Kafka
 
 # Why this project?
 

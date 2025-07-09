@@ -22,14 +22,12 @@
 //!
 //! The configuration should be complient with the `configuration` crate already present in the repository.
 
-use std::env;
-use std::sync::OnceLock;
-
 use opentelemetry::global::{self, BoxedSpan, BoxedTracer};
 use opentelemetry::trace::{Span, SpanKind, TraceContextExt, Tracer};
 use opentelemetry::{Context, KeyValue};
 use opentelemetry_otlp::{SpanExporter, WithExportConfig};
 use opentelemetry_sdk::{Resource, propagation::TraceContextPropagator, trace::SdkTracerProvider};
+use std::sync::OnceLock;
 use tokio::sync::mpsc;
 
 use crate::config::exporter::OtelGrpcExporterConfiguration;
@@ -50,16 +48,26 @@ pub async fn run(config: ProbeConfig) {
     // Init observability stuff
     let mut tracer_provider: Option<SdkTracerProvider> = None;
 
-    if env::var("ENABLE_SELF_MONITORING").unwrap_or(String::from("false")) == String::from("true") {
-        tracer_provider = Some(init_tracer_provider());
+    if config.scrap_config.default.self_monitoring.enable {
+        let zone = config.scrap_config.default.probe_zone.clone();
+        let self_monitoring_conf = config.scrap_config.default.self_monitoring.clone();
+        tracer_provider = Some(init_tracer_provider(
+            self_monitoring_conf.otel_endpoint.clone(),
+            self_monitoring_conf.service_name.clone(),
+            self_monitoring_conf.env.clone(),
+            zone,
+        ));
     }
 
-    if let Some(otel_conf) = &config.config.exporter.otel {
+    if let Some(otel_conf) = &config.scrap_config.exporter.otel {
         let config = OtelGrpcExporterConfiguration::from(otel_conf.clone());
         let _ = exporter::otel::init_metrics_exporter(config.into());
+        log::warn!("otel exporter is enabled");
     }
 
-    // Run the probe
+    //
+    // Run the probe and start the scraping
+    //
     probe_engine(config).await;
 
     // Shutdown obersvability stuff
@@ -69,13 +77,24 @@ pub async fn run(config: ProbeConfig) {
     }
 }
 
-pub async fn probe_engine(config: ProbeConfig) {
+/// Probe engine definition
+/// This is the starting point where the application will launch each scraping job depending on the configuration provided.
+///
+/// For instance... all the jobs are defined by the scraping interval at the root.
+/// This means that, for each group interval, one thread will be created.
+///
+/// For each of this threads created, an other one is created for each scraping target will be created.
+/// It ensure each scraping job is independant from each other.
+///
+/// The behavior of the scraping method and metric creation is defined on the dedicated module, refering to the target specification.
+///
+pub async fn probe_engine(mut config: ProbeConfig) {
     let (icmp_shutdown_tx, icmp_shutdown_rx) = mpsc::channel::<()>(1);
     let (http_shutdown_tx, http_shutdown_rx) = mpsc::channel::<()>(1);
 
     // group by interval to spawn one job for each
-    let icmp_group_by = config.icmp_group_by_interval();
-    let http_group_by = config.http_group_by_interval();
+    let icmp_group_by = config.apply_default_labels().icmp_group_by_interval();
+    let http_group_by = config.apply_default_labels().http_group_by_interval();
 
     // launch the scraping process
     // for each interval -
@@ -107,7 +126,7 @@ pub async fn probe_engine(config: ProbeConfig) {
 
 fn get_tracer() -> &'static BoxedTracer {
     static TRACER: OnceLock<BoxedTracer> = OnceLock::new();
-    TRACER.get_or_init(|| global::tracer("dice_server"))
+    TRACER.get_or_init(|| global::tracer("zookoo"))
 }
 
 fn tracing_new_span(tracer: &BoxedTracer, name: String) -> BoxedSpan {
@@ -131,22 +150,26 @@ fn tracing_new_span_with_context(
     tracer.start_with_context(name, &cx)
 }
 
-fn init_tracer_provider() -> SdkTracerProvider {
-    let default_endpoint = "http://localhost:4317/v1/traces".to_string();
-
+fn init_tracer_provider(
+    endpoint: String,
+    service_name: String,
+    env: String,
+    zone: Option<String>,
+) -> SdkTracerProvider {
     let exporter = SpanExporter::builder()
         .with_tonic()
-        .with_endpoint(env::var("INTERNAL_OLTP_ENDPOINT").unwrap_or(default_endpoint))
+        .with_endpoint(format!("{}/v1/traces", endpoint))
         .build()
         .expect("Failed to create span exporter");
 
     let provider = SdkTracerProvider::builder()
         .with_resource(
             Resource::builder()
-                .with_service_name("zookoo")
+                .with_service_name(service_name)
+                .with_attribute(KeyValue::new("env", env))
                 .with_attribute(KeyValue::new(
-                    "env",
-                    env::var("RUST_ENV").unwrap_or_default(),
+                    "zone",
+                    zone.unwrap_or("world_wide".to_string()),
                 ))
                 .build(),
         )

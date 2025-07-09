@@ -84,7 +84,7 @@ impl Scraping<HttpTarget> for HttpScrapper {
             let span_ref = cx_with_span.span();
             span_ref.set_status(Status::Ok);
             log::info!(
-                "event=metrics target={} job=rustbox {} {} {}",
+                "event=metrics target={} job=zookoo {} {} {}",
                 target.url,
                 metrics.dns.to_logfmt(),
                 metrics.http.to_logfmt(),

@@ -13,23 +13,11 @@ mod cli;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() {
+    print_ascii_art();
     dotenv().ok();
 
-    // Enable pyroscope monitoring
-    let mut pyroscope_agent: Option<PyroscopeAgent<PyroscopeAgentRunning>> = None;
-    if env::var("ENABLE_SELF_MONITORING").unwrap_or(String::from("false")) == String::from("true") {
-        if let Ok(pyroscope_endpoint) = env::var("PYRSCOPE_ENDPOINT") {
-            if let Ok(agent) = start_pyrsocope(&pyroscope_endpoint, "zookoo") {
-                println!("pyroscope agent is starting");
-                pyroscope_agent = Some(agent.start().unwrap());
-            } else {
-                println!("fail to start pyroscope agent")
-            };
-        }
-    }
-
     let default_config_file_path = match env::var("RUST_ENV").as_deref() {
-        Ok("production") => "/etc/rustbox/config.toml",
+        Ok("production") => "/etc/zookoo/config.toml",
         _ => "dev/config.toml",
     };
 
@@ -55,13 +43,28 @@ async fn main() {
     let parser = ConfigParser::new();
     let config = parser.parse_from_file(&config_file).unwrap();
 
-    let log_level = args
-        .log_level
-        .or(Some(config.defaults.log_level.clone()))
-        .unwrap();
+    // Enable pyroscope monitoring
+    let mut pyroscope_agent: Option<PyroscopeAgent<PyroscopeAgentRunning>> = None;
+    if config.defaults.self_monitoring.enable {
+        log::warn!(
+            "Pyroscope is started and send profiles using '{}'",
+            config.defaults.self_monitoring.pyroscope_endpoint
+        );
+
+        if let Ok(agent) = start_pyrsocope(
+            &config.defaults.self_monitoring.pyroscope_endpoint,
+            &config.defaults.self_monitoring.service_name,
+        ) {
+            pyroscope_agent = Some(agent.start().unwrap());
+        } else {
+            log::error!("fail to start pyroscope agent")
+        };
+    }
+
+    let log_level = args.log_level.unwrap_or(config.defaults.log_level.clone());
     set_log_level(log_level);
 
-    log::info!("Rustbox is launched ! ");
+    log::info!("Zookoo is launched ! ");
     log::debug!("Config file path={}", config_file);
     log::debug!("{:?}", config);
     log::info!("Starting the probe...");
@@ -121,4 +124,48 @@ fn start_pyrsocope(
     let agent = pyroscope.build()?;
 
     Ok(agent)
+}
+
+fn print_ascii_art() {
+    println!(
+        r#"
+                _
+            ,.-" "-.,
+           /   ===   \
+          /  =======  \
+       __|  (o)   (0)  |__      
+      / _|    .---.    |_ \         
+     | /.----/ O O \----.\ |       
+      \/     |     |     \/        
+      |                   |            
+      |                   |           
+      |                   |          
+      _\   -.,_____,.-   /_         
+  ,.-"  "-.,_________,.-"  "-.,
+ /          |       |          \  
+|           l.     .l           | 
+|            |     |            |
+l.           |     |           .l             
+ |           l.   .l           | \,     
+ l.           |   |           .l   \,    
+  |           |   |           |      \,  
+  l.          |   |          .l        |
+   |          |   |          |         |
+   |          |---|          |         |
+   |          |   |          |         |
+   /"-.,__,.-"\   /"-.,__,.-"\"-.,_,.-"\
+  |            \ /            |         |
+  |             |             |         |
+   \__|__|__|__/ \__|__|__|__/ \_|__|__/
+
+    ______            _    _____  _____ 
+   |___  /           | |  |  _  ||  _  |
+      / /  ___   ___ | | _| | | || | | |
+     / /  / _ \ / _ \| |/ / | | || | | |
+   ./ /__| (_) | (_) |   <\ \_/ /\ \_/ /
+   \_____/\___/ \___/|_|\_\\___/  \___/ 
+                                        
+                                     
+"#
+    );
 }

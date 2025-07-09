@@ -67,6 +67,12 @@ pub trait Scraping<T> {
     ) -> impl Future<Output = Result<(), ScrapeError>> + Send;
 }
 
+/// Main method to scrape the target depeding on the target specification
+///
+/// Args: `inverval_scraping` type of `GroupByInterval`
+///
+/// Each thread can shutdown gracefully if the `shutdown_rx` is called.
+///
 pub async fn scrape_with_shutdown<T, G>(
     intervals_scraping: GroupByInterval<G>,
     mut shutdown_rx: mpsc::Receiver<()>,

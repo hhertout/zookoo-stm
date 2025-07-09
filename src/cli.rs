@@ -1,5 +1,5 @@
 #[derive(clap::Parser, Debug)]
-#[command(author, version, about, name = "Rustbox")]
+#[command(author, version, about, name = "Zookoo")]
 pub struct CliArgs {
     /// <CONFIG> = Configuration file location
     #[arg(long)]
