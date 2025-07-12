@@ -1,12 +1,9 @@
-use std::process::exit;
-
 use crate::{
     config::{
         self,
         scrape_interval::ScrapeInterval,
         target::{HttpTarget, IcmpTarget},
     },
-    file::json_parser,
     group_by_interval::GroupByInterval,
 };
 
@@ -25,21 +22,17 @@ impl ProbeConfig {
         let default_labels = self.scrap_config.default.to_labels_hashmap();
 
         if let Some(http_target) = self.scrap_config.http.as_mut() {
-            if let Some(targets) = http_target.targets.as_mut() {
-                for target in targets.iter_mut() {
-                    if let Some(labels) = target.labels.as_mut() {
-                        labels.extend(default_labels.clone().into_iter());
-                    }
+            for target in http_target.targets.iter_mut() {
+                if let Some(labels) = target.labels.as_mut() {
+                    labels.extend(default_labels.clone().into_iter());
                 }
             }
         }
 
         if let Some(icmp_target) = self.scrap_config.icmp.as_mut() {
-            if let Some(target) = icmp_target.targets.as_mut() {
-                for target in target.iter_mut() {
-                    if let Some(labels) = target.labels.as_mut() {
-                        labels.extend(default_labels.clone().into_iter());
-                    }
+            for target in icmp_target.targets.iter_mut() {
+                if let Some(labels) = target.labels.as_mut() {
+                    labels.extend(default_labels.clone().into_iter());
                 }
             }
         }
@@ -50,22 +43,20 @@ impl ProbeConfig {
     pub fn icmp_group_by_interval(&self) -> GroupByInterval<IcmpTarget> {
         let mut group_by: GroupByInterval<IcmpTarget> = GroupByInterval::new();
         let _ = self.scrap_config.icmp.as_ref().map(|icmp_target| {
-            if let Some(targets) = icmp_target.targets.clone() {
-                for target in targets {
-                    match target.scrape_interval {
-                        ScrapeInterval::S5 => group_by.s5.push(target),
-                        ScrapeInterval::S10 => group_by.s10.push(target),
-                        ScrapeInterval::S30 => group_by.s30.push(target),
-                        ScrapeInterval::M1 => group_by.m1.push(target),
-                        ScrapeInterval::M5 => group_by.m5.push(target),
-                        ScrapeInterval::M10 => group_by.m10.push(target),
-                        ScrapeInterval::M30 => group_by.m30.push(target),
-                        ScrapeInterval::H1 => group_by.h1.push(target),
-                        ScrapeInterval::H12 => group_by.h12.push(target),
-                        ScrapeInterval::D1 => group_by.d1.push(target),
-                        ScrapeInterval::D7 => group_by.d7.push(target),
-                        ScrapeInterval::D30 => group_by.d30.push(target),
-                    }
+            for target in icmp_target.targets.clone() {
+                match target.scrape_interval {
+                    ScrapeInterval::S5 => group_by.s5.push(target),
+                    ScrapeInterval::S10 => group_by.s10.push(target),
+                    ScrapeInterval::S30 => group_by.s30.push(target),
+                    ScrapeInterval::M1 => group_by.m1.push(target),
+                    ScrapeInterval::M5 => group_by.m5.push(target),
+                    ScrapeInterval::M10 => group_by.m10.push(target),
+                    ScrapeInterval::M30 => group_by.m30.push(target),
+                    ScrapeInterval::H1 => group_by.h1.push(target),
+                    ScrapeInterval::H12 => group_by.h12.push(target),
+                    ScrapeInterval::D1 => group_by.d1.push(target),
+                    ScrapeInterval::D7 => group_by.d7.push(target),
+                    ScrapeInterval::D30 => group_by.d30.push(target),
                 }
             }
         });
@@ -76,58 +67,20 @@ impl ProbeConfig {
     pub fn http_group_by_interval(&self) -> GroupByInterval<HttpTarget> {
         let mut group_by: GroupByInterval<HttpTarget> = GroupByInterval::new();
         let _ = self.scrap_config.http.as_ref().map(|http_target| {
-            if let Some(targets) = http_target.targets.clone() {
-                for target in targets {
-                    match target.scrape_interval {
-                        ScrapeInterval::S5 => group_by.s5.push(target),
-                        ScrapeInterval::S10 => group_by.s10.push(target),
-                        ScrapeInterval::S30 => group_by.s30.push(target),
-                        ScrapeInterval::M1 => group_by.m1.push(target),
-                        ScrapeInterval::M5 => group_by.m5.push(target),
-                        ScrapeInterval::M10 => group_by.m10.push(target),
-                        ScrapeInterval::M30 => group_by.m30.push(target),
-                        ScrapeInterval::H1 => group_by.h1.push(target),
-                        ScrapeInterval::H12 => group_by.h12.push(target),
-                        ScrapeInterval::D1 => group_by.d1.push(target),
-                        ScrapeInterval::D7 => group_by.d7.push(target),
-                        ScrapeInterval::D30 => group_by.d30.push(target),
-                    }
-                }
-            }
-        });
-
-        return group_by;
-    }
-
-    pub fn json_http_group_by_interval(&self) -> GroupByInterval<HttpTarget> {
-        let mut group_by: GroupByInterval<HttpTarget> = GroupByInterval::new();
-        let _ = self.scrap_config.http.as_ref().map(|http_target| {
-            if let Some(paths) = http_target.target_file.clone() {
-                for path in paths {
-                    let targets = match json_parser::parse_json_from_file(path) {
-                        Ok(content) => content,
-                        Err(err) => {
-                            log::error!("{:?}", err);
-                            exit(1)
-                        }
-                    };
-
-                    for target in targets {
-                        match target.scrape_interval {
-                            ScrapeInterval::S5 => group_by.s5.push(target),
-                            ScrapeInterval::S10 => group_by.s10.push(target),
-                            ScrapeInterval::S30 => group_by.s30.push(target),
-                            ScrapeInterval::M1 => group_by.m1.push(target),
-                            ScrapeInterval::M5 => group_by.m5.push(target),
-                            ScrapeInterval::M10 => group_by.m10.push(target),
-                            ScrapeInterval::M30 => group_by.m30.push(target),
-                            ScrapeInterval::H1 => group_by.h1.push(target),
-                            ScrapeInterval::H12 => group_by.h12.push(target),
-                            ScrapeInterval::D1 => group_by.d1.push(target),
-                            ScrapeInterval::D7 => group_by.d7.push(target),
-                            ScrapeInterval::D30 => group_by.d30.push(target),
-                        }
-                    }
+            for target in http_target.targets.clone() {
+                match target.scrape_interval {
+                    ScrapeInterval::S5 => group_by.s5.push(target),
+                    ScrapeInterval::S10 => group_by.s10.push(target),
+                    ScrapeInterval::S30 => group_by.s30.push(target),
+                    ScrapeInterval::M1 => group_by.m1.push(target),
+                    ScrapeInterval::M5 => group_by.m5.push(target),
+                    ScrapeInterval::M10 => group_by.m10.push(target),
+                    ScrapeInterval::M30 => group_by.m30.push(target),
+                    ScrapeInterval::H1 => group_by.h1.push(target),
+                    ScrapeInterval::H12 => group_by.h12.push(target),
+                    ScrapeInterval::D1 => group_by.d1.push(target),
+                    ScrapeInterval::D7 => group_by.d7.push(target),
+                    ScrapeInterval::D30 => group_by.d30.push(target),
                 }
             }
         });

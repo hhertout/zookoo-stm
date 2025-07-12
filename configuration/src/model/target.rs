@@ -26,8 +26,7 @@ fn default_skip_tls() -> bool {
 
 #[derive(Debug, Deserialize)]
 pub struct HttpConfiguration {
-    pub target_file: Option<Vec<String>>,
-    pub targets: Option<Vec<HttpTarget>>,
+    pub targets: Vec<HttpTarget>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -57,8 +56,7 @@ pub struct AuthConfiguration {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct IcmpConfiguration {
-    pub target_file: Option<Vec<String>>,
-    pub targets: Option<Vec<IcmpTarget>>,
+    pub targets: Vec<IcmpTarget>,
 }
 
 #[derive(Debug, Deserialize, Clone)]

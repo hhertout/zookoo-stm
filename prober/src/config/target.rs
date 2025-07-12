@@ -26,8 +26,7 @@ fn default_skip_tls() -> bool {
 
 #[derive(Debug, Clone)]
 pub struct HttpConfiguration {
-    pub target_file: Option<Vec<String>>,
-    pub targets: Option<Vec<HttpTarget>>,
+    pub targets: Vec<HttpTarget>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -57,8 +56,7 @@ pub struct AuthConfiguration {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct IcmpConfiguration {
-    pub target_file: Option<Vec<String>>,
-    pub targets: Option<Vec<IcmpTarget>>,
+    pub targets: Vec<IcmpTarget>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -73,10 +71,7 @@ pub struct IcmpTarget {
 impl From<configuration::model::target::IcmpConfiguration> for IcmpConfiguration {
     fn from(value: configuration::model::target::IcmpConfiguration) -> Self {
         IcmpConfiguration {
-            target_file: value.target_file,
-            targets: value
-                .targets
-                .map(|targets| targets.into_iter().map(IcmpTarget::from).collect()),
+            targets: value.targets.into_iter().map(IcmpTarget::from).collect(),
         }
     }
 }
@@ -95,10 +90,7 @@ impl From<configuration::model::target::IcmpTarget> for IcmpTarget {
 impl From<configuration::model::target::HttpConfiguration> for HttpConfiguration {
     fn from(value: configuration::model::target::HttpConfiguration) -> Self {
         HttpConfiguration {
-            target_file: value.target_file,
-            targets: value
-                .targets
-                .map(|targets| targets.into_iter().map(HttpTarget::from).collect()),
+            targets: value.targets.into_iter().map(HttpTarget::from).collect(),
         }
     }
 }

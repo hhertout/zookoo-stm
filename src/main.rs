@@ -1,5 +1,5 @@
 use clap::Parser;
-use configuration::{ConfigParser, Parse};
+use configuration::{ConfigParser, Discovery, Parse};
 use dotenv::dotenv;
 use prober::scrap_config::ProbeConfig;
 use pyroscope::{
@@ -7,7 +7,7 @@ use pyroscope::{
     pyroscope::{PyroscopeAgentReady, PyroscopeAgentRunning},
 };
 use pyroscope_pprofrs::{PprofConfig, pprof_backend};
-use std::{env, io::Error, vec};
+use std::{env, io::Error, process::exit, vec};
 
 mod cli;
 
@@ -41,7 +41,9 @@ async fn main() {
     };
 
     let parser = ConfigParser::new();
-    let config = parser.parse_from_file(&config_file).unwrap();
+
+    // TODO: REMOVE UNWRAP AND SAFE EXTRACT ERR
+    let mut config = parser.parse_from_file(&config_file).unwrap();
 
     // Enable pyroscope monitoring
     let mut pyroscope_agent: Option<PyroscopeAgent<PyroscopeAgentRunning>> = None;
@@ -69,6 +71,13 @@ async fn main() {
     log::debug!("{:?}", config);
     log::info!("Starting the probe...");
 
+    // Parse discovery
+    if let Err(err) = parser.fetch_discovery(&mut config) {
+        log::error!("{}", err.to_string());
+        exit(1)
+    };
+
+    // Run the probe
     prober::run(ProbeConfig::from(config)).await;
 
     if let Some(agent) = pyroscope_agent {
@@ -78,6 +87,9 @@ async fn main() {
 }
 
 /// Configure the log level and update env logger accordingly
+///
+/// Caution: Unsafe
+/// TODO: maybe find a way to fix it and turn it into safe
 fn set_log_level(log_level: String) {
     let default_log_level = String::from("info");
 

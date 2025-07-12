@@ -14,7 +14,7 @@
 
 # On going
 
-- Target files parsing should be improved
+- Discovery http targets
 - histogram metrics doesn't work properly
 - Adding timeout on ping request (-t)
 - Labels on ICMP targets

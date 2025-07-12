@@ -38,7 +38,6 @@ use crate::target::icmp::scrape::IcmpScrapper;
 use crate::target::scrape_with_shutdown;
 
 pub(crate) mod config;
-pub(crate) mod file;
 pub(crate) mod group_by_interval;
 pub(crate) mod metrics;
 pub mod scrap_config;
