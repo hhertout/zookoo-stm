@@ -33,11 +33,11 @@ impl Scraping<HttpTarget> for HttpScrapper {
     async fn scrape(&self) -> Result<(), ScrapeError> {
         let mut span = tracing_new_span(get_tracer(), "scrape_target".to_string());
         span.set_attribute(KeyValue::new("type", "icmp".to_string()));
-        let cx = Context::current_with_span(span);
-        let guard = cx.clone().attach();
+        let ctx = Context::current_with_span(span);
+        let guard = ctx.clone().attach();
 
         let futures = self.targets.iter().map(|target| {
-            let ctx = cx.clone();
+            let ctx = ctx.clone();
             self.send_request(target, ctx)
         });
 
@@ -47,7 +47,7 @@ impl Scraping<HttpTarget> for HttpScrapper {
         Ok(())
     }
 
-    async fn send_request(&self, target: &HttpTarget, cx: Context) -> Result<(), ScrapeError> {
+    async fn send_request(&self, target: &HttpTarget, ctx: Context) -> Result<(), ScrapeError> {
         let span_attr = vec![
             KeyValue::new("url", target.url.clone()),
             KeyValue::new("http_method", target.method.clone()),
@@ -56,13 +56,13 @@ impl Scraping<HttpTarget> for HttpScrapper {
                 target.expected_status_code.clone().to_string(),
             ),
         ];
-        let cx_with_span = child_span_from_context("send_request", cx.clone(), span_attr);
+        let ctx_with_span = child_span_from_context("send_request", ctx.clone(), span_attr);
 
         let kind = match self.get_target_type(target.url.as_ref()) {
             Ok(target_type) => target_type,
             Err(err) => {
                 log::error!("{}", err.to_string());
-                let span_ref = cx_with_span.span();
+                let span_ref = ctx_with_span.span();
                 span_ref.set_status(Status::Error {
                     description: "get_target_type failed".into(),
                 });
@@ -78,10 +78,10 @@ impl Scraping<HttpTarget> for HttpScrapper {
         );
 
         if let Some(metrics) = self
-            .build_http_metrics(kind, target, cx_with_span.clone())
+            .build_http_metrics(kind, target, ctx_with_span.clone())
             .await
         {
-            let span_ref = cx_with_span.span();
+            let span_ref = ctx_with_span.span();
             span_ref.set_status(Status::Ok);
             log::info!(
                 "event=metrics target={} job=zookoo {} {} {}",
@@ -99,10 +99,10 @@ impl Scraping<HttpTarget> for HttpScrapper {
                 kind,
                 target.url.clone(),
                 Metrics::Http(metrics),
-                cx_with_span,
+                ctx_with_span,
             );
         } else {
-            let span_ref = cx_with_span.span();
+            let span_ref = ctx_with_span.span();
             span_ref.set_status(Status::Error {
                 description: std::borrow::Cow::Borrowed("probe failed"),
             });
@@ -117,7 +117,7 @@ impl HttpScrapper {
         &self,
         kind: TargetType,
         target: &HttpTarget,
-        cx: Context,
+        ctx: Context,
     ) -> Option<HttpRequestMetrics> {
         let span_attr = vec![
             KeyValue::new("url", target.url.clone()),
@@ -127,12 +127,12 @@ impl HttpScrapper {
                 target.expected_status_code.clone().to_string(),
             ),
         ];
-        let cx_with_span = child_span_from_context("build_http_metrics", cx.clone(), span_attr);
+        let ctx_with_span = child_span_from_context("build_http_metrics", ctx.clone(), span_attr);
 
-        let dns_metrics = match dns_lookup(&target.url, cx_with_span.clone()).await {
+        let dns_metrics = match dns_lookup(&target.url, ctx_with_span.clone()).await {
             Ok(m) => m,
             Err(err) => {
-                let span_ref = cx_with_span.span();
+                let span_ref = ctx_with_span.span();
                 span_ref.set_status(Status::Error {
                     description: "dns lookup failed".into(),
                 });
@@ -142,10 +142,10 @@ impl HttpScrapper {
         };
 
         let tls_metrics = if kind == TargetType::HTTPS {
-            match inspect_tls(&target.url, cx_with_span.clone()).await {
+            match inspect_tls(&target.url, ctx_with_span.clone()).await {
                 Ok(m) => Some(m),
                 Err(err) => {
-                    let span_ref = cx_with_span.span();
+                    let span_ref = ctx_with_span.span();
                     span_ref.set_status(Status::Error {
                         description: "tls lookup failed".into(),
                     });
@@ -157,10 +157,10 @@ impl HttpScrapper {
             None
         };
 
-        let http_metrics = match http_request(target, cx_with_span.clone()).await {
+        let http_metrics = match http_request(target, ctx_with_span.clone()).await {
             Ok(m) => m,
             Err(err) => {
-                let span_ref = cx_with_span.span();
+                let span_ref = ctx_with_span.span();
                 span_ref.set_status(Status::Error {
                     description: "fail to send request".into(),
                 });
@@ -169,7 +169,7 @@ impl HttpScrapper {
             }
         };
 
-        let span_ref = cx_with_span.span();
+        let span_ref = ctx_with_span.span();
         span_ref.set_status(Status::Ok);
 
         Some(HttpRequestMetrics {
@@ -180,9 +180,9 @@ impl HttpScrapper {
         })
     }
 
-    fn export_metrics(&self, kind: TargetType, target: String, metrics: Metrics, cx: Context) {
+    fn export_metrics(&self, kind: TargetType, target: String, metrics: Metrics, ctx: Context) {
         let span_attr = vec![KeyValue::new("url", target.clone())];
-        let cx_with_span = child_span_from_context("build_http_metrics", cx.clone(), span_attr);
+        let ctx_with_span = child_span_from_context("build_http_metrics", ctx.clone(), span_attr);
 
         match (kind, metrics) {
             (TargetType::HTTP | TargetType::HTTPS, Metrics::Http(m)) => m.export(&target),
@@ -194,7 +194,7 @@ impl HttpScrapper {
             }
         };
 
-        let span_ref = cx_with_span.span();
+        let span_ref = ctx_with_span.span();
         span_ref.set_status(Status::Ok);
     }
 

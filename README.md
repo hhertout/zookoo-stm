@@ -12,34 +12,45 @@
     </a>
 </p>
 
-# On going
+# TODO List
 
-- Discovery API http targets
-- histogram metrics doesn't work properly
-- Labels on ICMP targets
-- Kafka exporter
-- InfluxDB exporter
-- MongoDB exporter
-- TimescaleDB / PostgreSQL exporter
-- DNS test and expiration date of a dns name
-- metric probe http redirect
-- Unit Tests...
-- Expected content
-- Expected content type
-- Skip tls option on requests
-- Proxy configuration
-- Adding default parameters (headers, timeout, Probe location etc...)
-- GRPC request handler
-- UI
-- Massive load testing
-- target hot reload
-- HTTP API request to get the target list
-- Process Operator to add / restart the process via api
-- Clusterting - Ring to handle multi containerization / k8s with the same config target
-- Referential building
+- Global:
 
-Caution : Icmp scraping requires root privileges to run properly, as it uses the ping command under the hood.
-Run in sudo...
+  - check histogram metrics -> doesn't work properly
+  - Unit Tests...
+  - Configuration Hot Module Reload
+  - Process Operator to add / restart the process via api
+  - UI
+  - Load testing (k6 ?) & benchmarking
+  - Clusterting - Ring to handle multi containerization / k8s with the same config target
+
+- Defaults:
+
+  - Headers
+  - Timeout
+
+- Targets:
+
+  - Labels on ICMP targets
+  - Probe HTTP redirect & follow redirect
+  - Expected content
+  - Expected content type
+  - Proxy configuration
+  - GRPC request handler
+  - DNS test and expiration date of a dns name
+  - Skip tls option on requests
+
+- Discovery:
+
+  - Discovery API http targets
+
+- Exporter:
+
+  - Kafka exporter
+  - InfluxDB exporter
+  - MongoDB exporter
+  - TimescaleDB / PostgreSQL exporter
+  - Referential building
 
 # Presentation
 
@@ -65,6 +76,10 @@ In large-scale environments, we've found Blackbox Exporter to present limitation
 - Providing native support for multiple output backends
 - Offering a more predictable performance profile
 - Being easy to configure and integrate in modern observability stacks
+
+# Documentation
+
+For more information on how to use Zookoo, please refer to the [documentation](). (coming soon)
 
 # Installation
 

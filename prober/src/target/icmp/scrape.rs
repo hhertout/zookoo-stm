@@ -30,11 +30,11 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
     async fn scrape(&self) -> Result<(), ScrapeError> {
         let mut span = tracing_new_span(get_tracer(), "scrape_target".to_string());
         span.set_attribute(KeyValue::new("type", "icmp".to_string()));
-        let cx = Context::current_with_span(span);
-        let guard = cx.clone().attach();
+        let ctx = Context::current_with_span(span);
+        let guard = ctx.clone().attach();
 
         let futures = self.targets.iter().map(|target| {
-            let ctx = cx.clone();
+            let ctx = ctx.clone();
             self.send_request(target, ctx)
         });
 
@@ -44,18 +44,18 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
         Ok(())
     }
 
-    async fn send_request(&self, target: &IcmpTarget, cx: Context) -> Result<(), ScrapeError> {
+    async fn send_request(&self, target: &IcmpTarget, ctx: Context) -> Result<(), ScrapeError> {
         let span_attr = vec![
             KeyValue::new("ipv4", target.ipv4.clone().unwrap_or("unset".to_string())),
             KeyValue::new("fqdn", target.fqdn.clone().unwrap_or("unset".to_string())),
         ];
-        let cx_with_span = child_span_from_context("send_request", cx.clone(), span_attr);
+        let ctx_with_span = child_span_from_context("send_request", ctx.clone(), span_attr);
 
         let kind = match self.get_target_type(target) {
             Ok(target_type) => target_type,
             Err(err) => {
                 log::error!("{}", err.to_string());
-                let span_ref = cx_with_span.span();
+                let span_ref = ctx_with_span.span();
                 span_ref.set_status(Status::Error {
                     description: "get_target_type failed".into(),
                 });
@@ -72,10 +72,10 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
         );
 
         if let Some(metrics) = self
-            .build_icmp_metrics(kind, target, cx_with_span.clone())
+            .build_icmp_metrics(kind, target, ctx_with_span.clone())
             .await
         {
-            let span_ref = cx_with_span.span();
+            let span_ref = ctx_with_span.span();
             span_ref.set_status(Status::Ok);
             log::info!(
                 "event=metrics ipv4={} fqdn={} job=zookoo {}",
@@ -92,10 +92,10 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
                     duration: metrics.duration,
                     labels: target.labels.clone(),
                 }),
-                cx_with_span,
+                ctx_with_span,
             );
         } else {
-            let span_ref = cx_with_span.span();
+            let span_ref = ctx_with_span.span();
             log::error!("build metrics failed");
             span_ref.set_status(Status::Error {
                 description: std::borrow::Cow::Borrowed("probe failed"),
@@ -111,7 +111,7 @@ impl IcmpScrapper {
         &self,
         _: TargetType,
         target: &IcmpTarget,
-        cx: Context,
+        ctx: Context,
     ) -> Option<IcmpMetrics> {
         let span_attr = vec![
             KeyValue::new(
@@ -123,11 +123,11 @@ impl IcmpScrapper {
                 target.fqdn.clone().unwrap_or("unset".to_string()).clone(),
             ),
         ];
-        let cx_with_span = child_span_from_context("build_icmp_metrics", cx.clone(), span_attr);
-        let span_ref = cx_with_span.span();
+        let ctx_with_span = child_span_from_context("build_icmp_metrics", ctx.clone(), span_attr);
+        let span_ref = ctx_with_span.span();
 
         // todo
-        match ping_target(target, cx_with_span.clone()).await {
+        match ping_target(target, ctx_with_span.clone()).await {
             Ok((ip, duration)) => {
                 span_ref.set_status(Status::Ok);
                 Some(IcmpMetrics {
@@ -146,9 +146,9 @@ impl IcmpScrapper {
         }
     }
 
-    fn export_metrics(&self, kind: TargetType, target: String, metrics: Metrics, cx: Context) {
+    fn export_metrics(&self, kind: TargetType, target: String, metrics: Metrics, ctx: Context) {
         let span_attr = vec![KeyValue::new("target", target.clone())];
-        let cx_with_span = child_span_from_context("export_metrics", cx.clone(), span_attr);
+        let ctx_with_span = child_span_from_context("export_metrics", ctx.clone(), span_attr);
 
         match (kind, metrics) {
             (TargetType::IPV4, Metrics::Icmp(m)) => m.export(&target),
@@ -160,7 +160,7 @@ impl IcmpScrapper {
             }
         };
 
-        let span_ref = cx_with_span.span();
+        let span_ref = ctx_with_span.span();
         span_ref.set_status(Status::Ok);
     }
 
