@@ -7,3 +7,4 @@ test-config.toml
 .env
 .env.local
 test-target.json
+target.json
