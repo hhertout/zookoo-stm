@@ -10,6 +10,7 @@ use pyroscope_pprofrs::{PprofConfig, pprof_backend};
 use std::{env, io::Error, process::exit, vec};
 
 mod cli;
+mod hmr;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() {

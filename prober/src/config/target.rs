@@ -12,6 +12,10 @@ fn default_follow_redirect() -> bool {
     return false;
 }
 
+fn default_timeout() -> u16 {
+    return 15;
+}
+
 fn default_method() -> String {
     return String::from("GET");
 }
@@ -39,6 +43,8 @@ pub struct HttpTarget {
     pub headers: Option<HashMap<String, String>>,
     pub labels: Option<HashMap<String, String>>,
     pub auth: Option<AuthConfiguration>,
+    #[serde(default = "default_timeout")]
+    pub timeout_sec: u16,
     #[serde(default = "default_scrape_interval")]
     pub scrape_interval: ScrapeInterval,
     #[serde(default = "default_follow_redirect")]
@@ -64,6 +70,8 @@ pub struct IcmpTarget {
     pub ipv4: Option<String>,
     pub fqdn: Option<String>,
     pub labels: Option<HashMap<String, String>>,
+    #[serde(default = "default_timeout")]
+    pub timeout_sec: u16,
     #[serde(default = "default_scrape_interval")]
     pub scrape_interval: ScrapeInterval,
 }
@@ -82,6 +90,7 @@ impl From<configuration::model::target::IcmpTarget> for IcmpTarget {
             ipv4: value.ipv4,
             fqdn: value.fqdn,
             labels: value.labels,
+            timeout_sec: value.timeout_sec,
             scrape_interval: ScrapeInterval::from(value.scrape_interval),
         }
     }
@@ -104,6 +113,7 @@ impl From<configuration::model::target::HttpTarget> for HttpTarget {
             headers: value.headers,
             labels: value.labels,
             auth: value.auth.map(AuthConfiguration::from),
+            timeout_sec: value.timeout_sec,
             scrape_interval: ScrapeInterval::from(value.scrape_interval),
             follow_redirect: value.follow_redirect,
             skip_tls: value.skip_tls,

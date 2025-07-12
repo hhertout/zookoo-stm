@@ -14,9 +14,8 @@
 
 # On going
 
-- Discovery http targets
+- Discovery API http targets
 - histogram metrics doesn't work properly
-- Adding timeout on ping request (-t)
 - Labels on ICMP targets
 - Kafka exporter
 - InfluxDB exporter
@@ -29,7 +28,6 @@
 - Expected content type
 - Skip tls option on requests
 - Proxy configuration
-- Adding timeout on http request
 - Adding default parameters (headers, timeout, Probe location etc...)
 - GRPC request handler
 - UI

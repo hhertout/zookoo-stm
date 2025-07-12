@@ -58,7 +58,15 @@ pub async fn ping_target(
 
     let start = Instant::now();
     let output = Command::new("ping")
-        .args(["-c", "1", "-W", "1", &ip.to_string()])
+        .args([
+            "-c",
+            "1",
+            "-W",
+            "1",
+            "-t",
+            &target.timeout_sec.to_string(),
+            &ip.to_string(),
+        ])
         .output()
         .await;
 

@@ -20,6 +20,10 @@ fn default_status_code() -> u16 {
     return 200;
 }
 
+fn default_timeout() -> u16 {
+    return 15;
+}
+
 fn default_skip_tls() -> bool {
     return false;
 }
@@ -39,6 +43,8 @@ pub struct HttpTarget {
     pub headers: Option<HashMap<String, String>>,
     pub labels: Option<HashMap<String, String>>,
     pub auth: Option<AuthConfiguration>,
+    #[serde(default = "default_timeout")]
+    pub timeout_sec: u16,
     #[serde(default = "default_scrape_interval")]
     pub scrape_interval: ScrapeInterval,
     #[serde(default = "default_follow_redirect")]
@@ -64,6 +70,8 @@ pub struct IcmpTarget {
     pub ipv4: Option<String>,
     pub fqdn: Option<String>,
     pub labels: Option<HashMap<String, String>>,
+    #[serde(default = "default_timeout")]
+    pub timeout_sec: u16,
     #[serde(default = "default_scrape_interval")]
     pub scrape_interval: ScrapeInterval,
 }
