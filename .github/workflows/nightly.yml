@@ -5,7 +5,7 @@ on:
     branches: ["staging"]
 
 jobs:
-  docker_push:
+  docker_repository_push:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
