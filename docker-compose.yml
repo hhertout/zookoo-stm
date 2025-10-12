@@ -3,7 +3,10 @@ services:
     build: .
     ports:
       - "8888:8888"
-    
+    volumes:
+      - ./:/app
+    command: ["zookoo", "--config", "/app/test-config.toml"]
+   
   mimir:
     image: grafana/mimir:latest
     command:

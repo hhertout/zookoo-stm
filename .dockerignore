@@ -1,0 +1,23 @@
+# Ignore build artifacts and editor/OS cruft from the docker build context
+# Ignore workspace/build `target` directories but do NOT ignore source folders like `prober/src/target`
+/target
+/*/target
+.git
+.gitignore
+node_modules/
+.vscode/
+.idea/
+.DS_Store
+dist/
+*.tar.gz
+*.crate
+**/*.log
+# Optional: ignore local dev configs
+.env
+.env.*
+# docs / static sites
+documentation/node_modules/
+documentation/build/
+
+# Keep Dockerfiles and packaging
+!.docker/

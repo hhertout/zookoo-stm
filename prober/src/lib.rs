@@ -68,7 +68,7 @@ pub async fn run(config: ProbeConfig) {
     //
     // Run the probe and start the scraping
     //
-    probe_engine(config).await;
+    launch_probe_engine(config).await;
 
     // Shutdown obersvability stuff
     if let Some(provider) = tracer_provider {
@@ -88,7 +88,7 @@ pub async fn run(config: ProbeConfig) {
 ///
 /// The behavior of the scraping method and metric creation is defined on the dedicated module, refering to the target specification.
 ///
-pub async fn probe_engine(mut config: ProbeConfig) {
+pub async fn launch_probe_engine(mut config: ProbeConfig) {
     let (icmp_shutdown_tx, icmp_shutdown_rx) = mpsc::channel::<()>(1);
     let (http_shutdown_tx, http_shutdown_rx) = mpsc::channel::<()>(1);
 
