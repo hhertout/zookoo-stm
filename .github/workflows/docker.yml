@@ -10,6 +10,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
     - name: Login to Docker Hub
       uses: docker/login-action@v1
@@ -43,28 +45,34 @@ jobs:
 
     - name: Get latest git tag
       id: get_tag
-      run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      run: |
+        git fetch --tags --prune
+        latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        echo "tag=$latest_tag" >> $GITHUB_OUTPUT
 
     - name: Build and push API image - with version | Debian
+      if: steps.get_tag.outputs.tag != ''
       uses: docker/build-push-action@v5
       with:
         context: ./
         file: ./.docker/deb.dockerfile
         push: true
-        tags: neryolo/zookoo:${{github.ref_name}}
+        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}
 
     - name: Build and push API image - with version | Ubuntu
+      if: steps.get_tag.outputs.tag != ''
       uses: docker/build-push-action@v5
       with:
         context: ./
         file: ./.docker/ubuntu.dockerfile
         push: true
-        tags: neryolo/zookoo:${{github.ref_name}}-ubuntu
+        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}-ubuntu
 
     - name: Build and push API image - with version | Alpine
+      if: steps.get_tag.outputs.tag != ''
       uses: docker/build-push-action@v5
       with:
         context: ./
         file: ./.docker/alpine.dockerfile
         push: true
-        tags: neryolo/zookoo:${{github.ref_name}}-alpine
+        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}-alpine
