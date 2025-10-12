@@ -2,7 +2,7 @@ name: 🐳 Deploy Zookoo - DockerHub
 
 on:
   push:
-    branches: ["main", "cd/develop"]
+    branches: ["main"]
 
 jobs:
   docker_push:
