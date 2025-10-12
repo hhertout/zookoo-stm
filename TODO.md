@@ -2,6 +2,7 @@
 
 - Global:
 
+  - Fix prod dockerfile `exec /usr/local/bin/zookoo: no such file or directory`
   - Check config function (main.rs)
   - check histogram metrics -> doesn't work properly (to confirm)
   - Unit Tests...
