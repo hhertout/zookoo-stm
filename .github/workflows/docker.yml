@@ -59,7 +59,7 @@ jobs:
         context: ./
         file: ./.docker/ubuntu.dockerfile
         push: true
-        tags: neryolo/zookoo-ubuntu:${{ steps.get_tag.outputs.tag }}
+        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}-ubuntu
 
     - name: Build and push API image - with version | Alpine
       uses: docker/build-push-action@v5
