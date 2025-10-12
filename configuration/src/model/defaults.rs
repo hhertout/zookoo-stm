@@ -4,6 +4,10 @@ fn default_log_level() -> String {
     return String::from("info");
 }
 
+fn default_tls_ignore() -> bool {
+    return false;
+}
+
 fn default_self_monitoring_enabled() -> bool {
     return false;
 }
@@ -51,4 +55,6 @@ pub struct SelfMonitoringConfig {
     pub service_name: String,
     #[serde(default = "default_self_monitoring_env")]
     pub env: String,
+    #[serde(default = "default_tls_ignore")]
+    pub tls_ignore: bool,
 }

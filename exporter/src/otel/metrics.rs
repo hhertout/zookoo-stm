@@ -34,9 +34,9 @@ impl MetricsExporter {
 
         self.record_histogram(
             String::from(format!("{}ping_duration", self.prefix)),
-            Some(String::from("s")),
+            Some(String::from("ms")),
             String::from("ping duration repartition"),
-            duration as f64 / 1000.0,
+            duration as f64,
             &self.labels,
         );
     }
@@ -73,9 +73,9 @@ impl MetricsExporter {
 
         self.record_histogram(
             String::from(format!("{}dns_lookup_duration", self.prefix)),
-            Some(String::from("s")),
+            Some(String::from("ms")),
             String::from("dns lookup duration repartition"),
-            dns_lookup_duration as f64 / 1000.0,
+            dns_lookup_duration as f64,
             &self.labels,
         );
 
@@ -105,9 +105,9 @@ impl MetricsExporter {
 
         self.record_histogram(
             String::from(format!("{}http_request_duration", self.prefix)),
-            Some(String::from("s")),
+            Some(String::from("ms")),
             String::from("http request total duration repartition"),
-            http_request_duration as f64 / 1000.0,
+            http_request_duration as f64,
             &self.labels,
         );
 
@@ -122,9 +122,9 @@ impl MetricsExporter {
 
             self.record_histogram(
                 String::from(format!("{}http_tls_lookup_duration", self.prefix)),
-                Some(String::from("s")),
+                Some(String::from("ms")),
                 String::from("tls lookup duration repartition"),
-                http_tls_lookup_duration as f64 / 1000.0,
+                http_tls_lookup_duration as f64,
                 &self.labels,
             );
         }
@@ -140,9 +140,9 @@ impl MetricsExporter {
 
             self.record_histogram(
                 String::from(format!("{}http_tls_handshake_duration", self.prefix)),
-                Some(String::from("s")),
+                Some(String::from("ms")),
                 String::from("http tls handshake duration during the request repartition"),
-                http_tls_handshake_duration as f64 / 1000.0,
+                http_tls_handshake_duration as f64,
                 &self.labels,
             );
         }

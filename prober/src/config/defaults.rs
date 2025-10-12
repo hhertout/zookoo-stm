@@ -1,8 +1,15 @@
+///! This module defines the default configuration settings for the prober application.
+///! It includes the structure for default settings, such as probe location, zone, and self-monitoring configurations.
+///! The defaults are used to initialize the application with sensible values if not explicitly provided in the configuration file.
 use std::collections::HashMap;
 
 use serde::Deserialize;
 
 fn default_self_monitoring_enabled() -> bool {
+    return false;
+}
+
+fn default_tls_ignore() -> bool {
     return false;
 }
 
@@ -41,6 +48,8 @@ pub struct SelfMonitoringConfig {
     pub service_name: String,
     #[serde(default = "default_self_monitoring_env")]
     pub env: String,
+    #[serde(default = "default_tls_ignore")]
+    pub tls_ignore: bool,
 }
 
 impl Defaults {
@@ -92,6 +101,7 @@ impl From<configuration::model::defaults::SelfMonitoringConfig> for SelfMonitori
             otel_endpoint: value.otel_endpoint,
             service_name: value.service_name,
             env: value.env,
+            tls_ignore: value.tls_ignore,
         }
     }
 }

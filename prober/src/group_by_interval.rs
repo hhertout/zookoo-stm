@@ -1,5 +1,10 @@
 use crate::config::scrape_interval::ScrapeInterval;
 
+/// GroupByInterval is a struct that holds vectors of items grouped by different time intervals.
+/// It provides methods to access and manipulate these groups, allowing for efficient handling of data that is categorized by time intervals.
+/// The intervals include 5 seconds, 10 seconds, 30 seconds, 1 minute, 5 minutes, 10 minutes, 30 minutes, 1 hour, 12 hours, 1 day, 7 days, and 30 days.
+/// Each group is represented as a vector of items of type T, allowing for flexible storage of various data types.
+///
 #[derive(Debug, Clone)]
 pub struct GroupByInterval<T> {
     pub s5: Vec<T>,
@@ -108,6 +113,9 @@ impl<T: Clone> GroupByInterval<T> {
         ]
     }
 
+    /// Merge two GroupByInterval instances by concatenating their vectors for each interval.
+    /// This method allows for combining the data from two instances, effectively merging their contents.
+    /// It returns a new GroupByInterval instance that contains the combined data from both instances.
     pub fn merge(&self, other: GroupByInterval<T>) -> GroupByInterval<T> {
         GroupByInterval {
             s5: [self.s5.clone(), other.s5.clone()].concat(),

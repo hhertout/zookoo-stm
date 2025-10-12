@@ -11,6 +11,7 @@ pub struct ExporterConfiguration {
 pub struct OtelGrpcExporterConfiguration {
     pub url: String,
     pub auth: Option<AuthConfiguration>,
+    pub tls_insecure: bool,
     pub cert_path: Option<String>,
 }
 

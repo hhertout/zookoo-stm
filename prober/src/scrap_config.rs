@@ -40,6 +40,9 @@ impl ProbeConfig {
         return self;
     }
 
+    /// Get the group of ICMP targets grouped by their scrape intervals.
+    /// This method iterates over the ICMP targets defined in the configuration and groups them based on their scrape intervals.
+    /// It returns a `GroupByInterval<IcmpTarget>` instance containing the targets categorized by their respective intervals.
     pub fn icmp_group_by_interval(&self) -> GroupByInterval<IcmpTarget> {
         let mut group_by: GroupByInterval<IcmpTarget> = GroupByInterval::new();
         let _ = self.scrap_config.icmp.as_ref().map(|icmp_target| {
@@ -64,6 +67,9 @@ impl ProbeConfig {
         return group_by;
     }
 
+    /// Get the group of HTTP targets grouped by their scrape intervals.
+    /// This method iterates over the HTTP targets defined in the configuration and groups them based on their scrape intervals.
+    /// It returns a `GroupByInterval<HttpTarget>` instance containing the targets categorized by their respective intervals.
     pub fn http_group_by_interval(&self) -> GroupByInterval<HttpTarget> {
         let mut group_by: GroupByInterval<HttpTarget> = GroupByInterval::new();
         let _ = self.scrap_config.http.as_ref().map(|http_target| {

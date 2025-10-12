@@ -16,7 +16,8 @@
 
 - Global:
 
-  - check histogram metrics -> doesn't work properly
+  - Check config function (main.rs)
+  - check histogram metrics -> doesn't work properly (to confirm)
   - Unit Tests...
   - Configuration Hot Module Reload
   - Process Operator to add / restart the process via api
@@ -83,11 +84,9 @@ For more information on how to use Zookoo, please refer to the [documentation]()
 
 # Installation
 
-## With docker
+## With docker (recommended)
 
-This is the recommended way.
-
-Use the docker image `neryo/rustbox:latest`
+Use the docker image `neryo/zookoo:latest`
 
 ## Manual installation
 
@@ -98,9 +97,9 @@ Use the binary
 **You need cargo and rust installed**
 
 ```bash
-git clone <the repo> redbox
+git clone <the repo> zookoo
 
-cd redbox
+cd zookoo
 cargo build # build the project accordingly to your system
 
 # It create a binary in the /target folder

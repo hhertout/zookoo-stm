@@ -1,3 +1,7 @@
+///! This module defines the configuration for exporters in the prober application.
+///! It includes the structure for exporter configurations, such as OpenTelemetry, Kafka, and Metrics exporters.
+///! The configurations are used to define how the data should be exported, including endpoints, authentication
+
 #[derive(Debug, Clone)]
 pub struct ExporterConfiguration {
     pub otel: Option<OtelGrpcExporterConfiguration>,
@@ -10,6 +14,7 @@ pub struct OtelGrpcExporterConfiguration {
     pub url: String,
     pub auth: Option<AuthConfiguration>,
     pub cert_path: Option<String>,
+    pub tls_insecure: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -63,6 +68,7 @@ impl From<configuration::model::exporter::OtelGrpcExporterConfiguration>
             url: value.url,
             auth: value.auth.map(AuthConfiguration::from),
             cert_path: value.cert_path,
+            tls_insecure: value.tls_insecure,
         }
     }
 }
@@ -103,6 +109,7 @@ impl Into<exporter::config::OtelGrpcExporterConfiguration> for OtelGrpcExporterC
             url: self.url,
             auth: self.auth.map(Into::into),
             cert_path: self.cert_path,
+            tls_insecure: self.tls_insecure,
         }
     }
 }

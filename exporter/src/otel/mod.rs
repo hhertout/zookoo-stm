@@ -55,6 +55,19 @@ pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterP
         .with_tonic()
         .with_endpoint(config.url.clone());
 
+    if config.url.starts_with("https") {
+        let mut tls_config = ClientTlsConfig::new();
+
+        if config.tls_insecure {
+            tls_config = tls_config.with_enabled_roots();
+        } else {
+            tls_config = tls_config.with_native_roots();
+        }
+
+        // Apply tls
+        builder = builder.with_tls_config(tls_config);
+    }
+
     if let Some(auth) = config.auth_header() {
         log::warn!("otel authentication enable");
         builder = builder.with_metadata(auth.to_metadata());

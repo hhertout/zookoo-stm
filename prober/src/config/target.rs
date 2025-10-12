@@ -1,3 +1,6 @@
+///! This module defines the configuration for scraping targets in the prober application.
+///! It includes the structure for the scrap configuration, default settings, and methods to group targets by their scrape intervals.
+///! The configuration is used to define how the scraping should be performed, including intervals and labels.
 use std::collections::HashMap;
 
 use serde::Deserialize;

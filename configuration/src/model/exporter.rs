@@ -1,5 +1,9 @@
 use serde::Deserialize;
 
+fn default_tls_insecure() -> bool {
+    return false;
+}
+
 #[derive(Debug, Deserialize)]
 pub struct ExporterConfiguration {
     pub otel: Option<OtelGrpcExporterConfiguration>,
@@ -12,6 +16,8 @@ pub struct OtelGrpcExporterConfiguration {
     pub url: String,
     pub auth: Option<AuthConfiguration>,
     pub cert_path: Option<String>,
+    #[serde(default = "default_tls_insecure")]
+    pub tls_insecure: bool,
 }
 
 #[derive(Debug, Deserialize)]

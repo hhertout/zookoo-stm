@@ -54,14 +54,23 @@ async fn main() {
             config.defaults.self_monitoring.pyroscope_endpoint
         );
 
-        if let Ok(agent) = start_pyrsocope(
+        match start_pyrsocope(
             &config.defaults.self_monitoring.pyroscope_endpoint,
             &config.defaults.self_monitoring.service_name,
         ) {
-            pyroscope_agent = Some(agent.start().unwrap());
-        } else {
-            log::error!("fail to start pyroscope agent")
-        };
+            Ok(agent) => match agent.start() {
+                Ok(started_agent) => {
+                    pyroscope_agent = Some(started_agent);
+                    log::info!("Pyroscope agent started successfully");
+                }
+                Err(e) => {
+                    log::error!("Failed to start pyroscope agent: {}", e);
+                }
+            },
+            Err(e) => {
+                log::error!("Failed to initialize pyroscope agent: {}", e);
+            }
+        }
     }
 
     let log_level = args.log_level.unwrap_or(config.defaults.log_level.clone());
@@ -113,6 +122,7 @@ fn set_log_level(log_level: String) {
 }
 
 fn check_config() -> Result<(), Error> {
+    // TODO
     Ok(())
 }
 
