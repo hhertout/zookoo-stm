@@ -9,6 +9,8 @@ For configuration of Zookoo, you need to create a configuration file where you w
 This is a simple configuration file to scrape a single target.
 
 ```toml
+# config.toml
+
 [defaults]
 log_level = "info"
 
