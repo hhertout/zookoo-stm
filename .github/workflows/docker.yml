@@ -43,7 +43,7 @@ jobs:
 
     - name: Get latest git tag
       id: get_tag
-      run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+      run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
     - name: Build and push API image - with version | Debian
       uses: docker/build-push-action@v5
@@ -51,7 +51,7 @@ jobs:
         context: ./
         file: ./.docker/deb.dockerfile
         push: true
-        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}
+        tags: neryolo/zookoo:${{github.ref_name}}
 
     - name: Build and push API image - with version | Ubuntu
       uses: docker/build-push-action@v5
@@ -59,7 +59,7 @@ jobs:
         context: ./
         file: ./.docker/ubuntu.dockerfile
         push: true
-        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}-ubuntu
+        tags: neryolo/zookoo:${{github.ref_name}}-ubuntu
 
     - name: Build and push API image - with version | Alpine
       uses: docker/build-push-action@v5
@@ -67,4 +67,4 @@ jobs:
         context: ./
         file: ./.docker/alpine.dockerfile
         push: true
-        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}-alpine
+        tags: neryolo/zookoo:${{github.ref_name}}-alpine
