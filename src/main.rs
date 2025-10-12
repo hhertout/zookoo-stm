@@ -9,12 +9,13 @@ use pyroscope::{
 use pyroscope_pprofrs::{PprofConfig, pprof_backend};
 use std::{env, io::Error, process::exit, vec};
 
+mod ascii_art;
 mod cli;
 mod hmr;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() {
-    print_ascii_art();
+    ascii_art::print_ascii_art();
     dotenv().ok();
 
     let default_config_file_path = match env::var("RUST_ENV").as_deref() {
@@ -147,48 +148,4 @@ fn start_pyrsocope(
     let agent = pyroscope.build()?;
 
     Ok(agent)
-}
-
-fn print_ascii_art() {
-    println!(
-        r#"
-                _
-            ,.-" "-.,
-           /   ===   \
-          /  =======  \
-       __|  (o)   (0)  |__      
-      / _|    .---.    |_ \         
-     | /.----/ O O \----.\ |       
-      \/     |     |     \/        
-      |                   |            
-      |                   |           
-      |                   |          
-      _\   -.,_____,.-   /_         
-  ,.-"  "-.,_________,.-"  "-.,
- /          |       |          \  
-|           l.     .l           | 
-|            |     |            |
-l.           |     |           .l             
- |           l.   .l           | \,     
- l.           |   |           .l   \,    
-  |           |   |           |      \,  
-  l.          |   |          .l        |
-   |          |   |          |         |
-   |          |---|          |         |
-   |          |   |          |         |
-   /"-.,__,.-"\   /"-.,__,.-"\"-.,_,.-"\
-  |            \ /            |         |
-  |             |             |         |
-   \__|__|__|__/ \__|__|__|__/ \_|__|__/
-
-    ______            _    _____  _____ 
-   |___  /           | |  |  _  ||  _  |
-      / /  ___   ___ | | _| | | || | | |
-     / /  / _ \ / _ \| |/ / | | || | | |
-   ./ /__| (_) | (_) |   <\ \_/ /\ \_/ /
-   \_____/\___/ \___/|_|\_\\___/  \___/ 
-                                        
-                                     
-"#
-    );
 }
