@@ -2,7 +2,7 @@ name: 🐳 Deploy Zookoo - DockerHub
 
 on:
   push:
-    branches: ["develop", "cd/develop"]
+    branches: ["main", "cd/develop"]
 
 jobs:
   docker_push:
@@ -17,13 +17,21 @@ jobs:
         username: neryolo
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Build and push API image - latest
+    - name: Build and push API image - latest | Debian
       uses: docker/build-push-action@v5
       with:
         context: ./
         file: ./.docker/deb.dockerfile
         push: true
         tags: neryolo/zookoo:latest
+
+    - name: Build and push API image - latest | Ubuntu
+      uses: docker/build-push-action@v5
+      with:
+        context: ./
+        file: ./.docker/ubuntu.dockerfile
+        push: true
+        tags: neryolo/zookoo-ubuntu:latest
 
     - name: Build and push API image - latest | Alpine
       uses: docker/build-push-action@v5
@@ -37,7 +45,7 @@ jobs:
       id: get_tag
       run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
-    - name: Build and push API image - with version
+    - name: Build and push API image - with version | Debian
       uses: docker/build-push-action@v5
       with:
         context: ./
@@ -45,7 +53,15 @@ jobs:
         push: true
         tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}
 
-    - name: Build and push API image - latest | Alpine
+    - name: Build and push API image - with version | Ubuntu
+      uses: docker/build-push-action@v5
+      with:
+        context: ./
+        file: ./.docker/ubuntu.dockerfile
+        push: true
+        tags: neryolo/zookoo-ubuntu:${{ steps.get_tag.outputs.tag }}
+
+    - name: Build and push API image - with version | Alpine
       uses: docker/build-push-action@v5
       with:
         context: ./
