@@ -13,7 +13,7 @@
 
 - Probers:
 
-  - TCP probe
+  - TCP connect probe
   - UDP probe
 
 - Defaults:
