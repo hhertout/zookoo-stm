@@ -11,8 +11,8 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Designed for Grafana & Easy to Use',
+    Svg: require('@site/static/img/grafana.svg').default,
     description: (
       <>
         Zookoo is designed to be user-friendly and easy to set up. With a
@@ -25,7 +25,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Open Telemetry Complient',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    Svg: require('@site/static/img/otel.svg').default,
     description: (
       <>
         Zookoo is fully compliant with Open Telemetry standards, allowing
@@ -38,7 +38,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Powered by Rust',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    Svg: require('@site/static/img/speed.svg').default,
     description: (
       <>
         Blazingly fast and efficient, Zookoo is built with Rust to
