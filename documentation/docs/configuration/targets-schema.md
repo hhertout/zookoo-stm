@@ -1,33 +1,10 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-# Targets Configuration
+# Targets Schema
 
-## Source
-
-Zookoo can scrape metrics from various HTTP endpoints. You can define these targets in the configuration file or load them from a JSON file.
-
-### From the config file
-
-```toml
-[http]
-targets = [
-    { url = "https://google.com/", labels = { "env" = "dev", "service_name" = "google" }, scrape_interval = "10s" },
-    { url = "https://chatgpt.com/", labels = { "env" = "dev", "service_name" = "chatgpt" }, scrape_interval = "5s" },
-]
-```
-
-### From a JSON file
-
-```toml
-[http]
-targets_files = ["targets_zone1.json", "targets_zone2.json"]
-```
-
-## Target configuration
-
-### Block
+## Block
 
 - **`url`**:
 

@@ -13,7 +13,8 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
-        <Heading as="h1" className="hero__title">
+        <img src="/img/zookoo_backgroundless.png" alt="Zookoo Logo" width={300} height={300} />
+        <Heading as="h1" className="hero__title">   
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
@@ -21,7 +22,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/category/quick-start">
-            Zookoo Tutorial - 5min ⏱️
+            Zookoo quick start
           </Link>
         </div>
       </div>
@@ -33,7 +34,7 @@ export default function Home(): ReactNode {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
+      title={`${siteConfig.title} Documentation`}
       description="Description will go into a meta tag in <head />">
       <HomepageHeader />
       <main>
