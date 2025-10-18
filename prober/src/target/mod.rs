@@ -57,6 +57,12 @@ impl Display for ScrapeError {
 
 impl std::error::Error for ScrapeError {}
 
+/// Trait to define the scraping behavior depending on the target type
+///
+/// Handle the scraping behavior depending on the target type
+///
+/// Args: `T` target type
+///
 pub trait Scraping<T> {
     fn new(targets: Vec<T>) -> Self;
     fn scrape(&self) -> impl Future<Output = Result<(), ScrapeError>> + Send;

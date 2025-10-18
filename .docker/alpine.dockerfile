@@ -1,6 +1,16 @@
-FROM rust:latest AS builder
+FROM rust:alpine3.22 AS builder
 
 WORKDIR /usr/src/app
+
+# Install build dependencies including static OpenSSL libraries
+RUN apk add --no-cache \
+    build-base \
+    musl-dev \
+    openssl-dev \
+    openssl-libs-static \
+    pkgconfig \
+    git \
+    ca-certificates
 
 # Copy source code
 COPY . .
@@ -10,23 +20,22 @@ RUN cargo build --release
 
 FROM alpine:latest
 
-# Set user and group with no rights
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+WORKDIR /app
 
-# Copy binary from builder
-COPY --from=builder /usr/src/app/target/release/zookoo /usr/local/bin/zookoo
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates
 
-# Set permissions
+# Create a non-root user
+RUN addgroup -g 1000 appuser && \
+    adduser -D -u 1000 -G appuser appuser && \
+    chown -R appuser:appuser /app
 
-RUN chown appuser:appgroup /usr/local/bin/zookoo
-RUN chmod +x /usr/local/bin/zookoo
+# Copy the binary from builder
+COPY --from=builder /usr/src/app/target/release/zookoo /app/
+RUN chown appuser:appuser /app/zookoo
 
-RUN echo "export PATH=\$PATH:/usr/local/bin" >> /home/appuser/.profile
+# Switch to non-root user
+USER appuser
 
-ENTRYPOINT ["/usr/local/bin/zookoo"]
-
-USER appuser:appgroup
-
-
-
-CMD [ "zookoo", "--config", "/etc/zookoo/config.toml" ]
+# Run the application
+CMD ["/app/zookoo"]

@@ -96,22 +96,25 @@ pub async fn launch_probe_engine(mut config: ProbeConfig) {
     let icmp_group_by = config.apply_default_labels().icmp_group_by_interval();
     let http_group_by = config.apply_default_labels().http_group_by_interval();
 
-    // launch the scraping process
+    // launch the scraping process for each target type
     // for each interval -
     // |_ launch 1 job per interval
     //    |_ each interval launch one job per target
     //    |_ each target job complete send metrics in the same job
     //
-    let scrape_task = tokio::spawn(scrape_with_shutdown::<HttpScrapper, HttpTarget>(
+    let scrape_http_task = tokio::spawn(scrape_with_shutdown::<HttpScrapper, HttpTarget>(
         http_group_by,
         http_shutdown_rx,
     ));
-    let _ = tokio::spawn(scrape_with_shutdown::<IcmpScrapper, IcmpTarget>(
+
+    let scrape_icmp_task = tokio::spawn(scrape_with_shutdown::<IcmpScrapper, IcmpTarget>(
         icmp_group_by,
         icmp_shutdown_rx,
     ));
 
+    //
     // waiting for the process stop
+    //
     tokio::signal::ctrl_c()
         .await
         .expect("Failed to listen for Ctrl+C");
@@ -121,7 +124,8 @@ pub async fn launch_probe_engine(mut config: ProbeConfig) {
     // clean close of the jobs
     let _ = icmp_shutdown_tx.send(()).await;
     let _ = http_shutdown_tx.send(()).await;
-    let _ = scrape_task.await;
+    let _ = scrape_http_task.await;
+    let _ = scrape_icmp_task.await;
 }
 
 /// Get the tracer instance
