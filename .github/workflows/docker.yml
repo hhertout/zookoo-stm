@@ -36,14 +36,14 @@ jobs:
         platforms: linux/amd64,linux/arm64
         tags: neryolo/zookoo:latest
 
-    - name: Build and push API image - latest | Ubuntu
-      uses: docker/build-push-action@v5
-      with:
-        context: ./
-        file: ./.docker/ubuntu.dockerfile
-        push: true
-        platforms: linux/amd64,linux/arm64
-        tags: neryolo/zookoo:latest-ubuntu
+#    - name: Build and push API image - latest | Ubuntu
+#      uses: docker/build-push-action@v5
+#      with:
+#        context: ./
+#        file: ./.docker/ubuntu.dockerfile
+#        push: true
+#        platforms: linux/amd64,linux/arm64
+#        tags: neryolo/zookoo:latest-ubuntu
 
     - name: Build and push API image - latest | Alpine
       uses: docker/build-push-action@v5
@@ -71,15 +71,15 @@ jobs:
         platforms: linux/amd64,linux/arm64
         tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}
 
-    - name: Build and push API image - with version | Ubuntu
-      if: steps.get_tag.outputs.tag != ''
-      uses: docker/build-push-action@v5
-      with:
-        context: ./
-        file: ./.docker/ubuntu.dockerfile
-        push: true
-        platforms: linux/amd64,linux/arm64
-        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}-ubuntu
+#    - name: Build and push API image - with version | Ubuntu
+#      if: steps.get_tag.outputs.tag != ''
+#      uses: docker/build-push-action@v5
+#      with:
+#        context: ./
+#        file: ./.docker/ubuntu.dockerfile
+#        push: true
+#        platforms: linux/amd64,linux/arm64
+#        tags: neryolo/zookoo:${{ steps.get_tag.outputs.tag }}-ubuntu
 
     - name: Build and push API image - with version | Alpine
       if: steps.get_tag.outputs.tag != ''
