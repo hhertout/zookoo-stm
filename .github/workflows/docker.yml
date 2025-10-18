@@ -1,4 +1,4 @@
-name: 🐳 Deploy Zookoo - DockerHub
+name: 🐳 Deploy - DockerHub
 
 on:
   push:

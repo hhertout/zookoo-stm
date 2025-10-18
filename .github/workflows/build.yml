@@ -1,4 +1,4 @@
-name: ♻️ Integration pipeline
+name: ♻️ Integration
 
 on: [push, pull_request]
 

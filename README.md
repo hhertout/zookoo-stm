@@ -8,7 +8,10 @@
 <p align="center">
     <img src="https://img.shields.io/badge/version-0.0.1-blue" alt="version">
     <a href="https://github.com/hhertout/rac_tool/actions">
-      <img alt="Tests Passing" src="https://github.com/hhertout/rac_tool/actions/workflows/rust.yml/badge.svg" />
+      <img alt="Tests Passing" src="https://github.com/hhertout/zookoo-stm/actions/workflows/docker.yml/badge.svg" />
+    </a>
+    <a href="https://github.com/hhertout/rac_tool/actions">
+      <img alt="Tests Passing" src="https://github.com/hhertout/zookoo-stm/actions/workflows/nightly.yml/badge.svg" />
     </a>
 </p>
 
