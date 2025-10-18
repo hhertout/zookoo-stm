@@ -55,6 +55,7 @@ pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterP
         .with_tonic()
         .with_endpoint(config.url.clone());
 
+    // Configure TLS if needed
     if config.url.starts_with("https") {
         let mut tls_config = ClientTlsConfig::new();
 
@@ -68,11 +69,13 @@ pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterP
         builder = builder.with_tls_config(tls_config);
     }
 
+    // Configure authentication if needed
     if let Some(auth) = config.auth_header() {
         log::warn!("otel authentication enable");
         builder = builder.with_metadata(auth.to_metadata());
     }
 
+    // Configure custom certificate if needed
     if let Some(cert_path) = config.cert_path {
         log::warn!("otel custom certificate enable");
         if let Ok(pem) = fs::read_to_string(&cert_path) {

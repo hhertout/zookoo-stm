@@ -1,6 +1,15 @@
-FROM rust:latest AS builder
+FROM rust:bookworm AS builder
 
 WORKDIR /usr/src/app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy source code
 COPY . .
@@ -8,22 +17,27 @@ COPY . .
 # Build the application in release mode
 RUN cargo build --release
 
-FROM debian:latest
+FROM debian:bookworm-slim
 
-# Set user and group with no rights
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+WORKDIR /app
 
-# Copy binary from builder
-COPY --from=builder /usr/src/app/target/release/zookoo /usr/local/bin/zookoo
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set permissions
-RUN chown appuser:appgroup /usr/local/bin/zookoo
-RUN chmod +x /usr/local/bin/zookoo
+# Create a non-root user
+RUN groupadd -g 1000 appuser && \
+    useradd -r -u 1000 -g appuser appuser && \
+    chown -R appuser:appuser /app
 
-ENV PATH="/usr/local/bin:${PATH}"
+# Copy the binary from builder
+COPY --from=builder /usr/src/app/target/release/zookoo /app/
+RUN chown appuser:appuser /app/zookoo
 
-ENTRYPOINT ["/usr/local/bin/zookoo"]
+# Switch to non-root user
+USER appuser
 
-USER appuser:appgroup
-
-CMD [ "zookoo", "--config", "/etc/zookoo/config.toml" ]
+# Run the application
+CMD ["/app/zookoo"]

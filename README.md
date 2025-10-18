@@ -1,8 +1,8 @@
 <p align="center">
   <img src=".github/assets/zookoo.png" width="250">
 
-  <h1 align="center">Zookoo</h1>
-    <p align="center">Scrape your target and export your metrics !</p>
+  <h1 align="center">Zookoo (on going)</h1>
+    <p align="center">STM tool for scraping your targets and export your metrics !</p>
 </p>
 
 <p align="center">
