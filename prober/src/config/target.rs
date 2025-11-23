@@ -2,6 +2,7 @@
 ///! It includes the structure for the scrap configuration, default settings, and methods to group targets by their scrape intervals.
 ///! The configuration is used to define how the scraping should be performed, including intervals and labels.
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use serde::Deserialize;
 
@@ -31,6 +32,16 @@ fn default_skip_tls() -> bool {
     return false;
 }
 
+fn deserialize_arc_hashmap<'de, D>(
+    deserializer: D,
+) -> Result<Option<Arc<HashMap<String, String>>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let opt: Option<HashMap<String, String>> = Option::deserialize(deserializer)?;
+    Ok(opt.map(Arc::new))
+}
+
 #[derive(Debug, Clone)]
 pub struct HttpConfiguration {
     pub targets: Vec<HttpTarget>,
@@ -43,8 +54,10 @@ pub struct HttpTarget {
     #[serde(default = "default_status_code")]
     pub expected_status_code: u16,
     pub url: String,
-    pub headers: Option<HashMap<String, String>>,
-    pub labels: Option<HashMap<String, String>>,
+    #[serde(deserialize_with = "deserialize_arc_hashmap", default)]
+    pub headers: Option<Arc<HashMap<String, String>>>,
+    #[serde(deserialize_with = "deserialize_arc_hashmap", default)]
+    pub labels: Option<Arc<HashMap<String, String>>>,
     pub auth: Option<AuthConfiguration>,
     #[serde(default = "default_timeout")]
     pub timeout_sec: u16,
@@ -72,7 +85,8 @@ pub struct IcmpConfiguration {
 pub struct IcmpTarget {
     pub ipv4: Option<String>,
     pub fqdn: Option<String>,
-    pub labels: Option<HashMap<String, String>>,
+    #[serde(deserialize_with = "deserialize_arc_hashmap", default)]
+    pub labels: Option<Arc<HashMap<String, String>>>,
     #[serde(default = "default_timeout")]
     pub timeout_sec: u16,
     #[serde(default = "default_scrape_interval")]
@@ -92,7 +106,7 @@ impl From<configuration::model::target::IcmpTarget> for IcmpTarget {
         IcmpTarget {
             ipv4: value.ipv4,
             fqdn: value.fqdn,
-            labels: value.labels,
+            labels: value.labels.map(Arc::new),
             timeout_sec: value.timeout_sec,
             scrape_interval: ScrapeInterval::from(value.scrape_interval),
         }
@@ -113,8 +127,8 @@ impl From<configuration::model::target::HttpTarget> for HttpTarget {
             expected_status_code: value.expected_status_code,
             method: value.method,
             url: value.url,
-            headers: value.headers,
-            labels: value.labels,
+            headers: value.headers.map(Arc::new),
+            labels: value.labels.map(Arc::new),
             auth: value.auth.map(AuthConfiguration::from),
             timeout_sec: value.timeout_sec,
             scrape_interval: ScrapeInterval::from(value.scrape_interval),

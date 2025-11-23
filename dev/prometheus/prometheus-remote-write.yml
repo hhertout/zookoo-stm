@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Enable remote_write receiver
+# Started with --web.enable-remote-write-receiver flag
+
+scrape_configs:
+  # Scrape Alloy internal metrics
+  - job_name: 'alloy'
+    static_configs:
+      - targets: ['alloy:12345']
+        labels:
+          instance: 'alloy'
+          environment: 'dev'

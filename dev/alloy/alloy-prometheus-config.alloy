@@ -1,0 +1,52 @@
+// OTLP receiver for zookoo OTEL metrics
+otelcol.receiver.otlp "zookoo_otlp" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+  }
+}
+
+// Batch processor
+otelcol.processor.batch "default" {
+  timeout          = "10s"
+  send_batch_size  = 1024
+
+  output {
+    metrics = [otelcol.exporter.prometheus.default.input]
+  }
+}
+
+// Export OTLP to Prometheus format
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.prom.receiver]
+}
+
+// Prometheus remote_write receiver for direct remote_write metrics
+prometheus.receive_http "zookoo_metrics" {
+  http {
+    listen_address = "0.0.0.0"
+    listen_port    = 9999
+  }
+
+  forward_to = [prometheus.remote_write.prom.receiver]
+}
+
+// Forward all metrics to Prometheus
+prometheus.remote_write "prom" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+    
+    queue_config {
+      capacity             = 10000
+      max_shards           = 10
+      max_samples_per_send = 5000
+    }
+  }
+}

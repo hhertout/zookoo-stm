@@ -7,6 +7,15 @@ pub struct ExporterConfiguration {
     pub otel: Option<OtelGrpcExporterConfiguration>,
     pub metrics: Option<MetricsExporterConfiguration>,
     pub kafka: Option<KafkaExporterConfiguration>,
+    pub prometheus_remote_write: Option<PrometheusRemoteWriteConfiguration>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PrometheusRemoteWriteConfiguration {
+    pub url: String,
+    pub job: String,
+    pub instance: Option<String>,
+    pub auth: Option<AuthConfiguration>,
 }
 
 #[derive(Debug, Clone)]
@@ -43,6 +52,7 @@ impl From<configuration::model::exporter::ExporterConfiguration> for ExporterCon
             otel: value.otel.map(OtelGrpcExporterConfiguration::from),
             metrics: value.metrics.map(MetricsExporterConfiguration::from),
             kafka: value.kafka.map(KafkaExporterConfiguration::from),
+            prometheus_remote_write: value.prometheus_remote_write.map(PrometheusRemoteWriteConfiguration::from),
         }
     }
 }
@@ -89,6 +99,19 @@ impl From<configuration::model::exporter::AuthConfiguration> for AuthConfigurati
             username: value.username,
             password: value.password,
             bearer: value.bearer,
+        }
+    }
+}
+
+impl From<configuration::model::exporter::PrometheusRemoteWriteConfiguration>
+    for PrometheusRemoteWriteConfiguration
+{
+    fn from(value: configuration::model::exporter::PrometheusRemoteWriteConfiguration) -> Self {
+        PrometheusRemoteWriteConfiguration {
+            url: value.url,
+            job: value.job,
+            instance: value.instance,
+            auth: value.auth.map(AuthConfiguration::from),
         }
     }
 }
