@@ -84,7 +84,7 @@ async fn main() {
 
     // Parse discovery
     if let Err(err) = parser.fetch_discovery(&mut config) {
-        log::error!("{}", err.to_string());
+        log::error!("{}", err);
         exit(1)
     };
 
@@ -104,14 +104,13 @@ async fn main() {
 fn set_log_level(log_level: String) {
     let default_log_level = String::from("info");
 
-    let log_level_to_apply: String;
-    match log_level.as_str() {
-        "error" => log_level_to_apply = String::from("error"),
-        "warn" => log_level_to_apply = String::from("warn"),
-        "debug" => log_level_to_apply = String::from("debug"),
-        "info" => log_level_to_apply = String::from("info"),
-        _ => log_level_to_apply = default_log_level,
-    }
+    let log_level_to_apply: String = match log_level.as_str() {
+        "error" => String::from("error"),
+        "warn" => String::from("warn"),
+        "debug" => String::from("debug"),
+        "info" => String::from("info"),
+        _ => default_log_level,
+    };
 
     unsafe {
         std::env::set_var("RUST_LOG", log_level_to_apply);
