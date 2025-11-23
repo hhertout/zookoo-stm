@@ -1,0 +1,35 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg17
+    container_name: zookoo-timescaledb
+    environment:
+      POSTGRES_DB: zookoo
+      POSTGRES_USER: zookoo
+      POSTGRES_PASSWORD: zookoo
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+      - ./timescale/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - zookoo-net
+
+  zookoo:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: zookoo-timescale
+    depends_on:
+      - timescaledb
+    volumes:
+      - ./conf/zookoo-timescale-config.toml:/config/config.toml:ro
+    command: ["zookoo", "--config", "/config/config.toml"]
+    networks:
+      - zookoo-net
+
+volumes:
+  timescale_data:
+
+networks:
+  zookoo-net:
+    driver: bridge

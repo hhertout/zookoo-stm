@@ -14,6 +14,7 @@ pub struct ExporterConfiguration {
     pub metrics: Option<MetricsExporterConfiguration>,
     pub kafka: Option<KafkaExporterConfiguration>,
     pub prometheus_remote_write: Option<PrometheusRemoteWriteConfiguration>,
+    pub timescale: Option<TimescaleExporterConfiguration>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -52,4 +53,9 @@ pub struct PrometheusRemoteWriteConfiguration {
     pub job: String,
     pub instance: Option<String>,
     pub auth: Option<AuthConfiguration>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TimescaleExporterConfiguration {
+    pub connection_string: String,
 }

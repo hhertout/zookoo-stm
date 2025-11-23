@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+use std::io::Error;
 
 use opentelemetry::{InstrumentationScope, KeyValue, global};
+use crate::{Export, ExporterRequest, ProbeType};
 
 pub struct MetricsExporter {
     prefix: String,
@@ -273,5 +275,54 @@ impl MetricsExporter {
         };
 
         histogram.record(value, &attr);
+    }
+}
+
+impl Export for MetricsExporter {
+    #[allow(unreachable_patterns)]
+    fn export(&self, probe_type: ProbeType, data: ExporterRequest) -> Result<(), Error> {
+        match probe_type {
+            ProbeType::Http => {
+                // Extract HTTP metrics from the HashMap
+                let up = data.metrics.get("up").copied().unwrap_or(0) as u8;
+                let success = data.metrics.get("success").copied().unwrap_or(0) as u8;
+                let dns_duration = data.metrics.get("dns_duration_ms").copied().unwrap_or(0) as u128;
+                let status_code = data.metrics.get("status_code").copied().unwrap_or(0) as u16;
+                let http_duration = data.metrics.get("http_duration_ms").copied().unwrap_or(0) as u128;
+                let tls_duration = data.metrics.get("tls_duration_ms").map(|v| *v as u128);
+                let tls_handshake = data.metrics.get("tls_handshake_ms").map(|v| *v as u128);
+                let cert_expiration = data.metrics.get("cert_expiration_ts").map(|v| *v as i64);
+                let cert_begin = data.metrics.get("cert_begin_ts").map(|v| *v as i64);
+
+                self.export_metrics(
+                    up,
+                    success,
+                    dns_duration,
+                    status_code,
+                    http_duration,
+                    tls_duration,
+                    tls_handshake,
+                    cert_expiration,
+                    cert_begin,
+                );
+
+                Ok(())
+            }
+            ProbeType::Icmp => {
+                // Extract ICMP metrics from the HashMap
+                let up = data.metrics.get("up").copied().unwrap_or(0) as u8;
+                let rtt_ms = data.metrics.get("rtt_ms").copied().unwrap_or(0) as u128;
+
+                self.export_icmp_metrics(up, rtt_ms);
+
+                Ok(())
+            }
+            _ => {
+                Err(Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    format!("OTEL exporter does not support probe type: {}", probe_type)
+                ))
+            }
+        }
     }
 }

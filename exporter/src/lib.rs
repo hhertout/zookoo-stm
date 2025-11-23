@@ -8,21 +8,43 @@
 //! - Prometheus Pushgateway
 //!
 
-use std::{collections::HashMap, io::Error};
+use std::{collections::HashMap, io::Error, fmt};
 
 pub mod config;
 pub mod otel;
 pub mod prom;
+pub mod timescale;
 
-#[derive(Debug)]
+#[cfg(test)]
+mod lib_tests;
+
+#[cfg(test)]
+mod config_tests;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProbeType {
+    Http,
+    Icmp,
+}
+
+impl fmt::Display for ProbeType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ProbeType::Http => write!(f, "HTTP"),
+            ProbeType::Icmp => write!(f, "ICMP"),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct ExporterRequest {
     pub exporter: ExporterConfigurationRequest,
     pub metrics: HashMap<String, isize>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExporterConfigurationRequest {}
 
 pub trait Export {
-    fn export(&self, data: ExporterRequest) -> Result<(), Error>;
+    fn export(&self, probe_type: ProbeType, data: ExporterRequest) -> Result<(), Error>;
 }

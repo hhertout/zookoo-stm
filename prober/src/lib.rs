@@ -93,8 +93,40 @@ pub async fn run(config: ProbeConfig) {
         None
     };
 
+    // Initialize TimescaleDB exporter if configured
+    let timescale_exporter = if let Some(ts_conf) = &config.scrap_config.exporter.timescale {
+        log::warn!("timescale exporter is enabled");
+        log::info!("timescale connection: {}", ts_conf.connection_string);
+        
+        match crate::core::exporters::create_timescale_pool(&ts_conf.connection_string).await {
+            Ok(pool) => {
+                let pool = std::sync::Arc::new(pool);
+                let labels = std::collections::HashMap::new();
+                let exporter = exporter::timescale::TimescaleExporter::new(pool, labels);
+                
+                // Initialize schema (creates tables and hypertables)
+                match exporter.init_schema().await {
+                    Ok(_) => {
+                        log::info!("TimescaleDB schema initialized successfully");
+                        Some(exporter)
+                    }
+                    Err(e) => {
+                        log::error!("Failed to initialize TimescaleDB schema: {}", e);
+                        None
+                    }
+                }
+            }
+            Err(e) => {
+                log::error!("Failed to connect to TimescaleDB: {}", e);
+                None
+            }
+        }
+    } else {
+        None
+    };
+
     // Create exporters container and initialize as global
-    let exporters = crate::core::MetricExporters::new(prometheus_remote_write);
+    let exporters = crate::core::MetricExporters::new(prometheus_remote_write, timescale_exporter);
     exporters.clone().init_global();
 
     //
