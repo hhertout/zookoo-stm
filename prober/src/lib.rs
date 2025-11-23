@@ -32,17 +32,15 @@ use std::sync::OnceLock;
 use tokio::sync::mpsc;
 
 use crate::config::exporter::OtelGrpcExporterConfiguration;
-use crate::config::target::{HttpTarget, IcmpTarget};
+use crate::core::scraper::scrape_with_shutdown;
+use crate::probes::{HttpScraper, HttpTarget, IcmpScraper, IcmpTarget};
 use crate::scrap_config::ProbeConfig;
-use crate::target::http::scrape::HttpScrapper;
-use crate::target::icmp::scrape::IcmpScrapper;
-use crate::target::scrape_with_shutdown;
 
 pub(crate) mod config;
-pub(crate) mod group_by_interval;
-pub(crate) mod metrics;
+pub(crate) mod core;
+pub(crate) mod probes;
 pub mod scrap_config;
-pub(crate) mod target;
+pub(crate) mod utils;
 
 pub async fn run(config: ProbeConfig) {
     // Init observability stuff
@@ -102,12 +100,12 @@ pub async fn launch_probe_engine(mut config: ProbeConfig) {
     //    |_ each interval launch one job per target
     //    |_ each target job complete send metrics in the same job
     //
-    let scrape_http_task = tokio::spawn(scrape_with_shutdown::<HttpScrapper, HttpTarget>(
+    let scrape_http_task = tokio::spawn(scrape_with_shutdown::<HttpScraper, HttpTarget>(
         http_group_by,
         http_shutdown_rx,
     ));
 
-    let scrape_icmp_task = tokio::spawn(scrape_with_shutdown::<IcmpScrapper, IcmpTarget>(
+    let scrape_icmp_task = tokio::spawn(scrape_with_shutdown::<IcmpScraper, IcmpTarget>(
         icmp_group_by,
         icmp_shutdown_rx,
     ));

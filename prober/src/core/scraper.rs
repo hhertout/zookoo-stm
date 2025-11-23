@@ -1,41 +1,14 @@
+//! Scraper trait definition
 //!
-//! ## Target module
-//!
-//! Made to define the behavior of the scraping process depending on the target type
-//!
-//! ### Target type supported
-//! - ICMP
-//! - HTTP
-//! - HTTPS
-//!
+//! This module defines the core trait that all scraper implementations must follow
+
 use std::fmt::Display;
 use std::sync::Arc;
-
 use opentelemetry::Context;
 use tokio::sync::mpsc;
+use crate::utils::group_by_interval::GroupByInterval;
 
-use crate::group_by_interval::GroupByInterval;
-
-pub mod http;
-pub mod icmp;
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum TargetType {
-    HTTP,
-    HTTPS,
-    IPV4,
-}
-
-impl ToString for TargetType {
-    fn to_string(&self) -> String {
-        match self {
-            TargetType::HTTP => String::from("HTTP"),
-            TargetType::HTTPS => String::from("HTTPS"),
-            TargetType::IPV4 => String::from("ipv4"),
-        }
-    }
-}
-
+/// Error types for scraping operations
 #[derive(Debug)]
 pub enum ScrapeError {
     TypeError(String),
@@ -57,15 +30,21 @@ impl Display for ScrapeError {
 
 impl std::error::Error for ScrapeError {}
 
-/// Trait to define the scraping behavior depending on the target type
+/// Trait to define the scraping behavior for different probe types
 ///
-/// Handle the scraping behavior depending on the target type
+/// This trait must be implemented by all probe types (HTTP, ICMP, etc.)
+/// to define how they scrape their targets and handle the results.
 ///
-/// Args: `T` target type
-///
-pub trait Scraping<T> {
+/// # Type Parameters
+/// * `T` - The target type (e.g., HttpTarget, IcmpTarget)
+pub trait Scraping<T>: Send + Sync + 'static {
+    /// Create a new scraper instance with the given targets
     fn new(targets: Vec<T>) -> Self;
+    
+    /// Execute the scraping operation for all targets
     fn scrape(&self) -> impl Future<Output = Result<(), ScrapeError>> + Send;
+    
+    /// Send a request to a specific target
     fn send_request(
         &self,
         target: &T,
@@ -73,17 +52,21 @@ pub trait Scraping<T> {
     ) -> impl Future<Output = Result<(), ScrapeError>> + Send;
 }
 
-/// Main method to scrape the target depeding on the target specification
+/// Main method to scrape targets with graceful shutdown support
 ///
-/// Args: `inverval_scraping` type of `GroupByInterval`
+/// This function manages the lifecycle of scraping tasks, including:
+/// - Creating interval-based scraping loops
+/// - Managing shutdown signals
+/// - Ensuring all tasks complete gracefully
 ///
-/// Each thread can shutdown gracefully if the `shutdown_rx` is called.
-///
+/// # Type Parameters
+/// * `T` - The scraper type implementing the Scraping trait
+/// * `G` - The target configuration type
 pub async fn scrape_with_shutdown<T, G>(
     intervals_scraping: GroupByInterval<G>,
     mut shutdown_rx: mpsc::Receiver<()>,
 ) where
-    T: Scraping<G> + Sync + std::marker::Send + 'static,
+    T: Scraping<G>,
 {
     let mut tasks = Vec::new();
 
@@ -128,12 +111,14 @@ pub async fn scrape_with_shutdown<T, G>(
         }
     }
 
-    log::info!("All icmp scraping tasks spawned. Waiting for main shutdown signal.");
+    log::info!("All scraping tasks spawned. Waiting for main shutdown signal.");
     shutdown_rx.recv().await;
     log::info!("Main shutdown signal received. Sending shutdown to tasks...");
+    
     for (task, shutdown_tx) in tasks {
         let _ = shutdown_tx.send(()).await;
         let _ = task.await;
     }
-    log::info!("All icmp scraping tasks shut down.");
+    
+    log::info!("All scraping tasks shut down.");
 }

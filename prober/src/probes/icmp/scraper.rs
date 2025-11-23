@@ -10,21 +10,36 @@ use opentelemetry::{
 use crate::{
     child_span_from_context,
     config::target::IcmpTarget,
+    core::{MetricExportable, ScrapeError, Scraping},
     get_tracer,
-    metrics::{Metrics, icmp_metrics::IcmpRequestMetrics},
-    target::{ScrapeError, Scraping, TargetType, icmp::ping::IcmpMetrics},
+    probes::icmp::{
+        metrics::IcmpRequestMetrics,
+        ping::{IcmpMetrics, ping_target},
+    },
     tracing_new_span,
 };
-use crate::{metrics::MetricExportable, target::icmp::ping::ping_target};
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum TargetType {
+    IPV4,
+}
+
+impl ToString for TargetType {
+    fn to_string(&self) -> String {
+        match self {
+            TargetType::IPV4 => String::from("ipv4"),
+        }
+    }
+}
 
 #[derive(Clone)]
-pub struct IcmpScrapper {
+pub struct IcmpScraper {
     pub targets: Vec<IcmpTarget>,
 }
 
-impl Scraping<IcmpTarget> for IcmpScrapper {
+impl Scraping<IcmpTarget> for IcmpScraper {
     fn new(targets: Vec<IcmpTarget>) -> Self {
-        IcmpScrapper { targets }
+        IcmpScraper { targets }
     }
 
     async fn scrape(&self) -> Result<(), ScrapeError> {
@@ -86,12 +101,12 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
 
             self.export_metrics(
                 kind,
-                metrics.target,
-                Metrics::Icmp(IcmpRequestMetrics {
+                metrics.target.clone(),
+                IcmpRequestMetrics {
                     up: metrics.up,
                     duration: metrics.duration,
                     labels: target.labels.clone(),
-                }),
+                },
                 ctx_with_span,
             );
         } else {
@@ -106,7 +121,7 @@ impl Scraping<IcmpTarget> for IcmpScrapper {
     }
 }
 
-impl IcmpScrapper {
+impl IcmpScraper {
     async fn build_icmp_metrics(
         &self,
         _: TargetType,
@@ -146,19 +161,11 @@ impl IcmpScrapper {
         }
     }
 
-    fn export_metrics(&self, kind: TargetType, target: String, metrics: Metrics, ctx: Context) {
+    fn export_metrics(&self, _kind: TargetType, target: String, metrics: IcmpRequestMetrics, ctx: Context) {
         let span_attr = vec![KeyValue::new("target", target.clone())];
         let ctx_with_span = child_span_from_context("export_metrics", ctx.clone(), span_attr);
 
-        match (kind, metrics) {
-            (TargetType::IPV4, Metrics::Icmp(m)) => m.export(&target),
-            _ => {
-                log::error!(
-                    "wrong exporter type, got {}, expect ipv4 or fqdn",
-                    kind.to_string()
-                )
-            }
-        };
+        metrics.export(&target);
 
         let span_ref = ctx_with_span.span();
         span_ref.set_status(Status::Ok);

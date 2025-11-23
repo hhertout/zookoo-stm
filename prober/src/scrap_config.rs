@@ -4,7 +4,7 @@ use crate::{
         scrape_interval::ScrapeInterval,
         target::{HttpTarget, IcmpTarget},
     },
-    group_by_interval::GroupByInterval,
+    utils::GroupByInterval,
 };
 
 #[derive(Debug, Clone)]

@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
-use crate::metrics::MetricExportable;
+use crate::core::MetricExportable;
 
 pub struct IcmpRequestMetrics {
     pub up: u8,

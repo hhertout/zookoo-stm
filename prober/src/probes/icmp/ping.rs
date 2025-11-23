@@ -11,7 +11,7 @@ use opentelemetry::{
 use serde::Serialize;
 use tokio::{net::lookup_host, process::Command};
 
-use crate::{child_span_from_context, config::target::IcmpTarget, target::ScrapeError};
+use crate::{child_span_from_context, config::target::IcmpTarget, core::ScrapeError};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct IcmpMetrics {

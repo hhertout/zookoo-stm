@@ -5,30 +5,42 @@ use reqwest::Client;
 use std::io::{Error, ErrorKind};
 use std::sync::Arc;
 
-use crate::child_span_from_context;
-use crate::target::ScrapeError;
 use crate::{
+    child_span_from_context,
     config::target::HttpTarget,
+    core::{MetricExportable, ScrapeError, Scraping},
     get_tracer,
-    metrics::{MetricExportable, Metrics, http_metrics::HttpRequestMetrics},
-    target::{
-        Scraping, TargetType,
-        http::{
-            dns::dns_lookup,
-            request::http_request,
-            tls::{TlsMetrics, inspect_tls},
-        },
+    probes::http::{
+        dns::dns_lookup,
+        metrics::HttpRequestMetrics,
+        request::http_request,
+        tls::{TlsMetrics, inspect_tls},
     },
     tracing_new_span,
 };
 
+#[derive(PartialEq, Copy, Clone)]
+pub enum TargetType {
+    HTTP,
+    HTTPS,
+}
+
+impl ToString for TargetType {
+    fn to_string(&self) -> String {
+        match self {
+            TargetType::HTTP => String::from("HTTP"),
+            TargetType::HTTPS => String::from("HTTPS"),
+        }
+    }
+}
+
 #[derive(Clone)]
-pub struct HttpScrapper {
+pub struct HttpScraper {
     pub targets: Vec<HttpTarget>,
     client: Arc<Client>,
 }
 
-impl Scraping<HttpTarget> for HttpScrapper {
+impl Scraping<HttpTarget> for HttpScraper {
     fn new(targets: Vec<HttpTarget>) -> Self {
         let client = Client::builder()
             .pool_max_idle_per_host(10)
@@ -39,7 +51,7 @@ impl Scraping<HttpTarget> for HttpScrapper {
                 Client::new()
             });
         
-        HttpScrapper { 
+        HttpScraper { 
             targets,
             client: Arc::new(client),
         }
@@ -113,7 +125,7 @@ impl Scraping<HttpTarget> for HttpScrapper {
             self.export_metrics(
                 kind,
                 target.url.clone(),
-                Metrics::Http(metrics),
+                metrics,
                 ctx_with_span,
             );
         } else {
@@ -127,7 +139,7 @@ impl Scraping<HttpTarget> for HttpScrapper {
     }
 }
 
-impl HttpScrapper {
+impl HttpScraper {
     async fn build_http_metrics(
         &self,
         kind: TargetType,
@@ -195,19 +207,11 @@ impl HttpScrapper {
         })
     }
 
-    fn export_metrics(&self, kind: TargetType, target: String, metrics: Metrics, ctx: Context) {
+    fn export_metrics(&self, _kind: TargetType, target: String, metrics: HttpRequestMetrics, ctx: Context) {
         let span_attr = vec![KeyValue::new("url", target.clone())];
         let ctx_with_span = child_span_from_context("build_http_metrics", ctx.clone(), span_attr);
 
-        match (kind, metrics) {
-            (TargetType::HTTP | TargetType::HTTPS, Metrics::Http(m)) => m.export(&target),
-            _ => {
-                log::error!(
-                    "wrong exporter type, got {}, expect https or https",
-                    kind.to_string()
-                )
-            }
-        };
+        metrics.export(&target);
 
         let span_ref = ctx_with_span.span();
         span_ref.set_status(Status::Ok);

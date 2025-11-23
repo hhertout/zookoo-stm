@@ -2,8 +2,12 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::{
-    metrics::MetricExportable,
-    target::http::{dns::DnsMetrics, request::HttpMetrics, tls::TlsMetrics},
+    core::MetricExportable,
+    probes::http::{
+        dns::DnsMetrics,
+        request::HttpMetrics,
+        tls::TlsMetrics,
+    },
 };
 
 pub struct HttpRequestMetrics {
