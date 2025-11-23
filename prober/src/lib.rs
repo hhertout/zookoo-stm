@@ -93,22 +93,26 @@ pub async fn run(config: ProbeConfig) {
         None
     };
 
-    // Initialize TimescaleDB exporter if configured
-    let timescale_exporter = if let Some(ts_conf) = &config.scrap_config.exporter.timescale {
+    // Initialize TimescaleDB pool if configured
+    let timescale_pool = if let Some(ts_conf) = &config.scrap_config.exporter.timescale {
         log::warn!("timescale exporter is enabled");
         log::info!("timescale connection: {}", ts_conf.connection_string);
         
         match crate::core::exporters::create_timescale_pool(&ts_conf.connection_string).await {
             Ok(pool) => {
                 let pool = std::sync::Arc::new(pool);
-                let labels = std::collections::HashMap::new();
-                let exporter = exporter::timescale::TimescaleExporter::new(pool, labels);
                 
                 // Initialize schema (creates tables and hypertables)
-                match exporter.init_schema().await {
+                // Use a temporary exporter with empty labels just for schema initialization
+                let schema_initializer = exporter::timescale::TimescaleExporter::new(
+                    pool.clone(), 
+                    std::collections::HashMap::new()
+                );
+                
+                match schema_initializer.init_schema().await {
                     Ok(_) => {
                         log::info!("TimescaleDB schema initialized successfully");
-                        Some(exporter)
+                        Some(pool)
                     }
                     Err(e) => {
                         log::error!("Failed to initialize TimescaleDB schema: {}", e);
@@ -126,7 +130,7 @@ pub async fn run(config: ProbeConfig) {
     };
 
     // Create exporters container and initialize as global
-    let exporters = crate::core::MetricExporters::new(prometheus_remote_write, timescale_exporter);
+    let exporters = crate::core::MetricExporters::new(prometheus_remote_write, timescale_pool);
     exporters.clone().init_global();
 
     //

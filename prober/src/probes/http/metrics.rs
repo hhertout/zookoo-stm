@@ -152,9 +152,9 @@ impl MetricExportable for HttpRequestMetrics {
             }
 
             // Export to TimescaleDB if configured
-            if let Some(timescale) = &exporters.timescale {
+            if let Some(pool) = &exporters.timescale_pool {
                 let ts_exporter = exporter::timescale::TimescaleExporter::new(
-                    timescale.pool.clone(),
+                    pool.clone(),
                     labels.clone(),
                 );
                 if let Err(e) = ts_exporter.export(exporter::ProbeType::Http, request) {

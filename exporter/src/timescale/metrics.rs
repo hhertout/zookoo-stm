@@ -5,6 +5,59 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::sync::Arc;
 
+/// Safe conversion from u128 to i64 for duration metrics
+/// 
+/// # Design Rationale
+/// 
+/// Duration metrics are internally represented as `u128` (unsigned 128-bit) in the prober
+/// for maximum precision and to avoid overflow during intermediate calculations. However,
+/// TimescaleDB/PostgreSQL uses `BIGINT` (signed 64-bit) for numeric storage.
+/// 
+/// # Storage Capacity
+/// 
+/// An `i64` can represent values from `-2^63` to `2^63-1`:
+/// - Maximum: 9,223,372,036,854,775,807 milliseconds
+/// - Equivalent: ~292 million years
+/// - Practical use: Network timeouts are typically 1-120 seconds
+/// 
+/// # Overflow Protection
+/// 
+/// While overflow is theoretically possible, it is **extremely unlikely** in practice:
+/// - A network probe timing out at 292 million years would indicate a system failure
+/// - Modern HTTP clients timeout after 30-120 seconds by default
+/// - Even pathological cases won't approach this limit
+/// 
+/// This function uses `try_into()` with fallback to `i64::MAX` to guarantee:
+/// 1. **No panics**: Checked conversion prevents runtime crashes
+/// 2. **Data preservation**: Normal values (99.99999...%) convert without loss
+/// 3. **Graceful degradation**: Overflow cases are logged and clamped
+/// 4. **Observable behavior**: Log warnings help detect edge cases in production
+/// 
+/// # Examples
+/// 
+/// ```rust,ignore
+/// // Normal probe duration: 1 second
+/// assert_eq!(duration_to_i64(1000), 1000);
+/// 
+/// // Long timeout: 5 minutes
+/// assert_eq!(duration_to_i64(300_000), 300_000);
+/// 
+/// // Overflow case (hypothetical): clamps to max
+/// let overflow = (i64::MAX as u128) + 1;
+/// assert_eq!(duration_to_i64(overflow), i64::MAX); // Logs warning
+/// ```
+/// 
+/// # Testing
+/// 
+/// See `timescale::metrics_tests::test_duration_to_i64_*` for comprehensive test coverage.
+#[inline]
+pub(crate) fn duration_to_i64(duration: u128) -> i64 {
+    duration.try_into().unwrap_or_else(|_| {
+        log::warn!("Duration overflow detected: {} ms exceeds i64::MAX, clamping to maximum value", duration);
+        i64::MAX
+    })
+}
+
 /// TimescaleDB metrics exporter
 /// 
 /// Stores probe metrics in TimescaleDB hypertables for time-series analysis.
@@ -66,10 +119,10 @@ impl TimescaleExporter {
             up as i16,
             success as i16,
             status_code as i32,
-            dns_duration as i64,
-            http_duration as i64,
-            tls_duration.map(|d| d as i64),
-            tls_handshake.map(|d| d as i64),
+            duration_to_i64(dns_duration),
+            duration_to_i64(http_duration),
+            tls_duration.map(duration_to_i64),
+            tls_handshake.map(duration_to_i64),
             cert_expiration_ts,
             cert_begin_ts,
             http_version,
@@ -96,7 +149,7 @@ impl TimescaleExporter {
             zone,
             job,
             up as i16,
-            rtt_ms as i64,
+            duration_to_i64(rtt_ms),
             labels_json,
         ).await
     }
@@ -159,10 +212,10 @@ impl Export for TimescaleExporter {
                         up as i16,
                         success as i16,
                         status_code as i32,
-                        dns_duration as i64,
-                        http_duration as i64,
-                        tls_duration.map(|d| d as i64),
-                        tls_handshake.map(|d| d as i64),
+                        duration_to_i64(dns_duration),
+                        duration_to_i64(http_duration),
+                        tls_duration.map(duration_to_i64),
+                        tls_handshake.map(duration_to_i64),
                         cert_expiration,
                         cert_begin,
                         http_version,
@@ -194,7 +247,7 @@ impl Export for TimescaleExporter {
                         zone,
                         job,
                         up as i16,
-                        rtt_ms as i64,
+                        duration_to_i64(rtt_ms),
                         labels_json,
                     ).await {
                         log::error!("Failed to export ICMP metrics to TimescaleDB: {}", e);

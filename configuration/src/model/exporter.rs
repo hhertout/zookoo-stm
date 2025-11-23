@@ -36,7 +36,7 @@ pub struct KafkaExporterConfiguration {
 
 #[derive(Debug, Deserialize)]
 pub struct MetricsExporterConfiguration {
-    pub enpoint: String,
+    pub endpoint: String,
 }
 
 #[derive(Debug, Deserialize)]

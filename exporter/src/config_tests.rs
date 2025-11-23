@@ -110,10 +110,10 @@ mod tests {
     #[test]
     fn test_metrics_exporter_config() {
         let config = MetricsExporterConfiguration {
-            enpoint: "http://metrics:8080".to_string(),
+            endpoint: "http://metrics:8080".to_string(),
         };
 
-        assert_eq!(config.enpoint, "http://metrics:8080");
+        assert_eq!(config.endpoint, "http://metrics:8080");
     }
 
     #[test]

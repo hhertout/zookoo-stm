@@ -93,6 +93,41 @@ CREATE INDEX idx_icmp_metrics_target_time
 ON icmp_metrics (target, time DESC);
 ```
 
+## Data Types and Limits
+
+### Duration Storage
+
+Duration metrics (DNS resolution, HTTP request, TLS handshake, ICMP RTT) are stored as `BIGINT` (signed 64-bit integer) representing **milliseconds**.
+
+**Theoretical Maximum Duration**: 
+- `i64::MAX` = 9,223,372,036,854,775,807 milliseconds
+- ≈ 292,471,208 years
+- ≈ 106,751,991,167,300 days
+- ≈ 2,562,047,788,015 hours
+
+**Practical Application**:
+For network probes with typical timeouts of 1-120 seconds, this storage format is more than sufficient. The exporter includes overflow protection that clamps any duration exceeding `i64::MAX` to the maximum representable value (extremely unlikely in practice).
+
+**Type Conversion Safety**:
+The internal `duration_to_i64()` function uses checked casts to prevent data loss:
+- Normal values: Direct conversion from u128 to i64
+- Overflow values: Clamped to i64::MAX with warning log
+- No panics: Graceful handling of edge cases
+
+### Integer Ranges
+
+| Column | Type | Range | Purpose |
+|--------|------|-------|---------|
+| `up` | SMALLINT | 0-1 | Target reachability (binary flag) |
+| `success` | SMALLINT | 0-1 | Probe success (binary flag) |
+| `status_code` | INTEGER | 100-599 | HTTP status code |
+| `*_duration_ms` | BIGINT | 0 to 2^63-1 | Millisecond durations |
+| `*_ts` | BIGINT | Unix timestamp | Certificate validity timestamps |
+
+### JSON Labels
+
+The `labels` column uses PostgreSQL's `JSONB` format for efficient storage and querying of arbitrary key-value metadata. All probe labels (target, zone, job, etc.) are preserved in this field.
+
 ## Querying Data
 
 ### Recent HTTP Metrics

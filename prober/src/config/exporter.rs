@@ -42,7 +42,7 @@ pub struct KafkaExporterConfiguration {
 
 #[derive(Debug, Clone)]
 pub struct MetricsExporterConfiguration {
-    pub enpoint: String,
+    pub endpoint: String,
 }
 
 #[derive(Debug, Clone)]
@@ -95,7 +95,7 @@ impl From<configuration::model::exporter::MetricsExporterConfiguration>
 {
     fn from(value: configuration::model::exporter::MetricsExporterConfiguration) -> Self {
         MetricsExporterConfiguration {
-            enpoint: value.enpoint,
+            endpoint: value.endpoint,
         }
     }
 }

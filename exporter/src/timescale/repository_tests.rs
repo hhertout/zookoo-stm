@@ -1,8 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use crate::timescale::repository::TimescaleRepository;
-    use std::sync::Arc;
-
     #[test]
     fn test_repository_creation() {
         // We can't test actual DB operations without a database,

@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::timescale::TimescaleExporter;
-    use crate::{Export, ExporterRequest, ExporterConfigurationRequest, ProbeType};
+    use crate::{ExporterRequest, ExporterConfigurationRequest, ProbeType};
     use std::collections::HashMap;
 
     #[test]
@@ -155,5 +154,50 @@ mod tests {
 
         assert_eq!(request.metrics.get("http_duration_ms"), Some(&999999));
         assert_eq!(request.metrics.get("rtt_ms"), Some(&10000));
+    }
+
+    #[test]
+    fn test_duration_to_i64_normal_values() {
+        // Test the safe conversion function with normal duration values
+        use crate::timescale::metrics::duration_to_i64;
+        
+        // Typical duration values (milliseconds)
+        assert_eq!(duration_to_i64(0), 0);
+        assert_eq!(duration_to_i64(100), 100);
+        assert_eq!(duration_to_i64(5000), 5000);
+        assert_eq!(duration_to_i64(60_000), 60_000); // 1 minute
+        assert_eq!(duration_to_i64(3_600_000), 3_600_000); // 1 hour
+        
+        // Maximum safe value (i64::MAX)
+        assert_eq!(duration_to_i64(i64::MAX as u128), i64::MAX);
+    }
+
+    #[test]
+    fn test_duration_to_i64_overflow_protection() {
+        // Test that overflow is handled gracefully
+        use crate::timescale::metrics::duration_to_i64;
+        
+        // Values exceeding i64::MAX should be clamped
+        let overflow_value = (i64::MAX as u128) + 1;
+        assert_eq!(duration_to_i64(overflow_value), i64::MAX);
+        
+        // Extreme overflow
+        let extreme_overflow = u128::MAX;
+        assert_eq!(duration_to_i64(extreme_overflow), i64::MAX);
+    }
+
+    #[test]
+    fn test_duration_limits_documentation() {
+        // Document the practical limits for duration storage
+        // i64::MAX milliseconds = 9,223,372,036,854,775,807 ms
+        // = ~292,471,208 years
+        // This is sufficient for any realistic probe timeout scenario
+        
+        let max_representable_ms = i64::MAX as u128;
+        let ms_per_year = 365.25 * 24.0 * 60.0 * 60.0 * 1000.0;
+        let years = (max_representable_ms as f64) / ms_per_year;
+        
+        // Verify we can represent at least 290 million years
+        assert!(years > 290_000_000.0);
     }
 }

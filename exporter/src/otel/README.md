@@ -25,13 +25,6 @@ The OTLP exporter uses the official OpenTelemetry SDK to export metrics in the s
 [exporter.otel]
 url = "http://otel-collector:4317"
 tls_insecure = true
-
-[exporter.metrics]
-enpoint = "http://otel-collector:4317"
-service_name = "zookoo"
-service_namespace = "monitoring"
-service_version = "1.0.0"
-service_instance_id = "zookoo-prod-01"
 ```
 
 ### With TLS
@@ -135,13 +128,6 @@ prometheus.remote_write "prom" {
 [exporter.otel]
 url = "http://alloy:4317"
 tls_insecure = true
-
-[exporter.metrics]
-enpoint = "http://alloy:4317"
-service_name = "zookoo"
-service_namespace = "monitoring"
-service_version = "1.0.0"
-service_instance_id = "zookoo-prod-01"
 ```
 
 **Docker Compose:**
@@ -210,13 +196,6 @@ service:
 [exporter.otel]
 url = "http://otel-collector:4317"
 tls_insecure = true
-
-[exporter.metrics]
-enpoint = "http://otel-collector:4317"
-service_name = "zookoo"
-service_namespace = "monitoring"
-service_version = "1.0.0"
-service_instance_id = "zookoo-collector"
 ```
 
 ### Grafana Cloud
@@ -229,13 +208,6 @@ tls_insecure = false
 [exporter.otel.auth]
 username = "your-instance-id"
 password = "your-api-token"
-
-[exporter.metrics]
-enpoint = "https://otlp-gateway-prod-us-central-0.grafana.net:443"
-service_name = "zookoo"
-service_namespace = "monitoring"
-service_version = "1.0.0"
-service_instance_id = "zookoo-prod"
 ```
 
 ## Architecture

@@ -3,7 +3,6 @@ mod tests {
     use crate::otel::metrics::MetricsExporter;
     use crate::{Export, ExporterRequest, ExporterConfigurationRequest, ProbeType};
     use std::collections::HashMap;
-    use std::io::Error;
 
     #[test]
     fn test_metrics_exporter_creation() {
