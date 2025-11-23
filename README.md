@@ -31,6 +31,7 @@ It is built as a synthetic monitoring tool (STM) that allows you to scrape targe
 
 - self (via a dedicated endpoint)
 - Open telemetry (http/protobuf & grpc)
+- Prometheus Remote Write
 
 # Why this project?
 
