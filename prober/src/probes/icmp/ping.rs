@@ -13,6 +13,38 @@ use tokio::{net::lookup_host, process::Command};
 
 use crate::{child_span_from_context, config::target::IcmpTarget, core::ScrapeError};
 
+/// Sanitize IP address to prevent command injection
+/// Only allows valid IPv4 format: digits and dots
+pub(super) fn sanitize_ip(ip: &str) -> Result<String, ScrapeError> {
+    if ip.is_empty() {
+        return Err(ScrapeError::InvalidInput(
+            "IP address cannot be empty".to_string(),
+        ));
+    }
+    
+    if ip.chars().all(|c| c.is_ascii_digit() || c == '.') {
+        Ok(ip.to_string())
+    } else {
+        Err(ScrapeError::InvalidInput(format!(
+            "Invalid IP address format: {}",
+            ip
+        )))
+    }
+}
+
+/// Sanitize timeout value to prevent command injection
+/// Only allows positive integers between 1 and 3600 (1 hour max)
+pub(super) fn sanitize_timeout(timeout: u16) -> Result<String, ScrapeError> {
+    if timeout > 0 && timeout <= 3600 {
+        Ok(timeout.to_string())
+    } else {
+        Err(ScrapeError::InvalidInput(format!(
+            "Timeout must be between 1 and 3600 seconds, got: {}",
+            timeout
+        )))
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct IcmpMetrics {
     pub target: String,
@@ -56,6 +88,10 @@ pub async fn ping_target(
         )));
     };
 
+    // Sanitize inputs before passing to command
+    let sanitized_ip = sanitize_ip(&ip.to_string())?;
+    let sanitized_timeout = sanitize_timeout(target.timeout_sec)?;
+
     let start = Instant::now();
     let output = Command::new("ping")
         .args([
@@ -64,8 +100,8 @@ pub async fn ping_target(
             "-W",
             "1",
             "-t",
-            &target.timeout_sec.to_string(),
-            &ip.to_string(),
+            &sanitized_timeout,
+            &sanitized_ip,
         ])
         .output()
         .await;

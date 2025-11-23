@@ -8,6 +8,8 @@
 pub mod metrics;
 pub mod ping;
 pub mod scraper;
+#[cfg(test)]
+mod ping_tests;
 
 pub use scraper::IcmpScraper;
 

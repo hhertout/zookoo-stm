@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use serde::Deserialize;
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, PartialEq)]
 pub enum ScrapeInterval {
     #[serde(rename = "5s")]
     S5,
