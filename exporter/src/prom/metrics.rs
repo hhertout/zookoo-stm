@@ -64,22 +64,57 @@ impl PrometheusRemoteWriteExporter {
 }
 
 impl Export for PrometheusRemoteWriteExporter {
-    fn export(&self, data: ExporterRequest) -> Result<(), Error> {
-        // Convert the generic ExporterRequest into Prometheus remote_write format
-        let mut metrics = Vec::new();
-        
-        for (name, value) in data.metrics {
-            metrics.push((name, value as f64, self.labels.clone()));
-        }
+    #[allow(unreachable_patterns)]
+    fn export(&self, probe_type: crate::ProbeType, data: ExporterRequest) -> Result<(), Error> {
+        use crate::ProbeType;
 
-        // We need to spawn a tokio task because Export trait is sync but push_metrics is async
-        let remote_write = Arc::clone(&self.remote_write);
-        tokio::spawn(async move {
-            if let Err(e) = remote_write.push_metrics(metrics, None).await {
-                log::error!("Failed to export metrics via Export trait: {}", e);
+        match probe_type {
+            ProbeType::Http => {
+                // HTTP metrics
+                let success = data.metrics.get("success").copied().unwrap_or(0) as f64;
+                let dns_duration = data.metrics.get("dns_duration_ms").copied().unwrap_or(0) as f64 / 1000.0;
+                let http_duration = data.metrics.get("http_duration_ms").copied().unwrap_or(0) as f64 / 1000.0;
+
+                let metrics = vec![
+                    ("http_probe_success".to_string(), success, self.labels.clone()),
+                    ("http_probe_duration_seconds".to_string(), http_duration, self.labels.clone()),
+                    ("http_probe_dns_duration_seconds".to_string(), dns_duration, self.labels.clone()),
+                ];
+
+                let remote_write = Arc::clone(&self.remote_write);
+                tokio::spawn(async move {
+                    if let Err(e) = remote_write.push_metrics(metrics, None).await {
+                        log::error!("Failed to export HTTP metrics to Prometheus: {}", e);
+                    }
+                });
+
+                Ok(())
             }
-        });
+            ProbeType::Icmp => {
+                // ICMP metrics
+                let up = data.metrics.get("up").copied().unwrap_or(0) as f64;
+                let rtt_ms = data.metrics.get("rtt_ms").copied().unwrap_or(0) as f64 / 1000.0;
 
-        Ok(())
+                let metrics = vec![
+                    ("icmp_probe_success".to_string(), up, self.labels.clone()),
+                    ("icmp_probe_rtt_seconds".to_string(), rtt_ms, self.labels.clone()),
+                ];
+
+                let remote_write = Arc::clone(&self.remote_write);
+                tokio::spawn(async move {
+                    if let Err(e) = remote_write.push_metrics(metrics, None).await {
+                        log::error!("Failed to export ICMP metrics to Prometheus: {}", e);
+                    }
+                });
+
+                Ok(())
+            }
+            _ => {
+                Err(Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    format!("Prometheus exporter does not support probe type: {}", probe_type)
+                ))
+            }
+        }
     }
 }

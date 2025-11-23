@@ -55,7 +55,7 @@ username = "admin"
 password = "secret"
 
 [exporter.metrics]
-enpoint = "http://prometheus.example.com:9090"
+endpoint = "http://prometheus.example.com:9090"
 
 [exporter.kafka]
 broker = "kafka.example.com:9092"
@@ -145,7 +145,7 @@ scrape_interval = "5m"
         assert_eq!(auth.password, Some("secret".to_string()));
         
         let metrics = config.exporter.metrics.as_ref().unwrap();
-        assert_eq!(metrics.enpoint, "http://prometheus.example.com:9090");
+        assert_eq!(metrics.endpoint, "http://prometheus.example.com:9090");
         
         let kafka = config.exporter.kafka.as_ref().unwrap();
         assert_eq!(kafka.broker, "kafka.example.com:9092");

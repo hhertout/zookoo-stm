@@ -17,6 +17,9 @@ use std::fs;
 
 pub mod metrics;
 
+#[cfg(test)]
+mod metrics_tests;
+
 pub enum AuthHeader {
     Bearer(String),
     Basic { username: String, password: String },

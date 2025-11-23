@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 opentelemetry = { version = "0.31.0" }
 opentelemetry_sdk = { version = "0.31.0", features = ["rt-tokio"] }
-sqlx = "0.8.6"
+sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio", "tls-native-tls", "chrono"] }
 opentelemetry-otlp = { version = "0.31.0", features = [
     "grpc-tonic",
     "tls-roots",
@@ -22,3 +22,4 @@ urlencoding = "2.1"
 prost = "0.14.1"
 prost-types = "0.14.1"
 snap = "1.1.1"
+chrono = { version = "0.4", features = ["serde"] }

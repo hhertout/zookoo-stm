@@ -31,6 +31,8 @@ It is built as a synthetic monitoring tool (STM) that allows you to scrape targe
 
 - self (via a dedicated endpoint)
 - Open telemetry (http/protobuf & grpc)
+- Prometheus Remote Write (compatible with Grafana Alloy, Prometheus, Mimir, etc.)
+- TimescaleDB (PostgreSQL with time-series extension)
 
 # Why this project?
 

@@ -8,6 +8,7 @@ pub struct ExporterConfiguration {
     pub metrics: Option<MetricsExporterConfiguration>,
     pub kafka: Option<KafkaExporterConfiguration>,
     pub prometheus_remote_write: Option<PrometheusRemoteWriteConfiguration>,
+    pub timescale: Option<TimescaleExporterConfiguration>,
 }
 
 #[derive(Debug, Clone)]
@@ -16,6 +17,11 @@ pub struct PrometheusRemoteWriteConfiguration {
     pub job: String,
     pub instance: Option<String>,
     pub auth: Option<AuthConfiguration>,
+}
+
+#[derive(Debug, Clone)]
+pub struct TimescaleExporterConfiguration {
+    pub connection_string: String,
 }
 
 #[derive(Debug, Clone)]
@@ -36,7 +42,7 @@ pub struct KafkaExporterConfiguration {
 
 #[derive(Debug, Clone)]
 pub struct MetricsExporterConfiguration {
-    pub enpoint: String,
+    pub endpoint: String,
 }
 
 #[derive(Debug, Clone)]
@@ -53,6 +59,7 @@ impl From<configuration::model::exporter::ExporterConfiguration> for ExporterCon
             metrics: value.metrics.map(MetricsExporterConfiguration::from),
             kafka: value.kafka.map(KafkaExporterConfiguration::from),
             prometheus_remote_write: value.prometheus_remote_write.map(PrometheusRemoteWriteConfiguration::from),
+            timescale: value.timescale.map(TimescaleExporterConfiguration::from),
         }
     }
 }
@@ -88,7 +95,7 @@ impl From<configuration::model::exporter::MetricsExporterConfiguration>
 {
     fn from(value: configuration::model::exporter::MetricsExporterConfiguration) -> Self {
         MetricsExporterConfiguration {
-            enpoint: value.enpoint,
+            endpoint: value.endpoint,
         }
     }
 }
@@ -112,6 +119,16 @@ impl From<configuration::model::exporter::PrometheusRemoteWriteConfiguration>
             job: value.job,
             instance: value.instance,
             auth: value.auth.map(AuthConfiguration::from),
+        }
+    }
+}
+
+impl From<configuration::model::exporter::TimescaleExporterConfiguration>
+    for TimescaleExporterConfiguration
+{
+    fn from(value: configuration::model::exporter::TimescaleExporterConfiguration) -> Self {
+        TimescaleExporterConfiguration {
+            connection_string: value.connection_string,
         }
     }
 }
