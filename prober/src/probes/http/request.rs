@@ -1,4 +1,4 @@
-use crate::{child_span_from_context, config::target::HttpTarget};
+use crate::{observability::child_span_from_context, config::target::HttpTarget};
 use opentelemetry::{
     Context, KeyValue,
     trace::{Status, TraceContextExt},

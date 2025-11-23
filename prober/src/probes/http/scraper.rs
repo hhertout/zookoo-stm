@@ -6,17 +6,15 @@ use std::io::{Error, ErrorKind};
 use std::sync::Arc;
 
 use crate::{
-    child_span_from_context,
     config::target::HttpTarget,
     core::{MetricExportable, ScrapeError, Scraping},
-    get_tracer,
+    observability::{child_span_from_context, get_tracer, tracing_new_span},
     probes::http::{
         dns::dns_lookup,
         metrics::HttpRequestMetrics,
         request::http_request,
         tls::{TlsMetrics, inspect_tls},
     },
-    tracing_new_span,
 };
 
 #[derive(PartialEq, Copy, Clone)]

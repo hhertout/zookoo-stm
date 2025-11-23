@@ -1,4 +1,4 @@
-use crate::child_span_from_context;
+use crate::observability::child_span_from_context;
 use chrono::TimeZone;
 use chrono::{NaiveDateTime, Utc};
 use native_tls::TlsConnector as NativeTls;

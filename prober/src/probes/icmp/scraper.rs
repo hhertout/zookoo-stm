@@ -8,15 +8,13 @@ use opentelemetry::{
 };
 
 use crate::{
-    child_span_from_context,
     config::target::IcmpTarget,
     core::{MetricExportable, ScrapeError, Scraping},
-    get_tracer,
+    observability::{child_span_from_context, get_tracer, tracing_new_span},
     probes::icmp::{
         metrics::IcmpRequestMetrics,
         ping::{IcmpMetrics, ping_target},
     },
-    tracing_new_span,
 };
 
 #[derive(PartialEq, Copy, Clone)]

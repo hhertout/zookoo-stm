@@ -5,12 +5,14 @@
 //! ## Exporter type
 //!
 //! - Open telemetry
+//! - Prometheus Pushgateway
 //!
 
 use std::{collections::HashMap, io::Error};
 
 pub mod config;
 pub mod otel;
+pub mod prom;
 
 #[derive(Debug)]
 pub struct ExporterRequest {

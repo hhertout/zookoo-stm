@@ -7,7 +7,7 @@ use opentelemetry::{
 use serde::Serialize;
 use tokio::net::lookup_host;
 
-use crate::child_span_from_context;
+use crate::observability::child_span_from_context;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DnsMetrics {

@@ -5,6 +5,15 @@ pub struct ExporterConfiguration {
     pub otel: Option<OtelGrpcExporterConfiguration>,
     pub metrics: Option<MetricsExporterConfiguration>,
     pub kafka: Option<KafkaExporterConfiguration>,
+    pub prometheus: Option<PrometheusPushgatewayConfiguration>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PrometheusPushgatewayConfiguration {
+    pub url: String,
+    pub job: String,
+    pub instance: Option<String>,
+    pub auth: Option<AuthConfiguration>,
 }
 
 #[derive(Debug, Clone)]

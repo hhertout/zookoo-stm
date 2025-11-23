@@ -11,7 +11,7 @@ use opentelemetry::{
 use serde::Serialize;
 use tokio::{net::lookup_host, process::Command};
 
-use crate::{child_span_from_context, config::target::IcmpTarget, core::ScrapeError};
+use crate::{observability::child_span_from_context, config::target::IcmpTarget, core::ScrapeError};
 
 /// Sanitize IP address to prevent command injection
 /// Only allows valid IPv4 format: digits and dots

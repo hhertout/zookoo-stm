@@ -65,28 +65,38 @@ pub trait Scraping<T>: Send + Sync + 'static {
 pub async fn scrape_with_shutdown<T, G>(
     intervals_scraping: GroupByInterval<G>,
     mut shutdown_rx: mpsc::Receiver<()>,
+    exporters: crate::core::MetricExporters,
 ) where
     T: Scraping<G>,
 {
     let mut tasks = Vec::new();
+    let exporters = Arc::new(exporters);
 
     for (interval, items) in intervals_scraping {
+        log::debug!("Setting up scraping for interval {:?} with {} items", interval.to_duration(), items.len());
         if !items.is_empty() {
             let scrapper = Arc::new(T::new(items));
             let (shutdown_tx, mut task_shutdown_rx) = mpsc::channel::<()>(1);
+            let exporters_clone = Arc::clone(&exporters);
 
             let task = tokio::spawn(async move {
                 let mut ticker = tokio::time::interval(interval.to_duration());
                 let mut scrape_tasks = Vec::new();
                 
+                log::info!("Scraping task started for interval {:?}", interval.to_duration());
+                
                 loop {
                     tokio::select! {
                         _ = ticker.tick() => {
+                            log::debug!("Tick received for interval {:?}, starting scrape", interval.to_duration());
                             let scrapper = Arc::clone(&scrapper);
+                            let exporters = Arc::clone(&exporters_clone);
                             let handle = tokio::spawn(async move {
                                 if let Err(e) = scrapper.scrape().await {
                                     log::error!("scrape failed: {:?}", e);
                                 }
+                                // TODO: Export metrics using exporters
+                                let _ = exporters;
                             });
                             scrape_tasks.push(handle);
                         }

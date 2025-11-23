@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Grafana Alloy for OTLP metrics
+  alloy:
+    image: grafana/alloy:latest
+    container_name: zookoo-alloy-otel
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./alloy/alloy-otel-config.alloy:/etc/alloy/config.alloy
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "12345:12345" # Alloy UI
+    networks:
+      - zookoo-alloy-otel
+
+  # Prometheus for Alloy OTLP metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: zookoo-prometheus-alloy-otel
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-remote-write-receiver'
+      - '--enable-feature=exemplar-storage'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-alloy-otel-data:/prometheus
+    ports:
+      - "9092:9090"
+    networks:
+      - zookoo-alloy-otel
+
+networks:
+  zookoo-alloy-otel:
+    driver: bridge
+
+volumes:
+  prometheus-alloy-otel-data:
