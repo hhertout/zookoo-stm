@@ -116,20 +116,20 @@ impl<T: Clone> GroupByInterval<T> {
     /// Merge two GroupByInterval instances by concatenating their vectors for each interval.
     /// This method allows for combining the data from two instances, effectively merging their contents.
     /// It returns a new GroupByInterval instance that contains the combined data from both instances.
-    pub fn merge(&self, other: GroupByInterval<T>) -> GroupByInterval<T> {
-        GroupByInterval {
-            s5: [self.s5.clone(), other.s5.clone()].concat(),
-            s10: [self.s10.clone(), other.s10.clone()].concat(),
-            s30: [self.s30.clone(), other.s30.clone()].concat(),
-            m1: [self.m1.clone(), other.m1.clone()].concat(),
-            m5: [self.m5.clone(), other.m5.clone()].concat(),
-            m10: [self.m10.clone(), other.m10.clone()].concat(),
-            m30: [self.m30.clone(), other.m30.clone()].concat(),
-            h1: [self.h1.clone(), other.h1.clone()].concat(),
-            h12: [self.h12.clone(), other.h12.clone()].concat(),
-            d1: [self.d1.clone(), other.d1.clone()].concat(),
-            d7: [self.d7.clone(), other.d7.clone()].concat(),
-            d30: [self.d30.clone(), other.d30.clone()].concat(),
-        }
+    pub fn merge(&self, mut other: GroupByInterval<T>) -> GroupByInterval<T> {
+        let mut result = self.clone();
+        result.s5.append(&mut other.s5);
+        result.s10.append(&mut other.s10);
+        result.s30.append(&mut other.s30);
+        result.m1.append(&mut other.m1);
+        result.m5.append(&mut other.m5);
+        result.m10.append(&mut other.m10);
+        result.m30.append(&mut other.m30);
+        result.h1.append(&mut other.h1);
+        result.h12.append(&mut other.h12);
+        result.d1.append(&mut other.d1);
+        result.d7.append(&mut other.d7);
+        result.d30.append(&mut other.d30);
+        result
     }
 }

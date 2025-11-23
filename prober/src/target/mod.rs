@@ -94,21 +94,29 @@ pub async fn scrape_with_shutdown<T, G>(
 
             let task = tokio::spawn(async move {
                 let mut ticker = tokio::time::interval(interval.to_duration());
+                let mut scrape_tasks = Vec::new();
+                
                 loop {
                     tokio::select! {
                         _ = ticker.tick() => {
                             let scrapper = Arc::clone(&scrapper);
-                            tokio::spawn(async move {
+                            let handle = tokio::spawn(async move {
                                 if let Err(e) = scrapper.scrape().await {
                                     log::error!("scrape failed: {:?}", e);
                                 }
                             });
+                            scrape_tasks.push(handle);
                         }
                         _ = task_shutdown_rx.recv() => {
                             log::debug!("Shutting down scraping task for {:?}.", interval.to_duration());
                             break;
                         }
                     }
+                }
+                
+                // Wait for all pending scrape tasks to complete
+                for handle in scrape_tasks {
+                    let _ = handle.await;
                 }
                 log::debug!(
                     "Scraping task for {:?} exited loop.",

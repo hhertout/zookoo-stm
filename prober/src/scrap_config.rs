@@ -23,16 +23,32 @@ impl ProbeConfig {
 
         if let Some(http_target) = self.scrap_config.http.as_mut() {
             for target in http_target.targets.iter_mut() {
-                if let Some(labels) = target.labels.as_mut() {
-                    labels.extend(default_labels.clone().into_iter());
+                if let Some(labels_arc) = &target.labels {
+                    // Create a new HashMap by merging existing and default labels
+                    let mut merged_labels = (**labels_arc).clone();
+                    for (k, v) in default_labels.iter() {
+                        merged_labels.entry(k.clone()).or_insert_with(|| v.clone());
+                    }
+                    target.labels = Some(std::sync::Arc::new(merged_labels));
+                } else {
+                    // If no labels, just set default labels
+                    target.labels = Some(std::sync::Arc::new(default_labels.clone()));
                 }
             }
         }
 
         if let Some(icmp_target) = self.scrap_config.icmp.as_mut() {
             for target in icmp_target.targets.iter_mut() {
-                if let Some(labels) = target.labels.as_mut() {
-                    labels.extend(default_labels.clone().into_iter());
+                if let Some(labels_arc) = &target.labels {
+                    // Create a new HashMap by merging existing and default labels
+                    let mut merged_labels = (**labels_arc).clone();
+                    for (k, v) in default_labels.iter() {
+                        merged_labels.entry(k.clone()).or_insert_with(|| v.clone());
+                    }
+                    target.labels = Some(std::sync::Arc::new(merged_labels));
+                } else {
+                    // If no labels, just set default labels
+                    target.labels = Some(std::sync::Arc::new(default_labels.clone()));
                 }
             }
         }
@@ -46,20 +62,20 @@ impl ProbeConfig {
     pub fn icmp_group_by_interval(&self) -> GroupByInterval<IcmpTarget> {
         let mut group_by: GroupByInterval<IcmpTarget> = GroupByInterval::new();
         let _ = self.scrap_config.icmp.as_ref().map(|icmp_target| {
-            for target in icmp_target.targets.clone() {
+            for target in icmp_target.targets.iter() {
                 match target.scrape_interval {
-                    ScrapeInterval::S5 => group_by.s5.push(target),
-                    ScrapeInterval::S10 => group_by.s10.push(target),
-                    ScrapeInterval::S30 => group_by.s30.push(target),
-                    ScrapeInterval::M1 => group_by.m1.push(target),
-                    ScrapeInterval::M5 => group_by.m5.push(target),
-                    ScrapeInterval::M10 => group_by.m10.push(target),
-                    ScrapeInterval::M30 => group_by.m30.push(target),
-                    ScrapeInterval::H1 => group_by.h1.push(target),
-                    ScrapeInterval::H12 => group_by.h12.push(target),
-                    ScrapeInterval::D1 => group_by.d1.push(target),
-                    ScrapeInterval::D7 => group_by.d7.push(target),
-                    ScrapeInterval::D30 => group_by.d30.push(target),
+                    ScrapeInterval::S5 => group_by.s5.push(target.clone()),
+                    ScrapeInterval::S10 => group_by.s10.push(target.clone()),
+                    ScrapeInterval::S30 => group_by.s30.push(target.clone()),
+                    ScrapeInterval::M1 => group_by.m1.push(target.clone()),
+                    ScrapeInterval::M5 => group_by.m5.push(target.clone()),
+                    ScrapeInterval::M10 => group_by.m10.push(target.clone()),
+                    ScrapeInterval::M30 => group_by.m30.push(target.clone()),
+                    ScrapeInterval::H1 => group_by.h1.push(target.clone()),
+                    ScrapeInterval::H12 => group_by.h12.push(target.clone()),
+                    ScrapeInterval::D1 => group_by.d1.push(target.clone()),
+                    ScrapeInterval::D7 => group_by.d7.push(target.clone()),
+                    ScrapeInterval::D30 => group_by.d30.push(target.clone()),
                 }
             }
         });
@@ -73,20 +89,20 @@ impl ProbeConfig {
     pub fn http_group_by_interval(&self) -> GroupByInterval<HttpTarget> {
         let mut group_by: GroupByInterval<HttpTarget> = GroupByInterval::new();
         let _ = self.scrap_config.http.as_ref().map(|http_target| {
-            for target in http_target.targets.clone() {
+            for target in http_target.targets.iter() {
                 match target.scrape_interval {
-                    ScrapeInterval::S5 => group_by.s5.push(target),
-                    ScrapeInterval::S10 => group_by.s10.push(target),
-                    ScrapeInterval::S30 => group_by.s30.push(target),
-                    ScrapeInterval::M1 => group_by.m1.push(target),
-                    ScrapeInterval::M5 => group_by.m5.push(target),
-                    ScrapeInterval::M10 => group_by.m10.push(target),
-                    ScrapeInterval::M30 => group_by.m30.push(target),
-                    ScrapeInterval::H1 => group_by.h1.push(target),
-                    ScrapeInterval::H12 => group_by.h12.push(target),
-                    ScrapeInterval::D1 => group_by.d1.push(target),
-                    ScrapeInterval::D7 => group_by.d7.push(target),
-                    ScrapeInterval::D30 => group_by.d30.push(target),
+                    ScrapeInterval::S5 => group_by.s5.push(target.clone()),
+                    ScrapeInterval::S10 => group_by.s10.push(target.clone()),
+                    ScrapeInterval::S30 => group_by.s30.push(target.clone()),
+                    ScrapeInterval::M1 => group_by.m1.push(target.clone()),
+                    ScrapeInterval::M5 => group_by.m5.push(target.clone()),
+                    ScrapeInterval::M10 => group_by.m10.push(target.clone()),
+                    ScrapeInterval::M30 => group_by.m30.push(target.clone()),
+                    ScrapeInterval::H1 => group_by.h1.push(target.clone()),
+                    ScrapeInterval::H12 => group_by.h12.push(target.clone()),
+                    ScrapeInterval::D1 => group_by.d1.push(target.clone()),
+                    ScrapeInterval::D7 => group_by.d7.push(target.clone()),
+                    ScrapeInterval::D30 => group_by.d30.push(target.clone()),
                 }
             }
         });

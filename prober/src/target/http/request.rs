@@ -29,19 +29,12 @@ impl HttpMetrics {
     }
 }
 
-pub async fn http_request(target: &HttpTarget, cx: Context) -> Result<HttpMetrics, reqwest::Error> {
+pub async fn http_request(client: &Client, target: &HttpTarget, cx: Context) -> Result<HttpMetrics, reqwest::Error> {
     let span_attr = vec![KeyValue::new("url", target.url.to_string())];
     let cx_with_span = child_span_from_context("http_request", cx.clone(), span_attr);
     let span_ref = cx_with_span.span();
 
     let url = &target.url;
-
-    let client_instance = Client::builder()
-        // .danger_accept_invalid_certs(true)
-        //.proxy(Proxy::https("http://localhost:4545"))
-        .timeout(Duration::from_secs(target.timeout_sec.into()))
-        .tcp_keepalive_retries(0);
-    let client = client_instance.build().unwrap();
 
     let start = Instant::now();
 

@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use crate::{
     metrics::MetricExportable,
@@ -9,7 +10,7 @@ pub struct HttpRequestMetrics {
     pub dns: DnsMetrics,
     pub http: HttpMetrics,
     pub tls: Option<TlsMetrics>,
-    pub labels: Option<HashMap<String, String>>,
+    pub labels: Option<Arc<HashMap<String, String>>>,
 }
 
 impl MetricExportable for HttpRequestMetrics {
@@ -28,8 +29,8 @@ impl MetricExportable for HttpRequestMetrics {
                 labels.extend(tls_metrics.to_labels());
                 labels.insert(String::from("tls_version"), tls_metrics.version.to_string());
 
-                if let Some(l) = self.labels.clone() {
-                    labels.extend(l);
+                if let Some(l) = &self.labels {
+                    labels.extend(l.as_ref().iter().map(|(k, v)| (k.clone(), v.clone())));
                 }
 
                 let exporter = exporter::otel::metrics::MetricsExporter::new(labels);
@@ -48,8 +49,8 @@ impl MetricExportable for HttpRequestMetrics {
             }
             None => {
                 // http request without tls metrics
-                if let Some(l) = self.labels.clone() {
-                    labels.extend(l);
+                if let Some(l) = &self.labels {
+                    labels.extend(l.as_ref().iter().map(|(k, v)| (k.clone(), v.clone())));
                 }
 
                 let exporter = exporter::otel::metrics::MetricsExporter::new(labels);

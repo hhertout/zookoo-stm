@@ -1,7 +1,9 @@
 use futures::future::join_all;
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::{Context, KeyValue, global::ObjectSafeSpan, trace::Status};
+use reqwest::Client;
 use std::io::{Error, ErrorKind};
+use std::sync::Arc;
 
 use crate::child_span_from_context;
 use crate::target::ScrapeError;
@@ -23,11 +25,24 @@ use crate::{
 #[derive(Clone)]
 pub struct HttpScrapper {
     pub targets: Vec<HttpTarget>,
+    client: Arc<Client>,
 }
 
 impl Scraping<HttpTarget> for HttpScrapper {
     fn new(targets: Vec<HttpTarget>) -> Self {
-        HttpScrapper { targets }
+        let client = Client::builder()
+            .pool_max_idle_per_host(10)
+            .pool_idle_timeout(std::time::Duration::from_secs(90))
+            .build()
+            .unwrap_or_else(|e| {
+                log::error!("Failed to build shared HTTP client: {}, using default", e);
+                Client::new()
+            });
+        
+        HttpScrapper { 
+            targets,
+            client: Arc::new(client),
+        }
     }
 
     async fn scrape(&self) -> Result<(), ScrapeError> {
@@ -157,7 +172,7 @@ impl HttpScrapper {
             None
         };
 
-        let http_metrics = match http_request(target, ctx_with_span.clone()).await {
+        let http_metrics = match http_request(&self.client, target, ctx_with_span.clone()).await {
             Ok(m) => m,
             Err(err) => {
                 let span_ref = ctx_with_span.span();

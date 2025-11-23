@@ -42,18 +42,15 @@ impl TlsMetrics {
 
     pub fn to_labels(&self) -> HashMap<String, String> {
         let mut map: HashMap<String, String> = HashMap::new();
-        map.insert(
-            String::from("issuer"),
-            self.issuer.clone().replace(" ", "").replace("=", ":"),
-        );
-        map.insert(
-            String::from("subject"),
-            self.subject.clone().replace(" ", "").replace("=", ":"),
-        );
-        map.insert(
-            String::from("algorithm"),
-            self.algo.clone().replace(" ", "").replace("=", ":"),
-        );
+        
+        let issuer = self.issuer.replace(' ', "").replace('=', ":");
+        map.insert(String::from("issuer"), issuer);
+        
+        let subject = self.subject.replace(' ', "").replace('=', ":");
+        map.insert(String::from("subject"), subject);
+        
+        let algo = self.algo.replace(' ', "").replace('=', ":");
+        map.insert(String::from("algorithm"), algo);
 
         return map;
     }
