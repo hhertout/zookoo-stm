@@ -23,8 +23,8 @@ It is built as a synthetic monitoring tool (STM) that allows you to scrape targe
 
 **Scraping target** :
 
-- Http
-- Https
+- HTTP
+- HTTPS
 - ICMP
 
 **Exporter** :
