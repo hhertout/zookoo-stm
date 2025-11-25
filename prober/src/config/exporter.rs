@@ -22,6 +22,7 @@ pub struct PrometheusRemoteWriteConfiguration {
 #[derive(Debug, Clone)]
 pub struct TimescaleExporterConfiguration {
     pub connection_string: String,
+    pub schema: String,
 }
 
 #[derive(Debug, Clone)]
@@ -129,6 +130,7 @@ impl From<configuration::model::exporter::TimescaleExporterConfiguration>
     fn from(value: configuration::model::exporter::TimescaleExporterConfiguration) -> Self {
         TimescaleExporterConfiguration {
             connection_string: value.connection_string,
+            schema: value.schema,
         }
     }
 }

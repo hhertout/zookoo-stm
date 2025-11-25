@@ -69,8 +69,15 @@ pub struct TimescaleExporter {
 
 impl TimescaleExporter {
     /// Create a new TimescaleDB exporter with the given connection pool and labels
+    /// Uses the default "public" schema
     pub fn new(pool: Arc<PgPool>, labels: HashMap<String, String>) -> Self {
         let repository = TimescaleRepository::new(pool.clone());
+        Self { pool, repository, labels }
+    }
+
+    /// Create a new TimescaleDB exporter with a custom schema
+    pub fn with_schema(pool: Arc<PgPool>, labels: HashMap<String, String>, schema: String) -> Self {
+        let repository = TimescaleRepository::with_schema(pool.clone(), schema);
         Self { pool, repository, labels }
     }
 

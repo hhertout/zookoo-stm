@@ -34,7 +34,7 @@ pub struct Defaults {
     pub log_level: String,
     pub probe_location: Option<ProbeLocation>,
     pub probe_zone: Option<String>,
-    pub self_monitoring: SelfMonitoringConfig,
+    pub self_monitoring: Option<SelfMonitoringConfig>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

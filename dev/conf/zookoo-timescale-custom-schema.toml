@@ -1,4 +1,4 @@
-# Zookoo Configuration - TimescaleDB Exporter
+# Zookoo Configuration - TimescaleDB with Custom Schema
 [defaults]
 log_level = "info"
 self_monitoring = { enable = false }
@@ -7,18 +7,14 @@ probe_zone = "DEV"
 
 [exporter.timescale]
 connection_string = "postgresql://zookoo:zookoo@timescaledb:5432/zookoo"
-# Optional: Specify database schema (default: "public")
 schema = "monitoring"
 
 [http]
 targets = [
     { url = "https://example.com", labels = { zone = "eu-west-1", env = "production" } },
-    { url = "https://httpbin.org/status/200", labels = { zone = "us-east-1", env = "staging" } },
-    { url = "https://www.google.com", labels = { zone = "eu-west-1", env = "production" } }
 ]
 
 [icmp]
 targets = [
     { ipv4 = "8.8.8.8", labels = { zone = "global", env = "production", name = "google-dns" } },
-    { ipv4 = "1.1.1.1", labels = { zone = "global", env = "production", name = "cloudflare-dns" } }
 ]

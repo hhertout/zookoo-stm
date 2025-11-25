@@ -42,15 +42,17 @@ pub async fn run(config: ProbeConfig) {
     // Initialize observability (tracing) if self-monitoring is enabled
     let mut tracer_provider: Option<SdkTracerProvider> = None;
 
-    if config.scrap_config.default.self_monitoring.enable {
-        let zone = config.scrap_config.default.probe_zone.clone();
-        let self_monitoring_conf = config.scrap_config.default.self_monitoring.clone();
-        tracer_provider = Some(observability::init_tracer_provider(
-            self_monitoring_conf.otel_endpoint.clone(),
-            self_monitoring_conf.service_name.clone(),
-            self_monitoring_conf.env.clone(),
-            zone,
-        ));
+    if let Some(scrap_config) = &config.scrap_config.default.self_monitoring {
+        if scrap_config.enable {
+            let zone = config.scrap_config.default.probe_zone.clone();
+            let self_monitoring_conf = scrap_config.clone();
+            tracer_provider = Some(observability::init_tracer_provider(
+                self_monitoring_conf.otel_endpoint.clone(),
+                self_monitoring_conf.service_name.clone(),
+                self_monitoring_conf.env.clone(),
+                zone,
+            ));
+        }
     }
 
     // Initialize OpenTelemetry metrics exporter if configured
@@ -61,76 +63,90 @@ pub async fn run(config: ProbeConfig) {
     }
 
     // Initialize Prometheus remote_write exporter if configured (for Grafana Alloy, Prometheus, Mimir, etc.)
-    let prometheus_remote_write = if let Some(rw_conf) = &config.scrap_config.exporter.prometheus_remote_write {
-        log::warn!("prometheus remote_write exporter is enabled");
-        log::info!("prometheus remote_write url: {}", rw_conf.url);
-        log::info!("prometheus job: {}", rw_conf.job);
-        
-        // Note: extra_labels are for global labels like environment, region, etc.
-        // Zone is already included in each target's labels via apply_default_labels()
-        let extra_labels = std::collections::HashMap::new();
-        
-        let rw_config = exporter::prom::PrometheusRemoteWriteConfig {
-            url: rw_conf.url.clone(),
-            job: rw_conf.job.clone(),
-            instance: rw_conf.instance.clone(),
-            auth: rw_conf.auth.as_ref().map(|a| exporter::config::AuthConfiguration {
-                username: a.username.clone(),
-                password: a.password.clone(),
-                bearer: a.bearer.clone(),
-            }),
-            extra_labels,
-        };
-        
-        match exporter::prom::PrometheusRemoteWrite::new(rw_config) {
-            Ok(exporter) => Some(exporter),
-            Err(e) => {
-                log::error!("Failed to initialize Prometheus remote_write exporter: {}", e);
-                None
-            }
-        }
-    } else {
-        None
-    };
+    let prometheus_remote_write =
+        if let Some(rw_conf) = &config.scrap_config.exporter.prometheus_remote_write {
+            log::warn!("prometheus remote_write exporter is enabled");
+            log::info!("prometheus remote_write url: {}", rw_conf.url);
+            log::info!("prometheus job: {}", rw_conf.job);
 
-    // Initialize TimescaleDB pool if configured
-    let timescale_pool = if let Some(ts_conf) = &config.scrap_config.exporter.timescale {
-        log::warn!("timescale exporter is enabled");
-        log::info!("timescale connection: {}", ts_conf.connection_string);
-        
-        match crate::core::exporters::create_timescale_pool(&ts_conf.connection_string).await {
-            Ok(pool) => {
-                let pool = std::sync::Arc::new(pool);
-                
-                // Initialize schema (creates tables and hypertables)
-                // Use a temporary exporter with empty labels just for schema initialization
-                let schema_initializer = exporter::timescale::TimescaleExporter::new(
-                    pool.clone(), 
-                    std::collections::HashMap::new()
-                );
-                
-                match schema_initializer.init_schema().await {
-                    Ok(_) => {
-                        log::info!("TimescaleDB schema initialized successfully");
-                        Some(pool)
-                    }
-                    Err(e) => {
-                        log::error!("Failed to initialize TimescaleDB schema: {}", e);
-                        None
-                    }
+            // Note: extra_labels are for global labels like environment, region, etc.
+            // Zone is already included in each target's labels via apply_default_labels()
+            let extra_labels = std::collections::HashMap::new();
+
+            let rw_config = exporter::prom::PrometheusRemoteWriteConfig {
+                url: rw_conf.url.clone(),
+                job: rw_conf.job.clone(),
+                instance: rw_conf.instance.clone(),
+                auth: rw_conf
+                    .auth
+                    .as_ref()
+                    .map(|a| exporter::config::AuthConfiguration {
+                        username: a.username.clone(),
+                        password: a.password.clone(),
+                        bearer: a.bearer.clone(),
+                    }),
+                extra_labels,
+            };
+
+            match exporter::prom::PrometheusRemoteWrite::new(rw_config) {
+                Ok(exporter) => Some(exporter),
+                Err(e) => {
+                    log::error!(
+                        "Failed to initialize Prometheus remote_write exporter: {}",
+                        e
+                    );
+                    None
                 }
             }
-            Err(e) => {
-                log::error!("Failed to connect to TimescaleDB: {}", e);
-                None
+        } else {
+            None
+        };
+
+    // Initialize TimescaleDB pool if configured
+    let (timescale_pool, timescale_schema) =
+        if let Some(ts_conf) = &config.scrap_config.exporter.timescale {
+            log::warn!("timescale exporter is enabled");
+            log::info!("timescale connection: {}", ts_conf.connection_string);
+            log::info!("timescale schema: {}", ts_conf.schema);
+
+            match crate::core::exporters::create_timescale_pool(&ts_conf.connection_string).await {
+                Ok(pool) => {
+                    let pool = std::sync::Arc::new(pool);
+
+                    // Initialize schema (creates tables and hypertables)
+                    // Use a temporary exporter with empty labels just for schema initialization
+                    let schema_initializer = exporter::timescale::TimescaleExporter::with_schema(
+                        pool.clone(),
+                        std::collections::HashMap::new(),
+                        ts_conf.schema.clone(),
+                    );
+
+                    match schema_initializer.init_schema().await {
+                        Ok(_) => {
+                            log::info!("TimescaleDB schema initialized successfully");
+                            (Some(pool), ts_conf.schema.clone())
+                        }
+                        Err(e) => {
+                            log::error!("Failed to initialize TimescaleDB schema: {}", e);
+                            (None, "public".to_string())
+                        }
+                    }
+                }
+                Err(e) => {
+                    log::error!("Failed to connect to TimescaleDB: {}", e);
+                    (None, "public".to_string())
+                }
             }
-        }
-    } else {
-        None
-    };
+        } else {
+            (None, "public".to_string())
+        };
 
     // Create exporters container and initialize as global
-    let exporters = crate::core::MetricExporters::new(prometheus_remote_write, timescale_pool);
+    let exporters = crate::core::MetricExporters::new(
+        prometheus_remote_write,
+        timescale_pool,
+        timescale_schema,
+    );
     exporters.clone().init_global();
 
     //
@@ -163,9 +179,21 @@ pub async fn launch_probe_engine(mut config: ProbeConfig, exporters: crate::core
     // group by interval to spawn one job for each
     let icmp_group_by = config.apply_default_labels().icmp_group_by_interval();
     let http_group_by = config.apply_default_labels().http_group_by_interval();
-    
-    log::warn!("ICMP targets: s5={} s10={} s30={} m1={}", icmp_group_by.s5.len(), icmp_group_by.s10.len(), icmp_group_by.s30.len(), icmp_group_by.m1.len());
-    log::warn!("HTTP targets: s5={} s10={} s30={} m1={}", http_group_by.s5.len(), http_group_by.s10.len(), http_group_by.s30.len(), http_group_by.m1.len());
+
+    log::warn!(
+        "ICMP targets: s5={} s10={} s30={} m1={}",
+        icmp_group_by.s5.len(),
+        icmp_group_by.s10.len(),
+        icmp_group_by.s30.len(),
+        icmp_group_by.m1.len()
+    );
+    log::warn!(
+        "HTTP targets: s5={} s10={} s30={} m1={}",
+        http_group_by.s5.len(),
+        http_group_by.s10.len(),
+        http_group_by.s30.len(),
+        http_group_by.m1.len()
+    );
 
     // launch the scraping process for each target type
     // for each interval -
@@ -200,5 +228,3 @@ pub async fn launch_probe_engine(mut config: ProbeConfig, exporters: crate::core
     let _ = scrape_http_task.await;
     let _ = scrape_icmp_task.await;
 }
-
-

@@ -1,15 +1,11 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use exporter::Export;
 use crate::{
     core::MetricExportable,
-    probes::http::{
-        dns::DnsMetrics,
-        request::HttpMetrics,
-        tls::TlsMetrics,
-    },
+    probes::http::{dns::DnsMetrics, request::HttpMetrics, tls::TlsMetrics},
 };
+use exporter::Export;
 
 pub struct HttpRequestMetrics {
     pub dns: DnsMetrics,
@@ -19,7 +15,19 @@ pub struct HttpRequestMetrics {
 }
 
 impl HttpRequestMetrics {
-    fn extract_metrics_values(&self) -> (u8, u8, u128, u16, u128, Option<u128>, Option<u128>, Option<i64>, Option<i64>) {
+    fn extract_metrics_values(
+        &self,
+    ) -> (
+        u8,
+        u8,
+        u128,
+        u16,
+        u128,
+        Option<u128>,
+        Option<u128>,
+        Option<i64>,
+        Option<i64>,
+    ) {
         (
             self.http.up,
             self.http.success,
@@ -32,6 +40,42 @@ impl HttpRequestMetrics {
             self.tls.as_ref().and_then(|t| t.cert_begin_date),
         )
     }
+
+    fn to_metricmap(&self) -> HashMap<String, isize> {
+        let (
+            up,
+            success,
+            dns_duration,
+            status_code,
+            http_duration,
+            tls_duration,
+            tls_handshake,
+            cert_exp,
+            cert_begin,
+        ) = self.extract_metrics_values();
+
+        // Build metrics HashMap for Export trait
+        let mut metrics_map = HashMap::new();
+        metrics_map.insert("up".to_string(), up as isize);
+        metrics_map.insert("success".to_string(), success as isize);
+        metrics_map.insert("dns_duration_ms".to_string(), dns_duration as isize);
+        metrics_map.insert("status_code".to_string(), status_code as isize);
+        metrics_map.insert("http_duration_ms".to_string(), http_duration as isize);
+        if let Some(tls_dur) = tls_duration {
+            metrics_map.insert("tls_duration_ms".to_string(), tls_dur as isize);
+        }
+        if let Some(tls_hand) = tls_handshake {
+            metrics_map.insert("tls_handshake_ms".to_string(), tls_hand as isize);
+        }
+        if let Some(cert_exp_ts) = cert_exp {
+            metrics_map.insert("cert_expiration_ts".to_string(), cert_exp_ts as isize);
+        }
+        if let Some(cert_begin_ts) = cert_begin {
+            metrics_map.insert("cert_begin_ts".to_string(), cert_begin_ts as isize);
+        }
+
+        return metrics_map;
+    }
 }
 
 impl MetricExportable for HttpRequestMetrics {
@@ -39,7 +83,10 @@ impl MetricExportable for HttpRequestMetrics {
         let mut labels: HashMap<String, String> = HashMap::new();
 
         labels.insert(String::from("target"), target.to_string());
-        labels.insert(String::from("status_code"), self.http.status_code.to_string());
+        labels.insert(
+            String::from("status_code"),
+            self.http.status_code.to_string(),
+        );
 
         if let Some(http_version) = self.http.http_version {
             labels.insert(String::from("http_version"), http_version.to_string());
@@ -58,20 +105,7 @@ impl MetricExportable for HttpRequestMetrics {
                 let exporter = exporter::otel::metrics::MetricsExporter::new(labels.clone());
 
                 // Build metrics HashMap for Export trait
-                let mut metrics_map = HashMap::new();
-                metrics_map.insert("up".to_string(), self.http.up as isize);
-                metrics_map.insert("success".to_string(), self.http.success as isize);
-                metrics_map.insert("dns_duration_ms".to_string(), self.dns.duration.as_millis() as isize);
-                metrics_map.insert("status_code".to_string(), self.http.status_code as isize);
-                metrics_map.insert("http_duration_ms".to_string(), self.http.duration.as_millis() as isize);
-                metrics_map.insert("tls_duration_ms".to_string(), tls_metrics.duration.as_millis() as isize);
-                metrics_map.insert("tls_handshake_ms".to_string(), tls_metrics.handshake_duration.as_millis() as isize);
-                if let Some(cert_exp) = tls_metrics.cert_expiration_date {
-                    metrics_map.insert("cert_expiration_ts".to_string(), cert_exp as isize);
-                }
-                if let Some(cert_begin) = tls_metrics.cert_begin_date {
-                    metrics_map.insert("cert_begin_ts".to_string(), cert_begin as isize);
-                }
+                let metrics_map = self.to_metricmap();
 
                 let request = exporter::ExporterRequest {
                     exporter: exporter::ExporterConfigurationRequest {},
@@ -91,12 +125,7 @@ impl MetricExportable for HttpRequestMetrics {
                 let exporter = exporter::otel::metrics::MetricsExporter::new(labels.clone());
 
                 // Build metrics HashMap for Export trait
-                let mut metrics_map = HashMap::new();
-                metrics_map.insert("up".to_string(), self.http.up as isize);
-                metrics_map.insert("success".to_string(), self.http.success as isize);
-                metrics_map.insert("dns_duration_ms".to_string(), self.dns.duration.as_millis() as isize);
-                metrics_map.insert("status_code".to_string(), self.http.status_code as isize);
-                metrics_map.insert("http_duration_ms".to_string(), self.http.duration.as_millis() as isize);
+                let metrics_map = self.to_metricmap();
 
                 let request = exporter::ExporterRequest {
                     exporter: exporter::ExporterConfigurationRequest {},
@@ -111,28 +140,7 @@ impl MetricExportable for HttpRequestMetrics {
 
         // Export to configured exporters using the Export trait
         if let Some(exporters) = crate::core::MetricExporters::global() {
-            let (up, success, dns_duration, status_code, http_duration, tls_duration, tls_handshake, cert_exp, cert_begin) = 
-                self.extract_metrics_values();
-
-            // Build metrics HashMap for Export trait
-            let mut metrics_map = HashMap::new();
-            metrics_map.insert("up".to_string(), up as isize);
-            metrics_map.insert("success".to_string(), success as isize);
-            metrics_map.insert("dns_duration_ms".to_string(), dns_duration as isize);
-            metrics_map.insert("status_code".to_string(), status_code as isize);
-            metrics_map.insert("http_duration_ms".to_string(), http_duration as isize);
-            if let Some(tls_dur) = tls_duration {
-                metrics_map.insert("tls_duration_ms".to_string(), tls_dur as isize);
-            }
-            if let Some(tls_hand) = tls_handshake {
-                metrics_map.insert("tls_handshake_ms".to_string(), tls_hand as isize);
-            }
-            if let Some(cert_exp_ts) = cert_exp {
-                metrics_map.insert("cert_expiration_ts".to_string(), cert_exp_ts as isize);
-            }
-            if let Some(cert_begin_ts) = cert_begin {
-                metrics_map.insert("cert_begin_ts".to_string(), cert_begin_ts as isize);
-            }
+            let metrics_map = self.to_metricmap();
 
             let request = exporter::ExporterRequest {
                 exporter: exporter::ExporterConfigurationRequest {},
@@ -153,9 +161,10 @@ impl MetricExportable for HttpRequestMetrics {
 
             // Export to TimescaleDB if configured
             if let Some(pool) = &exporters.timescale_pool {
-                let ts_exporter = exporter::timescale::TimescaleExporter::new(
+                let ts_exporter = exporter::timescale::TimescaleExporter::with_schema(
                     pool.clone(),
                     labels.clone(),
+                    exporters.timescale_schema.clone(),
                 );
                 if let Err(e) = ts_exporter.export(exporter::ProbeType::Http, request) {
                     log::error!("Failed to export HTTP metrics to TimescaleDB: {}", e);

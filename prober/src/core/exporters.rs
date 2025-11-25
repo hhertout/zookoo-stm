@@ -38,16 +38,19 @@ static METRIC_EXPORTERS: OnceLock<MetricExporters> = OnceLock::new();
 pub struct MetricExporters {
     pub prometheus_remote_write: Option<Arc<PrometheusRemoteWrite>>,
     pub timescale_pool: Option<Arc<PgPool>>,
+    pub timescale_schema: String,
 }
 
 impl MetricExporters {
     pub fn new(
         prometheus_remote_write: Option<PrometheusRemoteWrite>,
         timescale_pool: Option<Arc<PgPool>>,
+        timescale_schema: String,
     ) -> Self {
         Self {
             prometheus_remote_write: prometheus_remote_write.map(Arc::new),
             timescale_pool,
+            timescale_schema,
         }
     }
 
