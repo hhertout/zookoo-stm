@@ -49,7 +49,9 @@ async fn main() {
 
     // Enable pyroscope monitoring
     let mut pyroscope_agent: Option<PyroscopeAgent<PyroscopeAgentRunning>> = None;
-    if let Some(scrape_config) =  config.defaults.self_monitoring.as_ref() && scrape_config.enable {
+    if let Some(scrape_config) = config.defaults.self_monitoring.as_ref()
+        && scrape_config.enable
+    {
         log::warn!(
             "Pyroscope is started and send profiles using '{}'",
             scrape_config.pyroscope_endpoint
