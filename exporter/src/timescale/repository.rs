@@ -6,18 +6,26 @@ use std::sync::Arc;
 /// Centralizes all SQL queries and database operations
 pub struct TimescaleRepository {
     pool: Arc<PgPool>,
+    schema: String,
 }
 
 impl TimescaleRepository {
     pub fn new(pool: Arc<PgPool>) -> Self {
-        Self { pool }
+        Self { 
+            pool,
+            schema: "public".to_string(),
+        }
+    }
+
+    pub fn with_schema(pool: Arc<PgPool>, schema: String) -> Self {
+        Self { pool, schema }
     }
 
     /// Create HTTP metrics table if it doesn't exist
     pub async fn create_http_metrics_table(&self) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        let query = format!(
             r#"
-            CREATE TABLE IF NOT EXISTS http_metrics (
+            CREATE TABLE IF NOT EXISTS {}.http_metrics (
                 time TIMESTAMPTZ NOT NULL,
                 target TEXT NOT NULL,
                 zone TEXT,
@@ -36,18 +44,20 @@ impl TimescaleRepository {
                 labels JSONB
             )
             "#,
-        )
-        .execute(&*self.pool)
-        .await?;
+            self.schema
+        );
+        sqlx::query(&query)
+            .execute(&*self.pool)
+            .await?;
 
         Ok(())
     }
 
     /// Create ICMP metrics table if it doesn't exist
     pub async fn create_icmp_metrics_table(&self) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        let query = format!(
             r#"
-            CREATE TABLE IF NOT EXISTS icmp_metrics (
+            CREATE TABLE IF NOT EXISTS {}.icmp_metrics (
                 time TIMESTAMPTZ NOT NULL,
                 target TEXT NOT NULL,
                 zone TEXT,
@@ -57,69 +67,79 @@ impl TimescaleRepository {
                 labels JSONB
             )
             "#,
-        )
-        .execute(&*self.pool)
-        .await?;
+            self.schema
+        );
+        sqlx::query(&query)
+            .execute(&*self.pool)
+            .await?;
 
         Ok(())
     }
 
     /// Create hypertable for HTTP metrics
     pub async fn create_http_hypertable(&self) -> Result<(), sqlx::Error> {
-        let _ = sqlx::query(
+        let query = format!(
             r#"
-            SELECT create_hypertable('http_metrics', 'time', 
+            SELECT create_hypertable('{}.http_metrics', 'time', 
                 if_not_exists => TRUE,
                 chunk_time_interval => INTERVAL '1 day'
             )
             "#,
-        )
-        .execute(&*self.pool)
-        .await;
+            self.schema
+        );
+        let _ = sqlx::query(&query)
+            .execute(&*self.pool)
+            .await;
 
         Ok(())
     }
 
     /// Create hypertable for ICMP metrics
     pub async fn create_icmp_hypertable(&self) -> Result<(), sqlx::Error> {
-        let _ = sqlx::query(
+        let query = format!(
             r#"
-            SELECT create_hypertable('icmp_metrics', 'time', 
+            SELECT create_hypertable('{}.icmp_metrics', 'time', 
                 if_not_exists => TRUE,
                 chunk_time_interval => INTERVAL '1 day'
             )
             "#,
-        )
-        .execute(&*self.pool)
-        .await;
+            self.schema
+        );
+        let _ = sqlx::query(&query)
+            .execute(&*self.pool)
+            .await;
 
         Ok(())
     }
 
     /// Create index on HTTP metrics
     pub async fn create_http_metrics_index(&self) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        let query = format!(
             r#"
             CREATE INDEX IF NOT EXISTS idx_http_metrics_target_time 
-            ON http_metrics (target, time DESC)
+            ON {}.http_metrics (target, time DESC)
             "#,
-        )
-        .execute(&*self.pool)
-        .await?;
+            self.schema
+        );
+        sqlx::query(&query)
+            .execute(&*self.pool)
+            .await?;
 
         Ok(())
     }
 
     /// Create index on ICMP metrics
     pub async fn create_icmp_metrics_index(&self) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        let query = format!(
             r#"
             CREATE INDEX IF NOT EXISTS idx_icmp_metrics_target_time 
-            ON icmp_metrics (target, time DESC)
+            ON {}.icmp_metrics (target, time DESC)
             "#,
-        )
-        .execute(&*self.pool)
-        .await?;
+            self.schema
+        );
+        sqlx::query(&query)
+            .execute(&*self.pool)
+            .await?;
 
         Ok(())
     }
@@ -143,16 +163,18 @@ impl TimescaleRepository {
         tls_version: Option<&str>,
         labels_json: serde_json::Value,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        let query = format!(
             r#"
-            INSERT INTO http_metrics (
+            INSERT INTO {}.http_metrics (
                 time, target, zone, job, up, success, status_code,
                 dns_duration_ms, http_duration_ms, tls_duration_ms, tls_handshake_ms,
                 cert_expiration_ts, cert_begin_ts, http_version, tls_version, labels
             ) VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
             "#,
-        )
-        .bind(target)
+            self.schema
+        );
+        sqlx::query(&query)
+            .bind(target)
         .bind(zone)
         .bind(job)
         .bind(up)
@@ -183,14 +205,16 @@ impl TimescaleRepository {
         rtt_ms: i64,
         labels_json: serde_json::Value,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        let query = format!(
             r#"
-            INSERT INTO icmp_metrics (
+            INSERT INTO {}.icmp_metrics (
                 time, target, zone, job, up, rtt_ms, labels
             ) VALUES (NOW(), $1, $2, $3, $4, $5, $6)
             "#,
-        )
-        .bind(target)
+            self.schema
+        );
+        sqlx::query(&query)
+            .bind(target)
         .bind(zone)
         .bind(job)
         .bind(up)
@@ -208,21 +232,23 @@ impl TimescaleRepository {
         target: &str,
         limit: i64,
     ) -> Result<Vec<HttpMetricRow>, sqlx::Error> {
-        let rows = sqlx::query_as::<_, HttpMetricRow>(
+        let query = format!(
             r#"
             SELECT time, target, zone, job, up, success, status_code,
                    dns_duration_ms, http_duration_ms, tls_duration_ms, tls_handshake_ms,
                    cert_expiration_ts, cert_begin_ts, http_version, tls_version, labels
-            FROM http_metrics
+            FROM {}.http_metrics
             WHERE target = $1
             ORDER BY time DESC
             LIMIT $2
             "#,
-        )
-        .bind(target)
-        .bind(limit)
-        .fetch_all(&*self.pool)
-        .await?;
+            self.schema
+        );
+        let rows = sqlx::query_as::<_, HttpMetricRow>(&query)
+            .bind(target)
+            .bind(limit)
+            .fetch_all(&*self.pool)
+            .await?;
 
         Ok(rows)
     }
@@ -233,19 +259,21 @@ impl TimescaleRepository {
         target: &str,
         limit: i64,
     ) -> Result<Vec<IcmpMetricRow>, sqlx::Error> {
-        let rows = sqlx::query_as::<_, IcmpMetricRow>(
+        let query = format!(
             r#"
             SELECT time, target, zone, job, up, rtt_ms, labels
-            FROM icmp_metrics
+            FROM {}.icmp_metrics
             WHERE target = $1
             ORDER BY time DESC
             LIMIT $2
             "#,
-        )
-        .bind(target)
-        .bind(limit)
-        .fetch_all(&*self.pool)
-        .await?;
+            self.schema
+        );
+        let rows = sqlx::query_as::<_, IcmpMetricRow>(&query)
+            .bind(target)
+            .bind(limit)
+            .fetch_all(&*self.pool)
+            .await?;
 
         Ok(rows)
     }

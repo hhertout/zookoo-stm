@@ -18,7 +18,20 @@ Add the TimescaleDB exporter to your `config.toml`:
 ```toml
 [exporters.timescale]
 connection_string = "postgresql://user:password@localhost:5432/database"
+# Optional: Specify database schema (default: "public")
+schema = "monitoring"
 ```
+
+### Configuration Parameters
+
+- **`connection_string`** (required): PostgreSQL connection URL
+- **`schema`** (optional): Database schema name. Defaults to `"public"` if not specified.
+
+Using a custom schema allows you to:
+- Isolate metrics from other database objects
+- Apply schema-level permissions
+- Organize multiple environments (dev, staging, prod) in the same database
+- Follow organizational naming conventions
 
 ### Connection String Format
 
@@ -28,24 +41,28 @@ postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
 
 Examples:
 ```toml
-# Local development
+# Local development (default schema)
 connection_string = "postgresql://zookoo:zookoo@localhost:5432/zookoo"
 
-# Production with SSL
+# Production with SSL and custom schema
 connection_string = "postgresql://user:pass@timescaledb.example.com:5432/metrics?sslmode=require"
+schema = "production"
 
-# Using environment variables (in Docker)
+# Using custom schema for isolation
 connection_string = "postgresql://zookoo:zookoo@timescaledb:5432/zookoo"
+schema = "monitoring"
 ```
 
 ## Database Schema
+
+All tables are created in the configured schema (default: `public`). The examples below show `public` schema, but you can use any schema name in your configuration.
 
 ### HTTP Metrics Table
 
 The exporter automatically creates the `http_metrics` hypertable:
 
 ```sql
-CREATE TABLE http_metrics (
+CREATE TABLE public.http_metrics (
     time TIMESTAMPTZ NOT NULL,
     target TEXT NOT NULL,
     zone TEXT,
@@ -212,6 +229,50 @@ FROM http_metrics
 WHERE time > NOW() - INTERVAL '1 day'
 GROUP BY bucket, target
 ORDER BY bucket DESC, target;
+```
+
+## Custom Schema Setup
+
+### Creating a Custom Schema
+
+To use a custom schema instead of `public`:
+
+1. **Create the schema in PostgreSQL**:
+```sql
+CREATE SCHEMA IF NOT EXISTS monitoring;
+GRANT USAGE ON SCHEMA monitoring TO zookoo;
+GRANT CREATE ON SCHEMA monitoring TO zookoo;
+```
+
+2. **Configure Zookoo**:
+```toml
+[exporter.timescale]
+connection_string = "postgresql://zookoo:zookoo@localhost:5432/zookoo"
+schema = "monitoring"
+```
+
+3. **Start Zookoo**: Tables and hypertables will be created automatically in the specified schema.
+
+### Benefits of Custom Schemas
+
+- **Isolation**: Separate monitoring data from application tables
+- **Permissions**: Apply schema-level access control
+- **Multi-tenant**: Run multiple environments in one database
+- **Organization**: Follow naming conventions (e.g., `prod`, `staging`, `monitoring`)
+
+### Querying Custom Schema
+
+When querying metrics in a custom schema, either:
+
+**Option 1: Schema-qualified queries**
+```sql
+SELECT * FROM monitoring.http_metrics WHERE target = 'https://example.com';
+```
+
+**Option 2: Set search_path**
+```sql
+SET search_path TO monitoring, public;
+SELECT * FROM http_metrics WHERE target = 'https://example.com';
 ```
 
 ## Docker Deployment

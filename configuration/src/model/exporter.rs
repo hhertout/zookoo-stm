@@ -58,4 +58,10 @@ pub struct PrometheusRemoteWriteConfiguration {
 #[derive(Debug, Deserialize)]
 pub struct TimescaleExporterConfiguration {
     pub connection_string: String,
+    #[serde(default = "default_schema")]
+    pub schema: String,
+}
+
+fn default_schema() -> String {
+    "public".to_string()
 }

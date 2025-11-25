@@ -68,9 +68,10 @@ impl MetricExportable for IcmpRequestMetrics {
 
             // Export to TimescaleDB if configured
             if let Some(pool) = &exporters.timescale_pool {
-                let ts_exporter = exporter::timescale::TimescaleExporter::new(
+                let ts_exporter = exporter::timescale::TimescaleExporter::with_schema(
                     pool.clone(),
                     labels.clone(),
+                    exporters.timescale_schema.clone(),
                 );
                 if let Err(e) = ts_exporter.export(exporter::ProbeType::Icmp, request) {
                     log::error!("Failed to export ICMP metrics to TimescaleDB: {}", e);

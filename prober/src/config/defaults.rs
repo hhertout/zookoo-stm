@@ -29,7 +29,7 @@ fn default_self_monitoring_env() -> String {
 pub struct Defaults {
     pub probe_location: Option<ProbeLocation>,
     pub probe_zone: Option<String>,
-    pub self_monitoring: SelfMonitoringConfig,
+    pub self_monitoring: Option<SelfMonitoringConfig>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -80,7 +80,7 @@ impl From<configuration::model::defaults::Defaults> for Defaults {
         Defaults {
             probe_location: value.probe_location.map(ProbeLocation::from),
             probe_zone: value.probe_zone,
-            self_monitoring: SelfMonitoringConfig::from(value.self_monitoring),
+            self_monitoring: value.self_monitoring.map(SelfMonitoringConfig::from),
         }
     }
 }
