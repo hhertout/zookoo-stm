@@ -59,4 +59,4 @@ jobs:
           profile: minimal
 
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test -p exporter -p prober -p configuration --verbose

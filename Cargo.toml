@@ -1,3 +1,10 @@
+[workspace]
+members = [
+    "configuration",
+    "prober",
+    "exporter",
+]
+
 [package]
 name = "zookoo"
 version = "0.0.1"

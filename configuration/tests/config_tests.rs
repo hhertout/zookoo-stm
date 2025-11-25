@@ -19,7 +19,7 @@ enable = false
         let config: Configuration = toml::from_str(toml).expect("Failed to deserialize minimal config");
         
         assert_eq!(config.defaults.log_level, "info");
-        assert_eq!(config.defaults.self_monitoring.enable, false);
+        assert_eq!(config.defaults.self_monitoring.as_ref().unwrap().enable, false);
         assert!(config.http.is_none());
         assert!(config.icmp.is_none());
         assert!(config.discovery.is_none());
@@ -127,7 +127,7 @@ scrape_interval = "5m"
         assert_eq!(location.latitude, 48.8566);
         assert_eq!(location.longitude, 2.3522);
         
-        let self_mon = &config.defaults.self_monitoring;
+        let self_mon = config.defaults.self_monitoring.as_ref().unwrap();
         assert_eq!(self_mon.enable, true);
         assert_eq!(self_mon.otel_endpoint, "https://otel.example.com:4317");
         assert_eq!(self_mon.pyroscope_endpoint, "https://pyroscope.example.com:4040");
@@ -220,12 +220,13 @@ scrape_interval = "5m"
         
         // Test default values
         assert_eq!(config.defaults.log_level, "info");
-        assert_eq!(config.defaults.self_monitoring.enable, false);
-        assert_eq!(config.defaults.self_monitoring.otel_endpoint, "http://localhost:4317");
-        assert_eq!(config.defaults.self_monitoring.pyroscope_endpoint, "http://localhost:9999");
-        assert_eq!(config.defaults.self_monitoring.service_name, "zookoo");
-        assert_eq!(config.defaults.self_monitoring.env, "development");
-        assert_eq!(config.defaults.self_monitoring.tls_ignore, false);
+        let self_mon = config.defaults.self_monitoring.as_ref().unwrap();
+        assert_eq!(self_mon.enable, false);
+        assert_eq!(self_mon.otel_endpoint, "http://localhost:4317");
+        assert_eq!(self_mon.pyroscope_endpoint, "http://localhost:9999");
+        assert_eq!(self_mon.service_name, "zookoo");
+        assert_eq!(self_mon.env, "development");
+        assert_eq!(self_mon.tls_ignore, false);
     }
 
     #[test]
