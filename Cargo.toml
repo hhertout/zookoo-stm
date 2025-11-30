@@ -1,8 +1,10 @@
 [workspace]
 members = [
     "configuration",
-    "prober",
-    "exporter",
+    "engine",
+    "exporter", 
+    "discovery", 
+    "probe",
 ]
 
 [package]
@@ -10,16 +12,21 @@ name = "zookoo"
 version = "0.0.1"
 edition = "2024"
 
+license = "MIT OR Apache-2.0"
+
 [dependencies]
 configuration = { path = "configuration" }
-prober = { path = "prober" }
+engine = { path = "engine" }
 exporter = { path = "exporter" }
 env_logger = "0.11.8"
 env = "1.0.1"
-dotenv = "0.15.0"
+dotenvy = "0.15.7"
 log = "0.4.27"
 clap = { version = "4.5.40", features = ["derive", "env"] }
 tokio = "1.45.1"
 pyroscope = "0.5.8"
 pyroscope_pprofrs = "0.2.10"
 hostname = "0.4.1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-log = "0.2.0"

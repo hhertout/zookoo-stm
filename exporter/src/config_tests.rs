@@ -30,11 +30,7 @@ mod tests {
 
     #[test]
     fn test_auth_configuration_empty() {
-        let auth = AuthConfiguration {
-            username: None,
-            password: None,
-            bearer: None,
-        };
+        let auth = AuthConfiguration { username: None, password: None, bearer: None };
 
         assert!(auth.username.is_none());
         assert!(auth.password.is_none());
@@ -109,21 +105,15 @@ mod tests {
 
     #[test]
     fn test_metrics_exporter_config() {
-        let config = MetricsExporterConfiguration {
-            endpoint: "http://metrics:8080".to_string(),
-        };
+        let config = MetricsExporterConfiguration { endpoint: "http://metrics:8080".to_string() };
 
         assert_eq!(config.endpoint, "http://metrics:8080");
     }
 
     #[test]
     fn test_exporter_configuration_empty() {
-        let config = ExporterConfiguration {
-            otel: None,
-            metrics: None,
-            kafka: None,
-            prometheus: None,
-        };
+        let config =
+            ExporterConfiguration { otel: None, metrics: None, kafka: None, prometheus: None };
 
         assert!(config.otel.is_none());
         assert!(config.metrics.is_none());

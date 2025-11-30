@@ -8,15 +8,12 @@
 //! - Prometheus Pushgateway
 //!
 
-use std::{collections::HashMap, io::Error, fmt};
+use std::{collections::HashMap, fmt};
 
 pub mod config;
 pub mod otel;
 pub mod prom;
 pub mod timescale;
-
-#[cfg(test)]
-mod lib_tests;
 
 #[cfg(test)]
 mod config_tests;
@@ -36,15 +33,47 @@ impl fmt::Display for ProbeType {
     }
 }
 
+/// Metric data containing both numeric metrics and string labels from targets
 #[derive(Debug, Clone)]
-pub struct ExporterRequest {
-    pub exporter: ExporterConfigurationRequest,
+pub struct MetricData {
+    /// Numeric metric values (e.g., duration_ms, status_code)
     pub metrics: HashMap<String, isize>,
+    /// String labels from the target configuration (e.g., service, env)
+    pub labels: HashMap<String, String>,
 }
 
-#[derive(Debug, Clone)]
-pub struct ExporterConfigurationRequest {}
+impl MetricData {
+    pub fn new() -> Self {
+        MetricData { metrics: HashMap::new(), labels: HashMap::new() }
+    }
 
-pub trait Export {
-    fn export(&self, probe_type: ProbeType, data: ExporterRequest) -> Result<(), Error>;
+    pub fn with_metrics(metrics: HashMap<String, isize>) -> Self {
+        MetricData { metrics, labels: HashMap::new() }
+    }
+
+    pub fn with_labels(mut self, labels: HashMap<String, String>) -> Self {
+        self.labels = labels;
+        self
+    }
+
+    pub fn with_instance(mut self, instance: String) -> Self {
+        self.labels.insert("instance".to_string(), instance);
+        self
+    }
+
+    pub fn with_probe(mut self, probe: ProbeType) -> Self {
+        self.labels.insert("probe".to_string(), probe.to_string());
+        self
+    }
+}
+
+impl Default for MetricData {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub trait Exporter: Send + Sync {
+    /// Export metrics for a given probe type.
+    fn export(&self, probe_type: ProbeType, metric_data: MetricData);
 }

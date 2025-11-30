@@ -4,6 +4,9 @@
 .idea
 *.log
 test-config.toml
+test-config.hcl
+test-config.tf
+test-config.alloy
 .env
 .env.local
 test-target.json

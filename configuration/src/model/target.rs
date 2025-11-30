@@ -2,38 +2,42 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::model::scrape_interval::ScrapeInterval;
+use crate::model::scrape_interval::{HasScrapeInterval, ScrapeInterval};
 
 fn default_scrape_interval() -> ScrapeInterval {
-    return ScrapeInterval::M1;
+    ScrapeInterval::M1
 }
 
 fn default_follow_redirect() -> bool {
-    return false;
+    false
 }
 
 fn default_method() -> String {
-    return String::from("GET");
+    String::from("GET")
 }
 
 fn default_status_code() -> u16 {
-    return 200;
+    200
 }
 
 fn default_timeout() -> u16 {
-    return 15;
+    15
 }
 
 fn default_skip_tls() -> bool {
-    return false;
+    false
 }
 
 #[derive(Debug, Deserialize)]
 pub struct HttpConfiguration {
-    pub targets: Vec<HttpTarget>,
+    pub targets: Option<Vec<HttpTarget>>,
+    pub target_from: Option<String>,
+    pub forward_to: Vec<String>,
+    #[serde(default = "default_scrape_interval")]
+    pub scrape_interval: ScrapeInterval,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct HttpTarget {
     #[serde(default = "default_method")]
     pub method: String,
@@ -53,7 +57,13 @@ pub struct HttpTarget {
     pub skip_tls: bool,
 }
 
-#[derive(Debug, Deserialize)]
+impl HasScrapeInterval for HttpTarget {
+    fn scrape_interval(&self) -> ScrapeInterval {
+        self.scrape_interval
+    }
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct AuthConfiguration {
     pub username: Option<String>,
     pub password: Option<String>,
@@ -62,7 +72,11 @@ pub struct AuthConfiguration {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct IcmpConfiguration {
-    pub targets: Vec<IcmpTarget>,
+    pub targets: Option<Vec<IcmpTarget>>,
+    pub target_from: Option<String>,
+    pub forward_to: Vec<String>,
+    #[serde(default = "default_scrape_interval")]
+    pub scrape_interval: ScrapeInterval,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -74,4 +88,10 @@ pub struct IcmpTarget {
     pub timeout_sec: u16,
     #[serde(default = "default_scrape_interval")]
     pub scrape_interval: ScrapeInterval,
+}
+
+impl HasScrapeInterval for IcmpTarget {
+    fn scrape_interval(&self) -> ScrapeInterval {
+        self.scrape_interval
+    }
 }

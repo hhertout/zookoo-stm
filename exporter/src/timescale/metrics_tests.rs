@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::{ExporterRequest, ExporterConfigurationRequest, ProbeType};
+    use crate::ProbeType;
     use std::collections::HashMap;
 
     #[test]
@@ -20,14 +20,9 @@ mod tests {
         metrics.insert("status_code".to_string(), 200);
         metrics.insert("http_duration_ms".to_string(), 300);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics: metrics.clone(),
-        };
-
-        assert_eq!(request.metrics.get("up"), Some(&1));
-        assert_eq!(request.metrics.get("success"), Some(&1));
-        assert_eq!(request.metrics.get("status_code"), Some(&200));
+        assert_eq!(metrics.get("up"), Some(&1));
+        assert_eq!(metrics.get("success"), Some(&1));
+        assert_eq!(metrics.get("status_code"), Some(&200));
     }
 
     #[test]
@@ -44,14 +39,9 @@ mod tests {
         metrics.insert("cert_expiration_ts".to_string(), 1768521599);
         metrics.insert("cert_begin_ts".to_string(), 1736899200);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics: metrics.clone(),
-        };
-
-        assert_eq!(request.metrics.get("tls_duration_ms"), Some(&100));
-        assert_eq!(request.metrics.get("tls_handshake_ms"), Some(&80));
-        assert_eq!(request.metrics.get("cert_expiration_ts"), Some(&1768521599));
+        assert_eq!(metrics.get("tls_duration_ms"), Some(&100));
+        assert_eq!(metrics.get("tls_handshake_ms"), Some(&80));
+        assert_eq!(metrics.get("cert_expiration_ts"), Some(&1768521599));
     }
 
     #[test]
@@ -61,16 +51,11 @@ mod tests {
         metrics.insert("up".to_string(), 1);
         metrics.insert("rtt_ms".to_string(), 25);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics: metrics.clone(),
-        };
+        assert_eq!(metrics.get("up"), Some(&1));
+        assert_eq!(metrics.get("rtt_ms"), Some(&25));
 
-        assert_eq!(request.metrics.get("up"), Some(&1));
-        assert_eq!(request.metrics.get("rtt_ms"), Some(&25));
-        
         // ICMP should only have these two metrics
-        assert_eq!(request.metrics.len(), 2);
+        assert_eq!(metrics.len(), 2);
     }
 
     #[test]
@@ -85,14 +70,14 @@ mod tests {
     #[test]
     fn test_http_metrics_all_fields() {
         let mut metrics = HashMap::new();
-        
+
         // Required fields
         metrics.insert("up".to_string(), 1);
         metrics.insert("success".to_string(), 1);
         metrics.insert("dns_duration_ms".to_string(), 50);
         metrics.insert("status_code".to_string(), 200);
         metrics.insert("http_duration_ms".to_string(), 300);
-        
+
         // Optional TLS fields
         metrics.insert("tls_duration_ms".to_string(), 100);
         metrics.insert("tls_handshake_ms".to_string(), 80);
@@ -100,7 +85,7 @@ mod tests {
         metrics.insert("cert_begin_ts".to_string(), 1736899200);
 
         assert_eq!(metrics.len(), 9);
-        
+
         // Verify each field exists and has correct value
         assert!(metrics.contains_key("up"));
         assert!(metrics.contains_key("success"));
@@ -131,13 +116,8 @@ mod tests {
         metrics.insert("success".to_string(), 0);
         metrics.insert("status_code".to_string(), 0);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics,
-        };
-
-        assert_eq!(request.metrics.get("up"), Some(&0));
-        assert_eq!(request.metrics.get("success"), Some(&0));
+        assert_eq!(metrics.get("up"), Some(&0));
+        assert_eq!(metrics.get("success"), Some(&0));
     }
 
     #[test]
@@ -147,27 +127,22 @@ mod tests {
         metrics.insert("rtt_ms".to_string(), 10000);
         metrics.insert("cert_expiration_ts".to_string(), 2147483647);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics,
-        };
-
-        assert_eq!(request.metrics.get("http_duration_ms"), Some(&999999));
-        assert_eq!(request.metrics.get("rtt_ms"), Some(&10000));
+        assert_eq!(metrics.get("http_duration_ms"), Some(&999999));
+        assert_eq!(metrics.get("rtt_ms"), Some(&10000));
     }
 
     #[test]
     fn test_duration_to_i64_normal_values() {
         // Test the safe conversion function with normal duration values
         use crate::timescale::metrics::duration_to_i64;
-        
+
         // Typical duration values (milliseconds)
         assert_eq!(duration_to_i64(0), 0);
         assert_eq!(duration_to_i64(100), 100);
         assert_eq!(duration_to_i64(5000), 5000);
         assert_eq!(duration_to_i64(60_000), 60_000); // 1 minute
         assert_eq!(duration_to_i64(3_600_000), 3_600_000); // 1 hour
-        
+
         // Maximum safe value (i64::MAX)
         assert_eq!(duration_to_i64(i64::MAX as u128), i64::MAX);
     }
@@ -176,11 +151,11 @@ mod tests {
     fn test_duration_to_i64_overflow_protection() {
         // Test that overflow is handled gracefully
         use crate::timescale::metrics::duration_to_i64;
-        
+
         // Values exceeding i64::MAX should be clamped
         let overflow_value = (i64::MAX as u128) + 1;
         assert_eq!(duration_to_i64(overflow_value), i64::MAX);
-        
+
         // Extreme overflow
         let extreme_overflow = u128::MAX;
         assert_eq!(duration_to_i64(extreme_overflow), i64::MAX);
@@ -192,11 +167,11 @@ mod tests {
         // i64::MAX milliseconds = 9,223,372,036,854,775,807 ms
         // = ~292,471,208 years
         // This is sufficient for any realistic probe timeout scenario
-        
+
         let max_representable_ms = i64::MAX as u128;
         let ms_per_year = 365.25 * 24.0 * 60.0 * 60.0 * 1000.0;
         let years = (max_representable_ms as f64) / ms_per_year;
-        
+
         // Verify we can represent at least 290 million years
         assert!(years > 290_000_000.0);
     }

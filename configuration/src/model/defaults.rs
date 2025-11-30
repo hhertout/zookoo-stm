@@ -1,37 +1,49 @@
 use serde::Deserialize;
 
 fn default_log_level() -> String {
-    return String::from("info");
+    String::from("info")
 }
 
 fn default_tls_ignore() -> bool {
-    return false;
+    false
 }
 
 fn default_self_monitoring_enabled() -> bool {
-    return false;
+    false
 }
 
 fn default_self_monitoring_otel_endpoint() -> String {
-    return String::from("http://localhost:4317");
+    String::from("http://localhost:4317")
 }
 
 fn default_self_monitoring_pyroscope_endpoint() -> String {
-    return String::from("http://localhost:9999");
+    String::from("http://localhost:9999")
 }
 
 fn default_self_monitoring_service_name() -> String {
-    return String::from("zookoo");
+    String::from("zookoo")
 }
 
 fn default_self_monitoring_env() -> String {
-    return String::from("development");
+    String::from("development")
+}
+
+fn default_job() -> String {
+    String::from("zookoo")
+}
+
+fn default_service_name() -> String {
+    String::from("zookoo")
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Defaults {
     #[serde(default = "default_log_level")]
     pub log_level: String,
+    #[serde(default = "default_job")]
+    pub job: String,
+    #[serde(default = "default_service_name")]
+    pub service_name: String,
     pub probe_location: Option<ProbeLocation>,
     pub probe_zone: Option<String>,
     pub self_monitoring: Option<SelfMonitoringConfig>,

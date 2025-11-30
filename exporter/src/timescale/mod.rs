@@ -8,4 +8,4 @@ mod repository_tests;
 mod metrics_tests;
 
 pub use metrics::TimescaleExporter;
-pub use repository::{TimescaleRepository, HttpMetricRow, IcmpMetricRow};
+pub use repository::{HttpMetricRow, IcmpMetricRow, TimescaleRepository};

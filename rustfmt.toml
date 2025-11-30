@@ -1,0 +1,13 @@
+max_width = 100
+hard_tabs = false
+
+indent_style = "Block"
+
+use_small_heuristics = "Max"
+newline_style = "Unix"
+
+reorder_imports = true
+reorder_modules = true
+
+edition = "2021"
+wrap_comments = true
