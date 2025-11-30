@@ -31,7 +31,7 @@ mod configuration_tests {
         let probe = config.probe.as_ref().unwrap();
         let http_configs = &probe.http;
 
-        assert_eq!(http_configs.len(), 1);
+        assert_eq!(http_configs.len(), 2);
 
         let http_config =
             http_configs.get("api_monitoring").expect("api_monitoring probe should exist");
