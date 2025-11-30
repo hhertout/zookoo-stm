@@ -130,10 +130,7 @@ impl TimescaleExporter {
         Ok(())
     }
 
-    pub async fn export_http_metrics(
-        &self,
-        params: HttpMetricsParams,
-    ) -> Result<(), sqlx::Error> {
+    pub async fn export_http_metrics(&self, params: HttpMetricsParams) -> Result<(), sqlx::Error> {
         let labels = self.merge_labels(&params.target_labels);
         let target = labels.get("target").map(|s| s.as_str()).unwrap_or("unknown");
         let zone = labels.get("zone").map(|s| s.as_str());
@@ -165,10 +162,7 @@ impl TimescaleExporter {
     }
 
     /// Export ICMP metrics to TimescaleDB
-    pub async fn export_icmp_metrics(
-        &self,
-        params: IcmpMetricsParams,
-    ) -> Result<(), sqlx::Error> {
+    pub async fn export_icmp_metrics(&self, params: IcmpMetricsParams) -> Result<(), sqlx::Error> {
         let labels = self.merge_labels(&params.target_labels);
         let target = labels.get("target").map(|s| s.as_str()).unwrap_or("unknown");
         let zone = labels.get("zone").map(|s| s.as_str());

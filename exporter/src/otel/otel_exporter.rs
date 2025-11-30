@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::{otel::metrics::{HttpMetricsParams, MetricsExporter}, Exporter, MetricData, ProbeType};
+use crate::{
+    Exporter, MetricData, ProbeType,
+    otel::metrics::{HttpMetricsParams, MetricsExporter},
+};
 
 pub struct OtelExporter {
     metric_exporter: MetricsExporter,
