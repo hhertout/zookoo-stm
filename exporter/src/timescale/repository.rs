@@ -2,7 +2,7 @@ use sqlx::PgPool;
 use std::sync::Arc;
 
 /// Repository for TimescaleDB database operations
-/// 
+///
 /// Centralizes all SQL queries and database operations
 pub struct TimescaleRepository {
     pool: Arc<PgPool>,
@@ -11,10 +11,7 @@ pub struct TimescaleRepository {
 
 impl TimescaleRepository {
     pub fn new(pool: Arc<PgPool>) -> Self {
-        Self { 
-            pool,
-            schema: "public".to_string(),
-        }
+        Self { pool, schema: "public".to_string() }
     }
 
     pub fn with_schema(pool: Arc<PgPool>, schema: String) -> Self {
@@ -46,9 +43,7 @@ impl TimescaleRepository {
             "#,
             self.schema
         );
-        sqlx::query(&query)
-            .execute(&*self.pool)
-            .await?;
+        sqlx::query(&query).execute(&*self.pool).await?;
 
         Ok(())
     }
@@ -69,9 +64,7 @@ impl TimescaleRepository {
             "#,
             self.schema
         );
-        sqlx::query(&query)
-            .execute(&*self.pool)
-            .await?;
+        sqlx::query(&query).execute(&*self.pool).await?;
 
         Ok(())
     }
@@ -87,9 +80,7 @@ impl TimescaleRepository {
             "#,
             self.schema
         );
-        let _ = sqlx::query(&query)
-            .execute(&*self.pool)
-            .await;
+        let _ = sqlx::query(&query).execute(&*self.pool).await;
 
         Ok(())
     }
@@ -105,9 +96,7 @@ impl TimescaleRepository {
             "#,
             self.schema
         );
-        let _ = sqlx::query(&query)
-            .execute(&*self.pool)
-            .await;
+        let _ = sqlx::query(&query).execute(&*self.pool).await;
 
         Ok(())
     }
@@ -121,9 +110,7 @@ impl TimescaleRepository {
             "#,
             self.schema
         );
-        sqlx::query(&query)
-            .execute(&*self.pool)
-            .await?;
+        sqlx::query(&query).execute(&*self.pool).await?;
 
         Ok(())
     }
@@ -137,32 +124,13 @@ impl TimescaleRepository {
             "#,
             self.schema
         );
-        sqlx::query(&query)
-            .execute(&*self.pool)
-            .await?;
+        sqlx::query(&query).execute(&*self.pool).await?;
 
         Ok(())
     }
 
     /// Insert HTTP metrics
-    pub async fn insert_http_metrics(
-        &self,
-        target: &str,
-        zone: Option<&str>,
-        job: Option<&str>,
-        up: i16,
-        success: i16,
-        status_code: i32,
-        dns_duration_ms: i64,
-        http_duration_ms: i64,
-        tls_duration_ms: Option<i64>,
-        tls_handshake_ms: Option<i64>,
-        cert_expiration_ts: Option<i64>,
-        cert_begin_ts: Option<i64>,
-        http_version: Option<&str>,
-        tls_version: Option<&str>,
-        labels_json: serde_json::Value,
-    ) -> Result<(), sqlx::Error> {
+    pub async fn insert_http_metrics(&self, to_insert: HttpMetricRow) -> Result<(), sqlx::Error> {
         let query = format!(
             r#"
             INSERT INTO {}.http_metrics (
@@ -174,37 +142,29 @@ impl TimescaleRepository {
             self.schema
         );
         sqlx::query(&query)
-            .bind(target)
-        .bind(zone)
-        .bind(job)
-        .bind(up)
-        .bind(success)
-        .bind(status_code)
-        .bind(dns_duration_ms)
-        .bind(http_duration_ms)
-        .bind(tls_duration_ms)
-        .bind(tls_handshake_ms)
-        .bind(cert_expiration_ts)
-        .bind(cert_begin_ts)
-        .bind(http_version)
-        .bind(tls_version)
-        .bind(labels_json)
-        .execute(&*self.pool)
-        .await?;
+            .bind(to_insert.target)
+            .bind(to_insert.zone)
+            .bind(to_insert.job)
+            .bind(to_insert.up)
+            .bind(to_insert.success)
+            .bind(to_insert.status_code)
+            .bind(to_insert.dns_duration_ms)
+            .bind(to_insert.http_duration_ms)
+            .bind(to_insert.tls_duration_ms)
+            .bind(to_insert.tls_handshake_ms)
+            .bind(to_insert.cert_expiration_ts)
+            .bind(to_insert.cert_begin_ts)
+            .bind(to_insert.http_version)
+            .bind(to_insert.tls_version)
+            .bind(to_insert.labels)
+            .execute(&*self.pool)
+            .await?;
 
         Ok(())
     }
 
     /// Insert ICMP metrics
-    pub async fn insert_icmp_metrics(
-        &self,
-        target: &str,
-        zone: Option<&str>,
-        job: Option<&str>,
-        up: i16,
-        rtt_ms: i64,
-        labels_json: serde_json::Value,
-    ) -> Result<(), sqlx::Error> {
+    pub async fn insert_icmp_metrics(&self, to_insert: IcmpMetricRow) -> Result<(), sqlx::Error> {
         let query = format!(
             r#"
             INSERT INTO {}.icmp_metrics (
@@ -214,14 +174,14 @@ impl TimescaleRepository {
             self.schema
         );
         sqlx::query(&query)
-            .bind(target)
-        .bind(zone)
-        .bind(job)
-        .bind(up)
-        .bind(rtt_ms)
-        .bind(labels_json)
-        .execute(&*self.pool)
-        .await?;
+            .bind(to_insert.target)
+            .bind(to_insert.zone)
+            .bind(to_insert.job)
+            .bind(to_insert.up)
+            .bind(to_insert.rtt_ms)
+            .bind(to_insert.labels)
+            .execute(&*self.pool)
+            .await?;
 
         Ok(())
     }

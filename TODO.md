@@ -1,9 +1,6 @@
 # TODO List
 
 - Global:
-
-  - Fix prod dockerfile `exec /usr/local/bin/zookoo: no such file or directory`
-  - Check config function (main.rs)
   - check histogram metrics -> doesn't work properly (to confirm)
   - Unit Tests...
   - Configuration Hot Module Reload
@@ -22,8 +19,6 @@
   - Timeout
 
 - Targets:
-
-  - Labels on ICMP targets
   - Probe HTTP redirect & follow redirect
   - Expected content
   - Expected content type
@@ -33,11 +28,9 @@
   - Skip tls option on requests
 
 - Discovery:
-
   - Discovery API http targets
 
 - Exporter:
-
   - Kafka exporter
   - InfluxDB exporter
   - MongoDB exporter

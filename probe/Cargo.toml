@@ -1,0 +1,27 @@
+[package]
+name = "probe"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+configuration = { path = "../configuration" }
+discovery = { path = "../discovery" }
+tokio = { version = "1.45.1", features = ["full"] }
+openssl = "0.10.73"
+log = "0.4.27"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+futures = "0.3.31"
+reqwest = { version = "0.12.20", features = ["json", "native-tls"] }
+ping = "0.7.0"
+native-tls = "0.2.14"
+tokio-native-tls = "0.3.1"
+chrono = "0.4.41"
+url = "2.5.4"
+opentelemetry = { version = "0.31.0", features = ["internal-logs"] }
+opentelemetry_sdk = { version = "0.31.0", features = ["internal-logs"] }
+opentelemetry-stdout = { version = "0.31.0", features = ["trace"] }
+opentelemetry-otlp = { version = "0.31.0", features = ["grpc-tonic", "tls", "internal-logs"] }
+sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

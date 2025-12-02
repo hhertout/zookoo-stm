@@ -19,6 +19,25 @@ services:
     networks:
       - zookoo-alloy-otel
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: zookoo-grafana-alloy-otel
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_JSON_ENABLED=true
+      - GF_DASHBOARDS_JSON_PATH=/var/lib/grafana/dashboards
+    volumes:
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "3001:3000"
+    depends_on:
+      - alloy
+    networks:
+      - zookoo-alloy-otel
+
   # Prometheus for Alloy OTLP metrics
   prometheus:
     image: prom/prometheus:latest
@@ -35,6 +54,19 @@ services:
       - prometheus-alloy-otel-data:/prometheus
     ports:
       - "9092:9090"
+    networks:
+      - zookoo-alloy-otel
+
+  zookoo:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: zookoo-timescale
+    depends_on:
+      - timescaledb
+    volumes:
+      - ./conf/zookoo-timescale-config.hcl:/config/config.hcl:ro
+    command: ["zookoo", "--config", "/config/config.hcl"]
     networks:
       - zookoo-alloy-otel
 

@@ -74,7 +74,8 @@ const config: Config = {
     },
     prism: {
       theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      darkTheme: prismThemes.oneDark,
+      additionalLanguages: ['toml', 'rust', 'bash', 'hcl'],
     },
   } satisfies Preset.ThemeConfig,
 };

@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ScrapeInterval {
     #[serde(rename = "5s")]
     S5,
@@ -47,4 +47,9 @@ impl ScrapeInterval {
             ScrapeInterval::D30 => Duration::from_secs(30 * 24 * 60 * 60),
         }
     }
+}
+
+/// Trait for targets that have a scrape interval
+pub trait HasScrapeInterval {
+    fn scrape_interval(&self) -> ScrapeInterval;
 }

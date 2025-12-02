@@ -1,20 +1,22 @@
 use serde::Deserialize;
 
 fn default_tls_insecure() -> bool {
-    return false;
+    false
 }
 
 fn default_prometheus_job() -> String {
     "zookoo-stm".to_string()
 }
 
+use std::collections::HashMap;
+
 #[derive(Debug, Deserialize)]
 pub struct ExporterConfiguration {
-    pub otel: Option<OtelGrpcExporterConfiguration>,
-    pub metrics: Option<MetricsExporterConfiguration>,
-    pub kafka: Option<KafkaExporterConfiguration>,
-    pub prometheus_remote_write: Option<PrometheusRemoteWriteConfiguration>,
-    pub timescale: Option<TimescaleExporterConfiguration>,
+    pub otel: Option<HashMap<String, OtelGrpcExporterConfiguration>>,
+    pub metrics: Option<HashMap<String, MetricsExporterConfiguration>>,
+    pub kafka: Option<HashMap<String, KafkaExporterConfiguration>>,
+    pub prometheus_remote_write: Option<HashMap<String, PrometheusRemoteWriteConfiguration>>,
+    pub timescale: Option<HashMap<String, TimescaleExporterConfiguration>>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -1,14 +1,13 @@
 #[cfg(test)]
 mod tests {
     use crate::otel::metrics::MetricsExporter;
-    use crate::{Export, ExporterRequest, ExporterConfigurationRequest, ProbeType};
     use std::collections::HashMap;
 
     #[test]
     fn test_metrics_exporter_creation() {
         let labels = HashMap::new();
         let _exporter = MetricsExporter::new(labels);
-        
+
         // Verify exporter can be created
         // We can't test actual OTEL operations without infrastructure
         // but we ensure the API is correct
@@ -26,16 +25,6 @@ mod tests {
     }
 
     #[test]
-    fn test_export_trait_implementation_exists() {
-        // Ensure MetricsExporter implements Export trait
-        let labels = HashMap::new();
-        let _exporter = MetricsExporter::new(labels);
-        
-        // The fact this compiles means Export is implemented
-        let _: &dyn Export = &_exporter;
-    }
-
-    #[test]
     fn test_http_metrics_format_for_otel() {
         let mut metrics = HashMap::new();
         metrics.insert("up".to_string(), 1);
@@ -44,15 +33,10 @@ mod tests {
         metrics.insert("status_code".to_string(), 200);
         metrics.insert("http_duration_ms".to_string(), 300);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics,
-        };
-
-        // Verify request structure is correct for OTEL export
-        assert!(request.metrics.contains_key("up"));
-        assert!(request.metrics.contains_key("success"));
-        assert!(request.metrics.contains_key("status_code"));
+        // Verify metrics structure is correct for OTEL export
+        assert!(metrics.contains_key("up"));
+        assert!(metrics.contains_key("success"));
+        assert!(metrics.contains_key("status_code"));
     }
 
     #[test]
@@ -61,19 +45,17 @@ mod tests {
         metrics.insert("up".to_string(), 1);
         metrics.insert("rtt_ms".to_string(), 25);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics,
-        };
-
-        assert_eq!(request.metrics.len(), 2);
-        assert!(request.metrics.contains_key("rtt_ms"));
+        assert_eq!(metrics.len(), 2);
+        assert!(metrics.contains_key("rtt_ms"));
     }
 
     #[test]
     fn test_labels_with_special_characters() {
         let mut labels = HashMap::new();
-        labels.insert("target".to_string(), "https://example.com/api/v1/test?param=value".to_string());
+        labels.insert(
+            "target".to_string(),
+            "https://example.com/api/v1/test?param=value".to_string(),
+        );
         labels.insert("zone".to_string(), "us-east-1".to_string());
         labels.insert("tag".to_string(), "key:value".to_string());
 
@@ -98,17 +80,13 @@ mod tests {
         metrics.insert("cert_expiration_ts".to_string(), 1768521599);
         metrics.insert("cert_begin_ts".to_string(), 1736899200);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics,
-        };
-
-        assert!(request.metrics.contains_key("tls_duration_ms"));
-        assert!(request.metrics.contains_key("cert_expiration_ts"));
+        assert!(metrics.contains_key("tls_duration_ms"));
+        assert!(metrics.contains_key("cert_expiration_ts"));
     }
 
     #[test]
     fn test_probe_type_http_routing() {
+        use crate::ProbeType;
         let probe_type = ProbeType::Http;
         assert_eq!(probe_type, ProbeType::Http);
         assert_ne!(probe_type, ProbeType::Icmp);
@@ -116,6 +94,7 @@ mod tests {
 
     #[test]
     fn test_probe_type_icmp_routing() {
+        use crate::ProbeType;
         let probe_type = ProbeType::Icmp;
         assert_eq!(probe_type, ProbeType::Icmp);
         assert_ne!(probe_type, ProbeType::Http);

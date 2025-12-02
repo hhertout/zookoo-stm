@@ -16,6 +16,7 @@ use crate::config::OtelGrpcExporterConfiguration;
 use std::fs;
 
 pub mod metrics;
+pub mod otel_exporter;
 
 #[cfg(test)]
 mod metrics_tests;
@@ -43,20 +44,13 @@ impl AuthHeader {
 
 fn get_resource() -> Resource {
     static RESOURCE: OnceLock<Resource> = OnceLock::new();
-    RESOURCE
-        .get_or_init(|| Resource::builder().with_service_name("zookoo").build())
-        .clone()
+    RESOURCE.get_or_init(|| Resource::builder().with_service_name("zookoo").build()).clone()
 }
 
 pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterProvider {
-    log::warn!(
-        "sending otel metrics with grpc to '{}' endpoint",
-        config.url
-    );
+    log::warn!("sending otel metrics with grpc to '{}' endpoint", config.url);
 
-    let mut builder = MetricExporter::builder()
-        .with_tonic()
-        .with_endpoint(config.url.clone());
+    let mut builder = MetricExporter::builder().with_tonic().with_endpoint(config.url.clone());
 
     // Configure TLS if needed
     if config.url.starts_with("https") {
@@ -110,11 +104,7 @@ pub fn shutdown(meter_exporter: SdkMeterProvider) -> Result<(), String> {
     }
 
     if !shutdown_errors.is_empty() {
-        return Err(format!(
-            "Failed to shutdown providers:{}",
-            shutdown_errors.join("\n")
-        )
-        .into());
+        return Err(format!("Failed to shutdown providers:{}", shutdown_errors.join("\n")));
     }
 
     Ok(())

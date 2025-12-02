@@ -50,10 +50,7 @@ impl OtelGrpcExporterConfiguration {
             if let Some(bearer) = &auth.bearer {
                 Some(AuthHeader::Bearer(bearer.clone()))
             } else if let (Some(username), Some(password)) = (&auth.username, &auth.password) {
-                Some(AuthHeader::Basic {
-                    username: username.clone(),
-                    password: password.clone(),
-                })
+                Some(AuthHeader::Basic { username: username.clone(), password: password.clone() })
             } else {
                 None
             }

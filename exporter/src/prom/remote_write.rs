@@ -51,7 +51,7 @@ pub struct PrometheusRemoteWriteConfig {
 }
 
 /// Prometheus remote_write exporter
-/// 
+///
 /// This exporter sends metrics to Prometheus-compatible endpoints that support
 /// the remote_write API, such as:
 /// - Prometheus itself (with remote_write receiver enabled)
@@ -59,7 +59,7 @@ pub struct PrometheusRemoteWriteConfig {
 /// - Grafana Mimir
 /// - Thanos
 /// - Victoria Metrics
-/// 
+///
 /// The data is encoded in Prometheus protobuf format and compressed with Snappy.
 pub struct PrometheusRemoteWrite {
     client: Client,
@@ -69,15 +69,13 @@ pub struct PrometheusRemoteWrite {
 impl PrometheusRemoteWrite {
     /// Create a new Prometheus remote_write exporter
     pub fn new(config: PrometheusRemoteWriteConfig) -> Result<Self, Box<dyn StdError>> {
-        let client = Client::builder()
-            .timeout(std::time::Duration::from_secs(30))
-            .build()?;
+        let client = Client::builder().timeout(std::time::Duration::from_secs(30)).build()?;
 
         Ok(Self { client, config })
     }
 
     /// Push metrics to the remote_write endpoint
-    /// 
+    ///
     /// # Arguments
     /// * `metric_name` - Name of the metric
     /// * `value` - Value of the metric
@@ -91,60 +89,35 @@ impl PrometheusRemoteWrite {
         timestamp: Option<i64>,
     ) -> Result<(), Box<dyn StdError>> {
         let mut time_series_labels = vec![
-            Label {
-                name: "__name__".to_string(),
-                value: metric_name.to_string(),
-            },
-            Label {
-                name: "job".to_string(),
-                value: self.config.job.clone(),
-            },
+            Label { name: "__name__".to_string(), value: metric_name.to_string() },
+            Label { name: "job".to_string(), value: self.config.job.clone() },
         ];
 
         // Add instance if configured
         if let Some(instance) = &self.config.instance {
-            time_series_labels.push(Label {
-                name: "instance".to_string(),
-                value: instance.clone(),
-            });
+            time_series_labels
+                .push(Label { name: "instance".to_string(), value: instance.clone() });
         }
 
         // Add extra labels from config
         for (key, val) in &self.config.extra_labels {
-            time_series_labels.push(Label {
-                name: key.clone(),
-                value: val.clone(),
-            });
+            time_series_labels.push(Label { name: key.clone(), value: val.clone() });
         }
 
         // Add metric-specific labels
         for (key, val) in labels {
-            time_series_labels.push(Label {
-                name: key,
-                value: val,
-            });
+            time_series_labels.push(Label { name: key, value: val });
         }
 
         let ts = timestamp.unwrap_or_else(|| {
-            SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_millis() as i64
+            SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as i64
         });
 
-        let sample = Sample {
-            value,
-            timestamp: ts,
-        };
+        let sample = Sample { value, timestamp: ts };
 
-        let time_series = TimeSeries {
-            labels: time_series_labels,
-            samples: vec![sample],
-        };
+        let time_series = TimeSeries { labels: time_series_labels, samples: vec![sample] };
 
-        let write_request = WriteRequest {
-            timeseries: vec![time_series],
-        };
+        let write_request = WriteRequest { timeseries: vec![time_series] };
 
         self.send_write_request(write_request).await
     }
@@ -156,59 +129,36 @@ impl PrometheusRemoteWrite {
         timestamp: Option<i64>,
     ) -> Result<(), Box<dyn StdError>> {
         let ts = timestamp.unwrap_or_else(|| {
-            SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_millis() as i64
+            SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as i64
         });
 
         let mut timeseries = Vec::new();
 
         for (metric_name, value, labels) in metrics {
             let mut time_series_labels = vec![
-                Label {
-                    name: "__name__".to_string(),
-                    value: metric_name,
-                },
-                Label {
-                    name: "job".to_string(),
-                    value: self.config.job.clone(),
-                },
+                Label { name: "__name__".to_string(), value: metric_name },
+                Label { name: "job".to_string(), value: self.config.job.clone() },
             ];
 
             // Add instance if configured
             if let Some(instance) = &self.config.instance {
-                time_series_labels.push(Label {
-                    name: "instance".to_string(),
-                    value: instance.clone(),
-                });
+                time_series_labels
+                    .push(Label { name: "instance".to_string(), value: instance.clone() });
             }
 
             // Add extra labels from config
             for (key, val) in &self.config.extra_labels {
-                time_series_labels.push(Label {
-                    name: key.clone(),
-                    value: val.clone(),
-                });
+                time_series_labels.push(Label { name: key.clone(), value: val.clone() });
             }
 
             // Add metric-specific labels
             for (key, val) in labels {
-                time_series_labels.push(Label {
-                    name: key,
-                    value: val,
-                });
+                time_series_labels.push(Label { name: key, value: val });
             }
 
-            let sample = Sample {
-                value,
-                timestamp: ts,
-            };
+            let sample = Sample { value, timestamp: ts };
 
-            timeseries.push(TimeSeries {
-                labels: time_series_labels,
-                samples: vec![sample],
-            });
+            timeseries.push(TimeSeries { labels: time_series_labels, samples: vec![sample] });
         }
 
         let write_request = WriteRequest { timeseries };
@@ -217,16 +167,23 @@ impl PrometheusRemoteWrite {
     }
 
     /// Send the write request to the remote endpoint
-    async fn send_write_request(&self, write_request: WriteRequest) -> Result<(), Box<dyn StdError>> {
-        log::debug!("Sending {} time series to {}", write_request.timeseries.len(), self.config.url);
-        
+    async fn send_write_request(
+        &self,
+        write_request: WriteRequest,
+    ) -> Result<(), Box<dyn StdError>> {
+        log::debug!(
+            "Sending {} time series to {}",
+            write_request.timeseries.len(),
+            self.config.url
+        );
+
         // Encode to protobuf
         let mut buf = Vec::new();
         write_request.encode(&mut buf)?;
 
         // Compress with Snappy
         let compressed = snap::raw::Encoder::new().compress_vec(&buf)?;
-        
+
         log::debug!("Encoded {} bytes, compressed to {} bytes", buf.len(), compressed.len());
 
         // Build request

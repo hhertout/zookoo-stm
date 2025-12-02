@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use crate::prom::PrometheusRemoteWriteExporter;
     use crate::prom::PrometheusRemoteWrite;
-    use crate::{Export, ExporterRequest, ExporterConfigurationRequest, ProbeType};
+    use crate::prom::PrometheusRemoteWriteExporter;
+    use crate::{Exporter, ProbeType};
     use std::collections::HashMap;
     use std::sync::Arc;
 
@@ -17,9 +17,10 @@ mod tests {
             extra_labels: HashMap::new(),
         };
 
-        let remote_write = PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
+        let remote_write =
+            PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
         let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
-        
+
         // Exporter should be created successfully
     }
 
@@ -34,11 +35,12 @@ mod tests {
             extra_labels: HashMap::new(),
         };
 
-        let remote_write = PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
+        let remote_write =
+            PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
         let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
-        
-        // Verify Export trait is implemented
-        let _: &dyn Export = &_exporter;
+
+        // Verify Exporter trait is implemented
+        let _: &dyn Exporter = &_exporter;
     }
 
     #[test]
@@ -48,14 +50,9 @@ mod tests {
         metrics.insert("dns_duration_ms".to_string(), 50);
         metrics.insert("http_duration_ms".to_string(), 300);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics: metrics.clone(),
-        };
-
-        assert_eq!(request.metrics.get("success"), Some(&1));
-        assert_eq!(request.metrics.get("dns_duration_ms"), Some(&50));
-        assert_eq!(request.metrics.get("http_duration_ms"), Some(&300));
+        assert_eq!(metrics.get("success"), Some(&1));
+        assert_eq!(metrics.get("dns_duration_ms"), Some(&50));
+        assert_eq!(metrics.get("http_duration_ms"), Some(&300));
     }
 
     #[test]
@@ -64,13 +61,8 @@ mod tests {
         metrics.insert("up".to_string(), 1);
         metrics.insert("rtt_ms".to_string(), 25);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics,
-        };
-
-        assert_eq!(request.metrics.get("up"), Some(&1));
-        assert_eq!(request.metrics.get("rtt_ms"), Some(&25));
+        assert_eq!(metrics.get("up"), Some(&1));
+        assert_eq!(metrics.get("rtt_ms"), Some(&25));
     }
 
     #[test]
@@ -88,9 +80,10 @@ mod tests {
             extra_labels: HashMap::new(),
         };
 
-        let remote_write = PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
+        let remote_write =
+            PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
         let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
-        
+
         // Should handle custom labels
     }
 
@@ -112,12 +105,7 @@ mod tests {
         metrics.insert("success".to_string(), 0);
         metrics.insert("dns_duration_ms".to_string(), 0);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics,
-        };
-
-        assert_eq!(request.metrics.get("success"), Some(&0));
+        assert_eq!(metrics.get("success"), Some(&0));
     }
 
     #[test]
@@ -126,12 +114,7 @@ mod tests {
         metrics.insert("http_duration_ms".to_string(), 999999);
         metrics.insert("rtt_ms".to_string(), 10000);
 
-        let request = ExporterRequest {
-            exporter: ExporterConfigurationRequest {},
-            metrics,
-        };
-
-        assert_eq!(request.metrics.get("http_duration_ms"), Some(&999999));
+        assert_eq!(metrics.get("http_duration_ms"), Some(&999999));
     }
 
     #[test]

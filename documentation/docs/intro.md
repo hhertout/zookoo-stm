@@ -12,36 +12,48 @@ Zookoo is designed to be user-friendly and easy to set up, making it accessible 
 
 This project provides an alternative to Blackbox, offering improved performance and greater configurability.
 
-# Why this project?
+### Easy configuration
 
-One of the biggest pain points with the Prometheus Blackbox Exporter is its fragmented and rigid configuration model. You need to define:
+Define your monitoring setup by using a clear and concise HCL configuration file. 
+Configure the pipeline you need in a single place. It offer flexibility and simplicity.
 
-- Modules in a separate blackbox.yml file
+Use a single, unified config file written in HCL:
 
-- Targets through Prometheus relabeling or external files
+```hcl
+defaults {
+  log_level = "info"
+  probe_zone = "eu-west-1"
+  service_name = "zookoo"
+  job = "zookoo"
 
-- Scraping rules in prometheus.yml
+  probe_location {
+    latitude = 48.858370
+    longitude = 2.29448
+  }
+}
 
-And sometimes even dynamic reloading via third-party tools
-This makes deployment cumbersome, error-prone, and difficult to maintain at scale. And not user friendly at for beginners.
+probe "http" "google_check" {
+  scrape_interval = "30s"
+  targets = [
+    {
+      url = "https://www.google.com"
+      method = "GET"
+      expected_status_code = 200
+      labels = {
+        service = "google"
+        env = "test"
+      }
+    }
+  ]
 
-### With Zookoo, it’s different:
+  forward_to = [exporter.otel.otlp]
+}
 
-We use a single, unified config file written in clean and human-friendly TOML:
+exporter "otel" "otlp" {
+  url = "http://localhost:4317"
+  tls_insecure = true
+}
 
-```toml
-[exporter.otel]
-url = "http://localhost:4317"
-
-[exporter.kafka]
-broker = "localhost:9092"
-topic = "metrics"
-
-[http]
-targets = [
-  { url = "https://google.com", labels = { env = "prod", service = "search" }, scrap_interval = "10s" },
-  { url = "https://chatgpt.com", labels = { env = "test", service = "ai" }, scrap_interval = "5s" },
-]
 ```
 
 - Define multiple exporters (OpenTelemetry, Kafka, InfluxDB...)
@@ -74,6 +86,8 @@ This tool was created to have a simpler, more flexible, and more powerful altern
 
 - **Exporters**:
   - OpenTelemetry
+  - Prometheus Remote Write
+  - TimescaleDB (PostgreSQL with time-series extension)
 
 ## Getting Started
 

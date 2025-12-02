@@ -1,9 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use crate::timescale::repository::TimescaleRepository;
-    use sqlx::PgPool;
-    use std::sync::Arc;
-
     #[test]
     fn test_repository_creation() {
         // We can't test actual DB operations without a database,
@@ -16,7 +12,7 @@ mod tests {
         // Test that repository can be created with custom schema
         // We can't actually connect to a database in unit tests,
         // but we can verify the API exists and compiles
-        
+
         // Note: This is a compile-time check, not a runtime test
         // The actual schema usage is validated in integration tests
     }
@@ -25,7 +21,7 @@ mod tests {
     fn test_http_metric_row_struct() {
         // Test that HttpMetricRow has the expected fields
         use crate::timescale::HttpMetricRow;
-        
+
         // This test ensures the struct compiles and has expected fields
         let _validate_struct = |row: HttpMetricRow| {
             let _ = row.time;
@@ -51,7 +47,7 @@ mod tests {
     fn test_icmp_metric_row_struct() {
         // Test that IcmpMetricRow has the expected fields
         use crate::timescale::IcmpMetricRow;
-        
+
         let _validate_struct = |row: IcmpMetricRow| {
             let _ = row.time;
             let _ = row.target;
