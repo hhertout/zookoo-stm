@@ -22,8 +22,8 @@ services:
     depends_on:
       - timescaledb
     volumes:
-      - ./conf/zookoo-timescale-config.toml:/config/config.toml:ro
-    command: ["zookoo", "--config", "/config/config.toml"]
+      - ./conf/zookoo-timescale-config.hcl:/config/config.hcl:ro
+    command: ["zookoo", "--config", "/config/config.hcl"]
     networks:
       - zookoo-net
 

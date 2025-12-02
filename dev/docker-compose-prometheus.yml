@@ -56,6 +56,19 @@ services:
     networks:
       - zookoo-prom
 
+  zookoo:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: zookoo-timescale
+    depends_on:
+      - timescaledb
+    volumes:
+      - ./conf/zookoo-timescale-config.hcl:/config/config.hcl:ro
+    command: ["zookoo", "--config", "/config/config.hcl"]
+    networks:
+      - zookoo-prom
+
 networks:
   zookoo-prom:
     driver: bridge

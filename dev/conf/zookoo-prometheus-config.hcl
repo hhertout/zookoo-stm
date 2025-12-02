@@ -17,7 +17,7 @@ defaults {
 }
 
 exporter "prometheus_remote_write" "main" {
-  url = "http://localhost:9999/api/v1/metrics/write"
+    url = "http://localhost:9999/api/v1/metrics/write"
     job = "zookoo-stm"
     instance = "zookoo-dev-prometheus"
 }
