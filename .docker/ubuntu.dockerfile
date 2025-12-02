@@ -56,17 +56,17 @@ RUN apt-get update && apt-get install -y \
     libssl3t64 \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user
-RUN groupadd -g 1000 appuser && \
-    useradd -r -u 1000 -g appuser appuser && \
-    chown -R appuser:appuser /app
+# Create a non-root user (use existing GID/UID if already present)
+RUN groupadd -g 1000 appuser 2>/dev/null || true && \
+    useradd -r -u 1000 -g 1000 appuser 2>/dev/null || true && \
+    chown -R 1000:1000 /app
 
 # Copy the binary from builder
 COPY --from=builder /usr/local/bin/zookoo /app/zookoo
-RUN chown appuser:appuser /app/zookoo
+RUN chown 1000:1000 /app/zookoo
 
 # Switch to non-root user
-USER appuser
+USER 1000
 
 # Run the application
 CMD ["/app/zookoo"]
