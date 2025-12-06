@@ -724,7 +724,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 42
       },
       "id": 5,
       "panels": [],
@@ -801,7 +801,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 43
       },
       "id": 2,
       "options": {
@@ -827,12 +827,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by (instance) (probe_http_request_duration_milliseconds {service_name=~\"$service_name\", job=~\"$job\", instance=~\"$instance\"})",
+          "expr": "sum by (instance) (probe_dns_lookup_duration_milliseconds{service_name=~\"$service_name\", job=~\"$job\", instance=~\"$instance\"})",
           "hide": false,
           "instant": false,
-          "legendFormat": "total_request_duration",
+          "legendFormat": "dns_lookup_duration",
           "range": true,
-          "refId": "A"
+          "refId": "B"
         },
         {
           "datasource": {
@@ -840,12 +840,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by (instance) (probe_dns_lookup_duration_milliseconds{service_name=~\"$service_name\", job=~\"$job\", instance=~\"$instance\"})",
+          "expr": "sum by (instance) (probe_tcp_connect_duration_milliseconds{service_name=~\"$service_name\", job=~\"$job\", instance=~\"$instance\"})",
           "hide": false,
           "instant": false,
-          "legendFormat": "dns_lookup_duration",
+          "legendFormat": "tcp_connect",
           "range": true,
-          "refId": "B"
+          "refId": "F"
         },
         {
           "datasource": {
@@ -866,12 +866,38 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by (instance) (probe_http_tls_lookup_duration_milliseconds{service_name=~\"$service_name\", job=~\"$job\", instance=~\"$instance\"})",
+          "expr": " sum by (instance) (probe_content_transfer_duration_milliseconds{service_name=~\"$service_name\", job=~\"$job\", instance=~\"$instance\"})",
           "hide": false,
           "instant": false,
-          "legendFormat": "tls_duration",
+          "legendFormat": "transfer_duration",
           "range": true,
-          "refId": "D"
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (instance) (probe_time_to_first_byte_milliseconds{service_name=~\"$service_name\", job=~\"$job\", instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "ttfb",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (instance) (probe_http_request_duration_milliseconds {service_name=~\"$service_name\", job=~\"$job\", instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "total_request_duration",
+          "range": true,
+          "refId": "A"
         }
       ],
       "title": "Http duration",
@@ -884,58 +910,79 @@
       },
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 35,
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
-          }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 53
       },
       "id": 1,
       "options": {
-        "calculate": false,
-        "cellGap": 1,
-        "color": {
-          "exponent": 0.5,
-          "fill": "dark-orange",
-          "mode": "scheme",
-          "reverse": false,
-          "scale": "exponential",
-          "scheme": "Oranges",
-          "steps": 95
-        },
-        "exemplars": {
-          "color": "rgba(255,0,255,0.7)"
-        },
-        "filterValues": {
-          "le": 1e-9
-        },
         "legend": {
-          "show": true
-        },
-        "rowsFrame": {
-          "layout": "auto"
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
-          "showColorScale": false,
-          "yHistogram": false
-        },
-        "yAxis": {
-          "axisPlacement": "hidden",
-          "reverse": false
+          "sort": "none"
         }
       },
       "pluginVersion": "12.3.0",
@@ -946,15 +993,15 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(probe_dns_lookup_duration_milliseconds_bucket{service_name=\"$service_name\", job=\"$job\", instance=~\"$instance\"}[2m])) by (le))",
-          "format": "heatmap",
+          "expr": "histogram_quantile(0.50, \n  sum by (le, instance) (\n    rate(probe_http_request_duration_milliseconds_bucket{job=~\"$job\", service_name=~\"$service_name\", instance=~\"$instance\"}[5m])\n  )\n)",
+          "format": "time_series",
           "legendFormat": "duration",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Request duration repartition",
-      "type": "heatmap"
+      "title": "Request duration (p50)",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -1026,10 +1073,12 @@
       {
         "current": {
           "text": [
-            "1.1.1.1"
+            "https://www.google.com",
+            "https://httpbin.org/status/200"
           ],
           "value": [
-            "1.1.1.1"
+            "https://www.google.com",
+            "https://httpbin.org/status/200"
           ]
         },
         "datasource": {
@@ -1060,5 +1109,5 @@
   "timezone": "browser",
   "title": "Zookoo - HTTP",
   "uid": "ba60a266-6f08-4103-a48c-e22fd49c88fb",
-  "version": 35
+  "version": 41
 }

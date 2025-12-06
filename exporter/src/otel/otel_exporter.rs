@@ -26,6 +26,12 @@ impl Exporter for OtelExporter {
                 let up = metrics.get("up").copied().unwrap_or(0) as u8;
                 let success = metrics.get("success").copied().unwrap_or(0) as u8;
                 let dns_duration = metrics.get("dns_duration_ms").copied().unwrap_or(0) as u128;
+                let tcp_connect_duration =
+                    metrics.get("tcp_connect_duration_ms").copied().unwrap_or(0) as u128;
+                let time_to_first_byte =
+                    metrics.get("time_to_first_byte_ms").copied().unwrap_or(0) as u128;
+                let content_transfer_duration =
+                    metrics.get("content_transfer_duration_ms").copied().unwrap_or(0) as u128;
                 let status_code = metrics.get("status_code").copied().unwrap_or(0) as u16;
                 let http_duration = metrics.get("http_duration_ms").copied().unwrap_or(0) as u128;
                 let tls_duration = metrics.get("tls_duration_ms").map(|v| *v as u128);
@@ -37,6 +43,9 @@ impl Exporter for OtelExporter {
                     up,
                     success,
                     dns_lookup_duration: dns_duration,
+                    tcp_connect_duration,
+                    time_to_first_byte,
+                    content_transfer_duration,
                     http_status_code: status_code,
                     http_request_duration: http_duration,
                     http_tls_lookup_duration: tls_duration,

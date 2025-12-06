@@ -1,15 +1,24 @@
 //! HTTP Probe Module
 //!
-//! This module handles HTTP/HTTPS probing including:
+//! This module handles HTTP/HTTPS probing with unified phase timing:
 //! - DNS resolution
-//! - TLS certificate inspection
-//! - HTTP request/response metrics
-//! - Custom headers and authentication
+//! - TCP connection
+//! - TLS handshake (for HTTPS)
+//! - HTTP request/response with TTFB and content transfer timing
+//!
+//! All phases are measured on a single connection for accurate metrics.
 
-pub mod dns;
-pub mod metrics;
-pub mod probe;
-pub mod request;
-pub mod tls;
+mod client;
+mod metrics;
+mod probe;
+mod resolver;
+mod tls;
 
-pub use probe::HttpProbe;
+#[cfg(test)]
+mod tests;
+
+pub use client::{AuthConfig, HttpClient, HttpRequestConfig};
+pub use metrics::HttpProbeMetrics;
+pub use probe::{HttpProbe, TargetType};
+pub use resolver::{DnsResolver, DnsResult, extract_host, extract_port};
+pub use tls::{CertInfo, TlsHandler, TlsResult};
