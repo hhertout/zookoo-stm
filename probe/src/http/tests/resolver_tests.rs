@@ -85,22 +85,6 @@ fn test_extract_port_invalid_url() {
 // ===== DNS Resolver Tests =====
 
 #[test]
-fn test_resolver_new() {
-    let resolver = DnsResolver::new();
-    // Just test that it creates successfully
-    assert!(true, "Resolver created successfully");
-    drop(resolver);
-}
-
-#[test]
-fn test_resolver_default() {
-    let resolver = DnsResolver::default();
-    // Just test that it creates successfully
-    assert!(true, "Default resolver created successfully");
-    drop(resolver);
-}
-
-#[test]
 fn test_resolver_clone() {
     let resolver = DnsResolver::new();
     let cloned = resolver.clone();

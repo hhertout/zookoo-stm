@@ -480,7 +480,7 @@ async fn test_probe_concurrent_scrapes() {
     let probe1 = Arc::clone(&probe);
     let probe2 = Arc::clone(&probe);
 
-    let (r1, r2) = tokio::join!(
+    let (_, _) = tokio::join!(
         async move {
             let p = probe1.lock().await;
             p.scrape().await;
@@ -490,8 +490,4 @@ async fn test_probe_concurrent_scrapes() {
             p.scrape().await;
         }
     );
-
-    // Both should complete without error
-    let _ = r1;
-    let _ = r2;
 }
