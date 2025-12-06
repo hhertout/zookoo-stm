@@ -3,7 +3,7 @@
 #![allow(clippy::unwrap_used)]
 
 use clap::Parser;
-use configuration::{HCL, Parse};
+use configuration::{ConfigParser, HCL, Parse};
 use dotenvy::dotenv;
 use pyroscope::{
     PyroscopeAgent,
@@ -54,7 +54,7 @@ async fn main() {
         None => default_config_file_path.to_string(),
     };
 
-    let config = match configuration::ConfigParser.parse_from_file::<HCL>(&config_file) {
+    let config = match ConfigParser.parse_from_file::<HCL>(&config_file) {
         Ok(cfg) => cfg,
         Err(e) => {
             tracing::error!(
