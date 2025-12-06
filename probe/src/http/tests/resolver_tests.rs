@@ -1,29 +1,20 @@
 //! Unit tests for DNS Resolver
 
-use super::super::resolver::{extract_host, extract_port, DnsResolver};
+use super::super::resolver::{DnsResolver, extract_host, extract_port};
 
 // ===== URL Parsing Tests =====
 
 #[test]
 fn test_extract_host_https() {
     assert_eq!(extract_host("https://example.com").unwrap(), "example.com");
-    assert_eq!(
-        extract_host("https://example.com/path/to/resource").unwrap(),
-        "example.com"
-    );
-    assert_eq!(
-        extract_host("https://example.com:8443/path").unwrap(),
-        "example.com"
-    );
+    assert_eq!(extract_host("https://example.com/path/to/resource").unwrap(), "example.com");
+    assert_eq!(extract_host("https://example.com:8443/path").unwrap(), "example.com");
 }
 
 #[test]
 fn test_extract_host_http() {
     assert_eq!(extract_host("http://example.com").unwrap(), "example.com");
-    assert_eq!(
-        extract_host("http://example.com:8080/path").unwrap(),
-        "example.com"
-    );
+    assert_eq!(extract_host("http://example.com:8080/path").unwrap(), "example.com");
 }
 
 #[test]
@@ -36,51 +27,27 @@ fn test_extract_host_localhost() {
 #[test]
 fn test_extract_host_ip_address() {
     assert_eq!(extract_host("http://192.168.1.1").unwrap(), "192.168.1.1");
-    assert_eq!(
-        extract_host("http://192.168.1.1:8080").unwrap(),
-        "192.168.1.1"
-    );
+    assert_eq!(extract_host("http://192.168.1.1:8080").unwrap(), "192.168.1.1");
     assert_eq!(extract_host("http://127.0.0.1:3000").unwrap(), "127.0.0.1");
 }
 
 #[test]
 fn test_extract_host_subdomain() {
-    assert_eq!(
-        extract_host("https://api.example.com").unwrap(),
-        "api.example.com"
-    );
-    assert_eq!(
-        extract_host("https://www.example.com").unwrap(),
-        "www.example.com"
-    );
-    assert_eq!(
-        extract_host("https://sub.domain.example.com").unwrap(),
-        "sub.domain.example.com"
-    );
+    assert_eq!(extract_host("https://api.example.com").unwrap(), "api.example.com");
+    assert_eq!(extract_host("https://www.example.com").unwrap(), "www.example.com");
+    assert_eq!(extract_host("https://sub.domain.example.com").unwrap(), "sub.domain.example.com");
 }
 
 #[test]
 fn test_extract_host_with_query_params() {
-    assert_eq!(
-        extract_host("https://example.com?foo=bar").unwrap(),
-        "example.com"
-    );
-    assert_eq!(
-        extract_host("https://example.com/path?foo=bar&baz=qux").unwrap(),
-        "example.com"
-    );
+    assert_eq!(extract_host("https://example.com?foo=bar").unwrap(), "example.com");
+    assert_eq!(extract_host("https://example.com/path?foo=bar&baz=qux").unwrap(), "example.com");
 }
 
 #[test]
 fn test_extract_host_with_fragment() {
-    assert_eq!(
-        extract_host("https://example.com#section").unwrap(),
-        "example.com"
-    );
-    assert_eq!(
-        extract_host("https://example.com/path#section").unwrap(),
-        "example.com"
-    );
+    assert_eq!(extract_host("https://example.com#section").unwrap(), "example.com");
+    assert_eq!(extract_host("https://example.com/path#section").unwrap(), "example.com");
 }
 
 #[test]
