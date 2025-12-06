@@ -119,7 +119,12 @@ where
 
             // Get collected metrics
             let metrics = self.probe.get_metrics().await;
-            log::debug!("event=metrics_collected pipeline={} count={}", self.label, metrics.len());
+            log::debug!(
+                "event=metrics_collected pipeline={} count={} exporters={}",
+                self.label,
+                metrics.len(),
+                self.forwarder.len()
+            );
 
             // Forward each metric set to all exporters
             for metric_data in metrics {
@@ -367,7 +372,6 @@ impl PipelineBuilder {
         if forward_to.is_empty() {
             // If no forward_to specified, throw an error and panic
             log::error!("event=error msg=no_forward_to_specified_for_exporters");
-            log::error!("\n\n\n\n");
             log::error!("INVALID CONFIGURATION");
             log::error!(
                 "Unrecoverable error: No forward_to specified for exporters ! Key forward_to is mandatory in probe configuration."
@@ -383,7 +387,6 @@ impl PipelineBuilder {
 
             if let Some(exporter) = all_exporters.get(key) {
                 resolved.push(exporter.clone());
-                log::error!("\n\n\n\n");
                 log::debug!("event=exporter_resolved reference={} key={}", reference, key);
             } else {
                 log::error!(
@@ -391,7 +394,6 @@ impl PipelineBuilder {
                     reference,
                     all_exporters.keys().collect::<Vec<_>>()
                 );
-                log::error!("\n\n\n\n");
                 log::error!("INVALID CONFIGURATION");
                 panic!("Exporter not found for reference: {}", reference);
             }
