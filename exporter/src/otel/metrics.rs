@@ -26,7 +26,7 @@ pub struct HttpMetricsParams {
 
 impl MetricsExporter {
     pub fn new(labels: HashMap<String, String>) -> Self {
-        MetricsExporter { prefix: String::from("probe_"), default_labels: labels }
+        MetricsExporter { prefix: String::from("zookoo_"), default_labels: labels }
     }
 
     /// Merge default labels with target-specific labels (target labels take precedence)

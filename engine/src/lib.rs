@@ -6,7 +6,11 @@
 use std::{collections::HashMap, sync::Arc};
 
 use configuration::model::Configuration;
-use exporter::{Exporter, otel::otel_exporter::OtelExporter};
+use exporter::{
+    Exporter,
+    otel::otel_exporter::OtelExporter,
+    prom::{PrometheusRemoteWrite, PrometheusRemoteWriteConfig, PrometheusRemoteWriteExporter},
+};
 use opentelemetry_sdk::{metrics::SdkMeterProvider, trace::SdkTracerProvider};
 use probe::observability::{init_meter_provider, init_tracer_provider};
 
@@ -104,12 +108,46 @@ impl Engine {
                 exporters.insert(key, Arc::new(exporter));
             }
 
-            // TODO: Add other exporter types
-            for label in exporter_wrapper.prometheus_remote_write.keys() {
-                log::warn!(
-                    "event=exporter_not_implemented type=prometheus_remote_write label={}",
-                    label
+            // Build Prometheus Remote Write exporters
+            for (label, prom_config) in &exporter_wrapper.prometheus_remote_write {
+                let key = format!("exporter.prometheus_remote_write.{}", label);
+                log::info!(
+                    "event=create_exporter type=prometheus_remote_write key={} endpoint={}",
+                    key,
+                    prom_config.url
                 );
+
+                let mut override_labels: HashMap<String, String> = HashMap::new();
+                override_labels.insert("exporter".to_string(), label.clone());
+                let labels =
+                    defaults_labels::set_defaults_labels(&config.defaults, override_labels);
+
+                let remote_write_config = PrometheusRemoteWriteConfig {
+                    url: prom_config.url.clone(),
+                    auth: prom_config.auth.as_ref().map(|a| exporter::config::AuthConfiguration {
+                        username: a.username.clone(),
+                        password: a.password.clone(),
+                        bearer: a.bearer.clone(),
+                    }),
+                    job: prom_config.job.clone(),
+                    instance: prom_config.instance.clone(),
+                    extra_labels: labels.clone(),
+                };
+
+                match PrometheusRemoteWrite::new(remote_write_config) {
+                    Ok(remote_write) => {
+                        let exporter =
+                            PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
+                        exporters.insert(key, Arc::new(exporter));
+                    }
+                    Err(e) => {
+                        log::error!(
+                            "event=exporter_creation_failed type=prometheus_remote_write label={} error={}",
+                            label,
+                            e
+                        );
+                    }
+                }
             }
             for label in exporter_wrapper.timescale.keys() {
                 log::warn!("event=exporter_not_implemented type=timescale label={}", label);

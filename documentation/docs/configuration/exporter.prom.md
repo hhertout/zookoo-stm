@@ -18,6 +18,14 @@ Prometheus Remote Write exporter allows you to send monitoring data to compatibl
 - **Content-Type**: `application/x-protobuf`
 - **Content-Encoding**: `snappy`
 
+## Limitations
+
+:::warning
+This exporter only supports **gauge metrics**. Histograms with buckets (`_bucket`, `_sum`, `_count` suffixes) are **not supported**.
+
+If you need histogram metrics for percentile calculations or latency distribution analysis, use the **OTLP exporter** instead, which provides full histogram support.
+:::
+
 
 ## Arguments
 

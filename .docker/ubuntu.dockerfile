@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 FROM rust:latest AS builder
 
 WORKDIR /usr/src/app

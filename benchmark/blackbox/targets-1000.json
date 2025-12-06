@@ -1,0 +1,6002 @@
+[
+  {
+    "url": "https://google.com",
+    "labels": {
+      "service": "google"
+    }
+  },
+  {
+    "url": "https://github.com",
+    "labels": {
+      "service": "github"
+    }
+  },
+  {
+    "url": "https://microsoft.com",
+    "labels": {
+      "service": "microsoft"
+    }
+  },
+  {
+    "url": "https://apple.com",
+    "labels": {
+      "service": "apple"
+    }
+  },
+  {
+    "url": "https://amazon.com",
+    "labels": {
+      "service": "amazon"
+    }
+  },
+  {
+    "url": "https://facebook.com",
+    "labels": {
+      "service": "facebook"
+    }
+  },
+  {
+    "url": "https://twitter.com",
+    "labels": {
+      "service": "twitter"
+    }
+  },
+  {
+    "url": "https://linkedin.com",
+    "labels": {
+      "service": "linkedin"
+    }
+  },
+  {
+    "url": "https://instagram.com",
+    "labels": {
+      "service": "instagram"
+    }
+  },
+  {
+    "url": "https://youtube.com",
+    "labels": {
+      "service": "youtube"
+    }
+  },
+  {
+    "url": "https://netflix.com",
+    "labels": {
+      "service": "netflix"
+    }
+  },
+  {
+    "url": "https://spotify.com",
+    "labels": {
+      "service": "spotify"
+    }
+  },
+  {
+    "url": "https://reddit.com",
+    "labels": {
+      "service": "reddit"
+    }
+  },
+  {
+    "url": "https://wikipedia.org",
+    "labels": {
+      "service": "wikipedia"
+    }
+  },
+  {
+    "url": "https://cloudflare.com",
+    "labels": {
+      "service": "cloudflare"
+    }
+  },
+  {
+    "url": "https://digitalocean.com",
+    "labels": {
+      "service": "digitalocean"
+    }
+  },
+  {
+    "url": "https://heroku.com",
+    "labels": {
+      "service": "heroku"
+    }
+  },
+  {
+    "url": "https://vercel.com",
+    "labels": {
+      "service": "vercel"
+    }
+  },
+  {
+    "url": "https://netlify.com",
+    "labels": {
+      "service": "netlify"
+    }
+  },
+  {
+    "url": "https://docker.com",
+    "labels": {
+      "service": "docker"
+    }
+  },
+  {
+    "url": "https://kubernetes.io",
+    "labels": {
+      "service": "kubernetes"
+    }
+  },
+  {
+    "url": "https://terraform.io",
+    "labels": {
+      "service": "terraform"
+    }
+  },
+  {
+    "url": "https://ansible.com",
+    "labels": {
+      "service": "ansible"
+    }
+  },
+  {
+    "url": "https://jenkins.io",
+    "labels": {
+      "service": "jenkins"
+    }
+  },
+  {
+    "url": "https://gitlab.com",
+    "labels": {
+      "service": "gitlab"
+    }
+  },
+  {
+    "url": "https://bitbucket.org",
+    "labels": {
+      "service": "bitbucket"
+    }
+  },
+  {
+    "url": "https://stackoverflow.com",
+    "labels": {
+      "service": "stackoverflow"
+    }
+  },
+  {
+    "url": "https://medium.com",
+    "labels": {
+      "service": "medium"
+    }
+  },
+  {
+    "url": "https://dev.to",
+    "labels": {
+      "service": "dev"
+    }
+  },
+  {
+    "url": "https://producthunt.com",
+    "labels": {
+      "service": "producthunt"
+    }
+  },
+  {
+    "url": "https://dribbble.com",
+    "labels": {
+      "service": "dribbble"
+    }
+  },
+  {
+    "url": "https://behance.net",
+    "labels": {
+      "service": "behance"
+    }
+  },
+  {
+    "url": "https://figma.com",
+    "labels": {
+      "service": "figma"
+    }
+  },
+  {
+    "url": "https://canva.com",
+    "labels": {
+      "service": "canva"
+    }
+  },
+  {
+    "url": "https://notion.so",
+    "labels": {
+      "service": "notion"
+    }
+  },
+  {
+    "url": "https://slack.com",
+    "labels": {
+      "service": "slack"
+    }
+  },
+  {
+    "url": "https://discord.com",
+    "labels": {
+      "service": "discord"
+    }
+  },
+  {
+    "url": "https://zoom.us",
+    "labels": {
+      "service": "zoom"
+    }
+  },
+  {
+    "url": "https://dropbox.com",
+    "labels": {
+      "service": "dropbox"
+    }
+  },
+  {
+    "url": "https://box.com",
+    "labels": {
+      "service": "box"
+    }
+  },
+  {
+    "url": "https://icloud.com",
+    "labels": {
+      "service": "icloud"
+    }
+  },
+  {
+    "url": "https://stripe.com",
+    "labels": {
+      "service": "stripe"
+    }
+  },
+  {
+    "url": "https://paypal.com",
+    "labels": {
+      "service": "paypal"
+    }
+  },
+  {
+    "url": "https://shopify.com",
+    "labels": {
+      "service": "shopify"
+    }
+  },
+  {
+    "url": "https://wix.com",
+    "labels": {
+      "service": "wix"
+    }
+  },
+  {
+    "url": "https://squarespace.com",
+    "labels": {
+      "service": "squarespace"
+    }
+  },
+  {
+    "url": "https://wordpress.com",
+    "labels": {
+      "service": "wordpress"
+    }
+  },
+  {
+    "url": "https://blogger.com",
+    "labels": {
+      "service": "blogger"
+    }
+  },
+  {
+    "url": "https://tumblr.com",
+    "labels": {
+      "service": "tumblr"
+    }
+  },
+  {
+    "url": "https://pinterest.com",
+    "labels": {
+      "service": "pinterest"
+    }
+  },
+  {
+    "url": "https://tiktok.com",
+    "labels": {
+      "service": "tiktok"
+    }
+  },
+  {
+    "url": "https://snapchat.com",
+    "labels": {
+      "service": "snapchat"
+    }
+  },
+  {
+    "url": "https://whatsapp.com",
+    "labels": {
+      "service": "whatsapp"
+    }
+  },
+  {
+    "url": "https://telegram.org",
+    "labels": {
+      "service": "telegram"
+    }
+  },
+  {
+    "url": "https://signal.org",
+    "labels": {
+      "service": "signal"
+    }
+  },
+  {
+    "url": "https://proton.me",
+    "labels": {
+      "service": "proton"
+    }
+  },
+  {
+    "url": "https://fastmail.com",
+    "labels": {
+      "service": "fastmail"
+    }
+  },
+  {
+    "url": "https://mailchimp.com",
+    "labels": {
+      "service": "mailchimp"
+    }
+  },
+  {
+    "url": "https://sendgrid.com",
+    "labels": {
+      "service": "sendgrid"
+    }
+  },
+  {
+    "url": "https://twilio.com",
+    "labels": {
+      "service": "twilio"
+    }
+  },
+  {
+    "url": "https://auth0.com",
+    "labels": {
+      "service": "auth0"
+    }
+  },
+  {
+    "url": "https://okta.com",
+    "labels": {
+      "service": "okta"
+    }
+  },
+  {
+    "url": "https://datadog.com",
+    "labels": {
+      "service": "datadog"
+    }
+  },
+  {
+    "url": "https://newrelic.com",
+    "labels": {
+      "service": "newrelic"
+    }
+  },
+  {
+    "url": "https://splunk.com",
+    "labels": {
+      "service": "splunk"
+    }
+  },
+  {
+    "url": "https://elastic.co",
+    "labels": {
+      "service": "elastic"
+    }
+  },
+  {
+    "url": "https://mongodb.com",
+    "labels": {
+      "service": "mongodb"
+    }
+  },
+  {
+    "url": "https://postgresql.org",
+    "labels": {
+      "service": "postgresql"
+    }
+  },
+  {
+    "url": "https://mysql.com",
+    "labels": {
+      "service": "mysql"
+    }
+  },
+  {
+    "url": "https://redis.io",
+    "labels": {
+      "service": "redis"
+    }
+  },
+  {
+    "url": "https://memcached.org",
+    "labels": {
+      "service": "memcached"
+    }
+  },
+  {
+    "url": "https://rabbitmq.com",
+    "labels": {
+      "service": "rabbitmq"
+    }
+  },
+  {
+    "url": "https://nginx.org",
+    "labels": {
+      "service": "nginx"
+    }
+  },
+  {
+    "url": "https://apache.org",
+    "labels": {
+      "service": "apache"
+    }
+  },
+  {
+    "url": "https://prometheus.io",
+    "labels": {
+      "service": "prometheus"
+    }
+  },
+  {
+    "url": "https://grafana.com",
+    "labels": {
+      "service": "grafana"
+    }
+  },
+  {
+    "url": "https://influxdata.com",
+    "labels": {
+      "service": "influxdata"
+    }
+  },
+  {
+    "url": "https://consul.io",
+    "labels": {
+      "service": "consul"
+    }
+  },
+  {
+    "url": "https://nomadproject.io",
+    "labels": {
+      "service": "nomadproject"
+    }
+  },
+  {
+    "url": "https://packer.io",
+    "labels": {
+      "service": "packer"
+    }
+  },
+  {
+    "url": "https://vagrantup.com",
+    "labels": {
+      "service": "vagrantup"
+    }
+  },
+  {
+    "url": "https://helm.sh",
+    "labels": {
+      "service": "helm"
+    }
+  },
+  {
+    "url": "https://istio.io",
+    "labels": {
+      "service": "istio"
+    }
+  },
+  {
+    "url": "https://envoyproxy.io",
+    "labels": {
+      "service": "envoyproxy"
+    }
+  },
+  {
+    "url": "https://linkerd.io",
+    "labels": {
+      "service": "linkerd"
+    }
+  },
+  {
+    "url": "https://fluxcd.io",
+    "labels": {
+      "service": "fluxcd"
+    }
+  },
+  {
+    "url": "https://crossplane.io",
+    "labels": {
+      "service": "crossplane"
+    }
+  },
+  {
+    "url": "https://kustomize.io",
+    "labels": {
+      "service": "kustomize"
+    }
+  },
+  {
+    "url": "https://rancher.com",
+    "labels": {
+      "service": "rancher"
+    }
+  },
+  {
+    "url": "https://portainer.io",
+    "labels": {
+      "service": "portainer"
+    }
+  },
+  {
+    "url": "https://traefik.io",
+    "labels": {
+      "service": "traefik"
+    }
+  },
+  {
+    "url": "https://caddyserver.com",
+    "labels": {
+      "service": "caddyserver"
+    }
+  },
+  {
+    "url": "https://oracle.com",
+    "labels": {
+      "service": "oracle"
+    }
+  },
+  {
+    "url": "https://ibm.com",
+    "labels": {
+      "service": "ibm"
+    }
+  },
+  {
+    "url": "https://salesforce.com",
+    "labels": {
+      "service": "salesforce"
+    }
+  },
+  {
+    "url": "https://adobe.com",
+    "labels": {
+      "service": "adobe"
+    }
+  },
+  {
+    "url": "https://atlassian.com",
+    "labels": {
+      "service": "atlassian"
+    }
+  },
+  {
+    "url": "https://jetbrains.com",
+    "labels": {
+      "service": "jetbrains"
+    }
+  },
+  {
+    "url": "https://npmjs.com",
+    "labels": {
+      "service": "npmjs"
+    }
+  },
+  {
+    "url": "https://pypi.org",
+    "labels": {
+      "service": "pypi"
+    }
+  },
+  {
+    "url": "https://rubygems.org",
+    "labels": {
+      "service": "rubygems"
+    }
+  },
+  {
+    "url": "https://nuget.org",
+    "labels": {
+      "service": "nuget"
+    }
+  },
+  {
+    "url": "https://gradle.org",
+    "labels": {
+      "service": "gradle"
+    }
+  },
+  {
+    "url": "https://rust-lang.org",
+    "labels": {
+      "service": "rust_lang"
+    }
+  },
+  {
+    "url": "https://golang.org",
+    "labels": {
+      "service": "golang"
+    }
+  },
+  {
+    "url": "https://python.org",
+    "labels": {
+      "service": "python"
+    }
+  },
+  {
+    "url": "https://nodejs.org",
+    "labels": {
+      "service": "nodejs"
+    }
+  },
+  {
+    "url": "https://php.net",
+    "labels": {
+      "service": "php"
+    }
+  },
+  {
+    "url": "https://ruby-lang.org",
+    "labels": {
+      "service": "ruby_lang"
+    }
+  },
+  {
+    "url": "https://swift.org",
+    "labels": {
+      "service": "swift"
+    }
+  },
+  {
+    "url": "https://kotlinlang.org",
+    "labels": {
+      "service": "kotlinlang"
+    }
+  },
+  {
+    "url": "https://typescriptlang.org",
+    "labels": {
+      "service": "typescriptlang"
+    }
+  },
+  {
+    "url": "https://dart.dev",
+    "labels": {
+      "service": "dart"
+    }
+  },
+  {
+    "url": "https://flutter.dev",
+    "labels": {
+      "service": "flutter"
+    }
+  },
+  {
+    "url": "https://reactjs.org",
+    "labels": {
+      "service": "reactjs"
+    }
+  },
+  {
+    "url": "https://vuejs.org",
+    "labels": {
+      "service": "vuejs"
+    }
+  },
+  {
+    "url": "https://angular.io",
+    "labels": {
+      "service": "angular"
+    }
+  },
+  {
+    "url": "https://svelte.dev",
+    "labels": {
+      "service": "svelte"
+    }
+  },
+  {
+    "url": "https://nextjs.org",
+    "labels": {
+      "service": "nextjs"
+    }
+  },
+  {
+    "url": "https://nuxt.com",
+    "labels": {
+      "service": "nuxt"
+    }
+  },
+  {
+    "url": "https://remix.run",
+    "labels": {
+      "service": "remix"
+    }
+  },
+  {
+    "url": "https://astro.build",
+    "labels": {
+      "service": "astro"
+    }
+  },
+  {
+    "url": "https://tailwindcss.com",
+    "labels": {
+      "service": "tailwindcss"
+    }
+  },
+  {
+    "url": "https://getbootstrap.com",
+    "labels": {
+      "service": "getbootstrap"
+    }
+  },
+  {
+    "url": "https://chakra-ui.com",
+    "labels": {
+      "service": "chakra_ui"
+    }
+  },
+  {
+    "url": "https://deno.land",
+    "labels": {
+      "service": "deno"
+    }
+  },
+  {
+    "url": "https://bun.sh",
+    "labels": {
+      "service": "bun"
+    }
+  },
+  {
+    "url": "https://vitejs.dev",
+    "labels": {
+      "service": "vitejs"
+    }
+  },
+  {
+    "url": "https://webpack.js.org",
+    "labels": {
+      "service": "webpack"
+    }
+  },
+  {
+    "url": "https://rollupjs.org",
+    "labels": {
+      "service": "rollupjs"
+    }
+  },
+  {
+    "url": "https://turbo.build",
+    "labels": {
+      "service": "turbo"
+    }
+  },
+  {
+    "url": "https://nx.dev",
+    "labels": {
+      "service": "nx"
+    }
+  },
+  {
+    "url": "https://pnpm.io",
+    "labels": {
+      "service": "pnpm"
+    }
+  },
+  {
+    "url": "https://yarnpkg.com",
+    "labels": {
+      "service": "yarnpkg"
+    }
+  },
+  {
+    "url": "https://brew.sh",
+    "labels": {
+      "service": "brew"
+    }
+  },
+  {
+    "url": "https://ubuntu.com",
+    "labels": {
+      "service": "ubuntu"
+    }
+  },
+  {
+    "url": "https://debian.org",
+    "labels": {
+      "service": "debian"
+    }
+  },
+  {
+    "url": "https://fedoraproject.org",
+    "labels": {
+      "service": "fedoraproject"
+    }
+  },
+  {
+    "url": "https://archlinux.org",
+    "labels": {
+      "service": "archlinux"
+    }
+  },
+  {
+    "url": "https://nixos.org",
+    "labels": {
+      "service": "nixos"
+    }
+  },
+  {
+    "url": "https://freebsd.org",
+    "labels": {
+      "service": "freebsd"
+    }
+  },
+  {
+    "url": "https://openbsd.org",
+    "labels": {
+      "service": "openbsd"
+    }
+  },
+  {
+    "url": "https://alpinelinux.org",
+    "labels": {
+      "service": "alpinelinux"
+    }
+  },
+  {
+    "url": "https://rockylinux.org",
+    "labels": {
+      "service": "rockylinux"
+    }
+  },
+  {
+    "url": "https://almalinux.org",
+    "labels": {
+      "service": "almalinux"
+    }
+  },
+  {
+    "url": "https://redhat.com",
+    "labels": {
+      "service": "redhat"
+    }
+  },
+  {
+    "url": "https://suse.com",
+    "labels": {
+      "service": "suse"
+    }
+  },
+  {
+    "url": "https://vmware.com",
+    "labels": {
+      "service": "vmware"
+    }
+  },
+  {
+    "url": "https://proxmox.com",
+    "labels": {
+      "service": "proxmox"
+    }
+  },
+  {
+    "url": "https://synology.com",
+    "labels": {
+      "service": "synology"
+    }
+  },
+  {
+    "url": "https://ubnt.com",
+    "labels": {
+      "service": "ubnt"
+    }
+  },
+  {
+    "url": "https://cisco.com",
+    "labels": {
+      "service": "cisco"
+    }
+  },
+  {
+    "url": "https://akamai.com",
+    "labels": {
+      "service": "akamai"
+    }
+  },
+  {
+    "url": "https://fastly.com",
+    "labels": {
+      "service": "fastly"
+    }
+  },
+  {
+    "url": "https://jsdelivr.com",
+    "labels": {
+      "service": "jsdelivr"
+    }
+  },
+  {
+    "url": "https://unpkg.com",
+    "labels": {
+      "service": "unpkg"
+    }
+  },
+  {
+    "url": "https://cdnjs.com",
+    "labels": {
+      "service": "cdnjs"
+    }
+  },
+  {
+    "url": "https://vultr.com",
+    "labels": {
+      "service": "vultr"
+    }
+  },
+  {
+    "url": "https://linode.com",
+    "labels": {
+      "service": "linode"
+    }
+  },
+  {
+    "url": "https://hetzner.com",
+    "labels": {
+      "service": "hetzner"
+    }
+  },
+  {
+    "url": "https://ovhcloud.com",
+    "labels": {
+      "service": "ovhcloud"
+    }
+  },
+  {
+    "url": "https://scaleway.com",
+    "labels": {
+      "service": "scaleway"
+    }
+  },
+  {
+    "url": "https://contabo.com",
+    "labels": {
+      "service": "contabo"
+    }
+  },
+  {
+    "url": "https://upcloud.com",
+    "labels": {
+      "service": "upcloud"
+    }
+  },
+  {
+    "url": "https://hostinger.com",
+    "labels": {
+      "service": "hostinger"
+    }
+  },
+  {
+    "url": "https://bluehost.com",
+    "labels": {
+      "service": "bluehost"
+    }
+  },
+  {
+    "url": "https://godaddy.com",
+    "labels": {
+      "service": "godaddy"
+    }
+  },
+  {
+    "url": "https://namecheap.com",
+    "labels": {
+      "service": "namecheap"
+    }
+  },
+  {
+    "url": "https://hover.com",
+    "labels": {
+      "service": "hover"
+    }
+  },
+  {
+    "url": "https://porkbun.com",
+    "labels": {
+      "service": "porkbun"
+    }
+  },
+  {
+    "url": "https://cloudns.net",
+    "labels": {
+      "service": "cloudns"
+    }
+  },
+  {
+    "url": "https://easydns.com",
+    "labels": {
+      "service": "easydns"
+    }
+  },
+  {
+    "url": "https://sentry.io",
+    "labels": {
+      "service": "sentry"
+    }
+  },
+  {
+    "url": "https://launchdarkly.com",
+    "labels": {
+      "service": "launchdarkly"
+    }
+  },
+  {
+    "url": "https://segment.com",
+    "labels": {
+      "service": "segment"
+    }
+  },
+  {
+    "url": "https://amplitude.com",
+    "labels": {
+      "service": "amplitude"
+    }
+  },
+  {
+    "url": "https://mixpanel.com",
+    "labels": {
+      "service": "mixpanel"
+    }
+  },
+  {
+    "url": "https://heap.io",
+    "labels": {
+      "service": "heap"
+    }
+  },
+  {
+    "url": "https://hotjar.com",
+    "labels": {
+      "service": "hotjar"
+    }
+  },
+  {
+    "url": "https://fullstory.com",
+    "labels": {
+      "service": "fullstory"
+    }
+  },
+  {
+    "url": "https://logrocket.com",
+    "labels": {
+      "service": "logrocket"
+    }
+  },
+  {
+    "url": "https://bugsnag.com",
+    "labels": {
+      "service": "bugsnag"
+    }
+  },
+  {
+    "url": "https://rollbar.com",
+    "labels": {
+      "service": "rollbar"
+    }
+  },
+  {
+    "url": "https://airbrake.io",
+    "labels": {
+      "service": "airbrake"
+    }
+  },
+  {
+    "url": "https://honeybadger.io",
+    "labels": {
+      "service": "honeybadger"
+    }
+  },
+  {
+    "url": "https://google.com/about",
+    "labels": {
+      "service": "google_about"
+    }
+  },
+  {
+    "url": "https://github.com/about",
+    "labels": {
+      "service": "github_about"
+    }
+  },
+  {
+    "url": "https://microsoft.com/about",
+    "labels": {
+      "service": "microsoft_about"
+    }
+  },
+  {
+    "url": "https://apple.com/about",
+    "labels": {
+      "service": "apple_about"
+    }
+  },
+  {
+    "url": "https://amazon.com/about",
+    "labels": {
+      "service": "amazon_about"
+    }
+  },
+  {
+    "url": "https://facebook.com/about",
+    "labels": {
+      "service": "facebook_about"
+    }
+  },
+  {
+    "url": "https://twitter.com/about",
+    "labels": {
+      "service": "twitter_about"
+    }
+  },
+  {
+    "url": "https://linkedin.com/about",
+    "labels": {
+      "service": "linkedin_about"
+    }
+  },
+  {
+    "url": "https://instagram.com/about",
+    "labels": {
+      "service": "instagram_about"
+    }
+  },
+  {
+    "url": "https://youtube.com/about",
+    "labels": {
+      "service": "youtube_about"
+    }
+  },
+  {
+    "url": "https://netflix.com/about",
+    "labels": {
+      "service": "netflix_about"
+    }
+  },
+  {
+    "url": "https://spotify.com/about",
+    "labels": {
+      "service": "spotify_about"
+    }
+  },
+  {
+    "url": "https://reddit.com/about",
+    "labels": {
+      "service": "reddit_about"
+    }
+  },
+  {
+    "url": "https://wikipedia.org/about",
+    "labels": {
+      "service": "wikipedia_about"
+    }
+  },
+  {
+    "url": "https://cloudflare.com/about",
+    "labels": {
+      "service": "cloudflare_about"
+    }
+  },
+  {
+    "url": "https://digitalocean.com/about",
+    "labels": {
+      "service": "digitalocean_about"
+    }
+  },
+  {
+    "url": "https://heroku.com/about",
+    "labels": {
+      "service": "heroku_about"
+    }
+  },
+  {
+    "url": "https://vercel.com/about",
+    "labels": {
+      "service": "vercel_about"
+    }
+  },
+  {
+    "url": "https://netlify.com/about",
+    "labels": {
+      "service": "netlify_about"
+    }
+  },
+  {
+    "url": "https://docker.com/about",
+    "labels": {
+      "service": "docker_about"
+    }
+  },
+  {
+    "url": "https://kubernetes.io/about",
+    "labels": {
+      "service": "kubernetes_about"
+    }
+  },
+  {
+    "url": "https://terraform.io/about",
+    "labels": {
+      "service": "terraform_about"
+    }
+  },
+  {
+    "url": "https://ansible.com/about",
+    "labels": {
+      "service": "ansible_about"
+    }
+  },
+  {
+    "url": "https://jenkins.io/about",
+    "labels": {
+      "service": "jenkins_about"
+    }
+  },
+  {
+    "url": "https://gitlab.com/about",
+    "labels": {
+      "service": "gitlab_about"
+    }
+  },
+  {
+    "url": "https://bitbucket.org/about",
+    "labels": {
+      "service": "bitbucket_about"
+    }
+  },
+  {
+    "url": "https://stackoverflow.com/about",
+    "labels": {
+      "service": "stackoverflow_about"
+    }
+  },
+  {
+    "url": "https://medium.com/about",
+    "labels": {
+      "service": "medium_about"
+    }
+  },
+  {
+    "url": "https://dev.to/about",
+    "labels": {
+      "service": "dev_about"
+    }
+  },
+  {
+    "url": "https://producthunt.com/about",
+    "labels": {
+      "service": "producthunt_about"
+    }
+  },
+  {
+    "url": "https://dribbble.com/about",
+    "labels": {
+      "service": "dribbble_about"
+    }
+  },
+  {
+    "url": "https://behance.net/about",
+    "labels": {
+      "service": "behance_about"
+    }
+  },
+  {
+    "url": "https://figma.com/about",
+    "labels": {
+      "service": "figma_about"
+    }
+  },
+  {
+    "url": "https://canva.com/about",
+    "labels": {
+      "service": "canva_about"
+    }
+  },
+  {
+    "url": "https://notion.so/about",
+    "labels": {
+      "service": "notion_about"
+    }
+  },
+  {
+    "url": "https://slack.com/about",
+    "labels": {
+      "service": "slack_about"
+    }
+  },
+  {
+    "url": "https://discord.com/about",
+    "labels": {
+      "service": "discord_about"
+    }
+  },
+  {
+    "url": "https://zoom.us/about",
+    "labels": {
+      "service": "zoom_about"
+    }
+  },
+  {
+    "url": "https://dropbox.com/about",
+    "labels": {
+      "service": "dropbox_about"
+    }
+  },
+  {
+    "url": "https://box.com/about",
+    "labels": {
+      "service": "box_about"
+    }
+  },
+  {
+    "url": "https://icloud.com/about",
+    "labels": {
+      "service": "icloud_about"
+    }
+  },
+  {
+    "url": "https://stripe.com/about",
+    "labels": {
+      "service": "stripe_about"
+    }
+  },
+  {
+    "url": "https://paypal.com/about",
+    "labels": {
+      "service": "paypal_about"
+    }
+  },
+  {
+    "url": "https://shopify.com/about",
+    "labels": {
+      "service": "shopify_about"
+    }
+  },
+  {
+    "url": "https://wix.com/about",
+    "labels": {
+      "service": "wix_about"
+    }
+  },
+  {
+    "url": "https://squarespace.com/about",
+    "labels": {
+      "service": "squarespace_about"
+    }
+  },
+  {
+    "url": "https://wordpress.com/about",
+    "labels": {
+      "service": "wordpress_about"
+    }
+  },
+  {
+    "url": "https://blogger.com/about",
+    "labels": {
+      "service": "blogger_about"
+    }
+  },
+  {
+    "url": "https://tumblr.com/about",
+    "labels": {
+      "service": "tumblr_about"
+    }
+  },
+  {
+    "url": "https://pinterest.com/about",
+    "labels": {
+      "service": "pinterest_about"
+    }
+  },
+  {
+    "url": "https://tiktok.com/about",
+    "labels": {
+      "service": "tiktok_about"
+    }
+  },
+  {
+    "url": "https://snapchat.com/about",
+    "labels": {
+      "service": "snapchat_about"
+    }
+  },
+  {
+    "url": "https://whatsapp.com/about",
+    "labels": {
+      "service": "whatsapp_about"
+    }
+  },
+  {
+    "url": "https://telegram.org/about",
+    "labels": {
+      "service": "telegram_about"
+    }
+  },
+  {
+    "url": "https://signal.org/about",
+    "labels": {
+      "service": "signal_about"
+    }
+  },
+  {
+    "url": "https://proton.me/about",
+    "labels": {
+      "service": "proton_about"
+    }
+  },
+  {
+    "url": "https://fastmail.com/about",
+    "labels": {
+      "service": "fastmail_about"
+    }
+  },
+  {
+    "url": "https://mailchimp.com/about",
+    "labels": {
+      "service": "mailchimp_about"
+    }
+  },
+  {
+    "url": "https://sendgrid.com/about",
+    "labels": {
+      "service": "sendgrid_about"
+    }
+  },
+  {
+    "url": "https://twilio.com/about",
+    "labels": {
+      "service": "twilio_about"
+    }
+  },
+  {
+    "url": "https://auth0.com/about",
+    "labels": {
+      "service": "auth0_about"
+    }
+  },
+  {
+    "url": "https://okta.com/about",
+    "labels": {
+      "service": "okta_about"
+    }
+  },
+  {
+    "url": "https://datadog.com/about",
+    "labels": {
+      "service": "datadog_about"
+    }
+  },
+  {
+    "url": "https://newrelic.com/about",
+    "labels": {
+      "service": "newrelic_about"
+    }
+  },
+  {
+    "url": "https://splunk.com/about",
+    "labels": {
+      "service": "splunk_about"
+    }
+  },
+  {
+    "url": "https://elastic.co/about",
+    "labels": {
+      "service": "elastic_about"
+    }
+  },
+  {
+    "url": "https://mongodb.com/about",
+    "labels": {
+      "service": "mongodb_about"
+    }
+  },
+  {
+    "url": "https://postgresql.org/about",
+    "labels": {
+      "service": "postgresql_about"
+    }
+  },
+  {
+    "url": "https://mysql.com/about",
+    "labels": {
+      "service": "mysql_about"
+    }
+  },
+  {
+    "url": "https://redis.io/about",
+    "labels": {
+      "service": "redis_about"
+    }
+  },
+  {
+    "url": "https://memcached.org/about",
+    "labels": {
+      "service": "memcached_about"
+    }
+  },
+  {
+    "url": "https://rabbitmq.com/about",
+    "labels": {
+      "service": "rabbitmq_about"
+    }
+  },
+  {
+    "url": "https://nginx.org/about",
+    "labels": {
+      "service": "nginx_about"
+    }
+  },
+  {
+    "url": "https://apache.org/about",
+    "labels": {
+      "service": "apache_about"
+    }
+  },
+  {
+    "url": "https://prometheus.io/about",
+    "labels": {
+      "service": "prometheus_about"
+    }
+  },
+  {
+    "url": "https://grafana.com/about",
+    "labels": {
+      "service": "grafana_about"
+    }
+  },
+  {
+    "url": "https://influxdata.com/about",
+    "labels": {
+      "service": "influxdata_about"
+    }
+  },
+  {
+    "url": "https://consul.io/about",
+    "labels": {
+      "service": "consul_about"
+    }
+  },
+  {
+    "url": "https://nomadproject.io/about",
+    "labels": {
+      "service": "nomadproject_about"
+    }
+  },
+  {
+    "url": "https://packer.io/about",
+    "labels": {
+      "service": "packer_about"
+    }
+  },
+  {
+    "url": "https://vagrantup.com/about",
+    "labels": {
+      "service": "vagrantup_about"
+    }
+  },
+  {
+    "url": "https://helm.sh/about",
+    "labels": {
+      "service": "helm_about"
+    }
+  },
+  {
+    "url": "https://istio.io/about",
+    "labels": {
+      "service": "istio_about"
+    }
+  },
+  {
+    "url": "https://envoyproxy.io/about",
+    "labels": {
+      "service": "envoyproxy_about"
+    }
+  },
+  {
+    "url": "https://linkerd.io/about",
+    "labels": {
+      "service": "linkerd_about"
+    }
+  },
+  {
+    "url": "https://fluxcd.io/about",
+    "labels": {
+      "service": "fluxcd_about"
+    }
+  },
+  {
+    "url": "https://crossplane.io/about",
+    "labels": {
+      "service": "crossplane_about"
+    }
+  },
+  {
+    "url": "https://kustomize.io/about",
+    "labels": {
+      "service": "kustomize_about"
+    }
+  },
+  {
+    "url": "https://rancher.com/about",
+    "labels": {
+      "service": "rancher_about"
+    }
+  },
+  {
+    "url": "https://portainer.io/about",
+    "labels": {
+      "service": "portainer_about"
+    }
+  },
+  {
+    "url": "https://traefik.io/about",
+    "labels": {
+      "service": "traefik_about"
+    }
+  },
+  {
+    "url": "https://caddyserver.com/about",
+    "labels": {
+      "service": "caddyserver_about"
+    }
+  },
+  {
+    "url": "https://oracle.com/about",
+    "labels": {
+      "service": "oracle_about"
+    }
+  },
+  {
+    "url": "https://ibm.com/about",
+    "labels": {
+      "service": "ibm_about"
+    }
+  },
+  {
+    "url": "https://salesforce.com/about",
+    "labels": {
+      "service": "salesforce_about"
+    }
+  },
+  {
+    "url": "https://adobe.com/about",
+    "labels": {
+      "service": "adobe_about"
+    }
+  },
+  {
+    "url": "https://atlassian.com/about",
+    "labels": {
+      "service": "atlassian_about"
+    }
+  },
+  {
+    "url": "https://jetbrains.com/about",
+    "labels": {
+      "service": "jetbrains_about"
+    }
+  },
+  {
+    "url": "https://npmjs.com/about",
+    "labels": {
+      "service": "npmjs_about"
+    }
+  },
+  {
+    "url": "https://pypi.org/about",
+    "labels": {
+      "service": "pypi_about"
+    }
+  },
+  {
+    "url": "https://rubygems.org/about",
+    "labels": {
+      "service": "rubygems_about"
+    }
+  },
+  {
+    "url": "https://nuget.org/about",
+    "labels": {
+      "service": "nuget_about"
+    }
+  },
+  {
+    "url": "https://gradle.org/about",
+    "labels": {
+      "service": "gradle_about"
+    }
+  },
+  {
+    "url": "https://rust-lang.org/about",
+    "labels": {
+      "service": "rust_lang_about"
+    }
+  },
+  {
+    "url": "https://golang.org/about",
+    "labels": {
+      "service": "golang_about"
+    }
+  },
+  {
+    "url": "https://python.org/about",
+    "labels": {
+      "service": "python_about"
+    }
+  },
+  {
+    "url": "https://nodejs.org/about",
+    "labels": {
+      "service": "nodejs_about"
+    }
+  },
+  {
+    "url": "https://php.net/about",
+    "labels": {
+      "service": "php_about"
+    }
+  },
+  {
+    "url": "https://ruby-lang.org/about",
+    "labels": {
+      "service": "ruby_lang_about"
+    }
+  },
+  {
+    "url": "https://swift.org/about",
+    "labels": {
+      "service": "swift_about"
+    }
+  },
+  {
+    "url": "https://kotlinlang.org/about",
+    "labels": {
+      "service": "kotlinlang_about"
+    }
+  },
+  {
+    "url": "https://typescriptlang.org/about",
+    "labels": {
+      "service": "typescriptlang_about"
+    }
+  },
+  {
+    "url": "https://dart.dev/about",
+    "labels": {
+      "service": "dart_about"
+    }
+  },
+  {
+    "url": "https://flutter.dev/about",
+    "labels": {
+      "service": "flutter_about"
+    }
+  },
+  {
+    "url": "https://reactjs.org/about",
+    "labels": {
+      "service": "reactjs_about"
+    }
+  },
+  {
+    "url": "https://vuejs.org/about",
+    "labels": {
+      "service": "vuejs_about"
+    }
+  },
+  {
+    "url": "https://angular.io/about",
+    "labels": {
+      "service": "angular_about"
+    }
+  },
+  {
+    "url": "https://svelte.dev/about",
+    "labels": {
+      "service": "svelte_about"
+    }
+  },
+  {
+    "url": "https://nextjs.org/about",
+    "labels": {
+      "service": "nextjs_about"
+    }
+  },
+  {
+    "url": "https://nuxt.com/about",
+    "labels": {
+      "service": "nuxt_about"
+    }
+  },
+  {
+    "url": "https://remix.run/about",
+    "labels": {
+      "service": "remix_about"
+    }
+  },
+  {
+    "url": "https://astro.build/about",
+    "labels": {
+      "service": "astro_about"
+    }
+  },
+  {
+    "url": "https://tailwindcss.com/about",
+    "labels": {
+      "service": "tailwindcss_about"
+    }
+  },
+  {
+    "url": "https://getbootstrap.com/about",
+    "labels": {
+      "service": "getbootstrap_about"
+    }
+  },
+  {
+    "url": "https://chakra-ui.com/about",
+    "labels": {
+      "service": "chakra_ui_about"
+    }
+  },
+  {
+    "url": "https://deno.land/about",
+    "labels": {
+      "service": "deno_about"
+    }
+  },
+  {
+    "url": "https://bun.sh/about",
+    "labels": {
+      "service": "bun_about"
+    }
+  },
+  {
+    "url": "https://vitejs.dev/about",
+    "labels": {
+      "service": "vitejs_about"
+    }
+  },
+  {
+    "url": "https://webpack.js.org/about",
+    "labels": {
+      "service": "webpack_about"
+    }
+  },
+  {
+    "url": "https://rollupjs.org/about",
+    "labels": {
+      "service": "rollupjs_about"
+    }
+  },
+  {
+    "url": "https://turbo.build/about",
+    "labels": {
+      "service": "turbo_about"
+    }
+  },
+  {
+    "url": "https://nx.dev/about",
+    "labels": {
+      "service": "nx_about"
+    }
+  },
+  {
+    "url": "https://pnpm.io/about",
+    "labels": {
+      "service": "pnpm_about"
+    }
+  },
+  {
+    "url": "https://yarnpkg.com/about",
+    "labels": {
+      "service": "yarnpkg_about"
+    }
+  },
+  {
+    "url": "https://brew.sh/about",
+    "labels": {
+      "service": "brew_about"
+    }
+  },
+  {
+    "url": "https://ubuntu.com/about",
+    "labels": {
+      "service": "ubuntu_about"
+    }
+  },
+  {
+    "url": "https://debian.org/about",
+    "labels": {
+      "service": "debian_about"
+    }
+  },
+  {
+    "url": "https://fedoraproject.org/about",
+    "labels": {
+      "service": "fedoraproject_about"
+    }
+  },
+  {
+    "url": "https://archlinux.org/about",
+    "labels": {
+      "service": "archlinux_about"
+    }
+  },
+  {
+    "url": "https://nixos.org/about",
+    "labels": {
+      "service": "nixos_about"
+    }
+  },
+  {
+    "url": "https://freebsd.org/about",
+    "labels": {
+      "service": "freebsd_about"
+    }
+  },
+  {
+    "url": "https://openbsd.org/about",
+    "labels": {
+      "service": "openbsd_about"
+    }
+  },
+  {
+    "url": "https://alpinelinux.org/about",
+    "labels": {
+      "service": "alpinelinux_about"
+    }
+  },
+  {
+    "url": "https://rockylinux.org/about",
+    "labels": {
+      "service": "rockylinux_about"
+    }
+  },
+  {
+    "url": "https://almalinux.org/about",
+    "labels": {
+      "service": "almalinux_about"
+    }
+  },
+  {
+    "url": "https://redhat.com/about",
+    "labels": {
+      "service": "redhat_about"
+    }
+  },
+  {
+    "url": "https://suse.com/about",
+    "labels": {
+      "service": "suse_about"
+    }
+  },
+  {
+    "url": "https://vmware.com/about",
+    "labels": {
+      "service": "vmware_about"
+    }
+  },
+  {
+    "url": "https://proxmox.com/about",
+    "labels": {
+      "service": "proxmox_about"
+    }
+  },
+  {
+    "url": "https://synology.com/about",
+    "labels": {
+      "service": "synology_about"
+    }
+  },
+  {
+    "url": "https://ubnt.com/about",
+    "labels": {
+      "service": "ubnt_about"
+    }
+  },
+  {
+    "url": "https://cisco.com/about",
+    "labels": {
+      "service": "cisco_about"
+    }
+  },
+  {
+    "url": "https://akamai.com/about",
+    "labels": {
+      "service": "akamai_about"
+    }
+  },
+  {
+    "url": "https://fastly.com/about",
+    "labels": {
+      "service": "fastly_about"
+    }
+  },
+  {
+    "url": "https://jsdelivr.com/about",
+    "labels": {
+      "service": "jsdelivr_about"
+    }
+  },
+  {
+    "url": "https://unpkg.com/about",
+    "labels": {
+      "service": "unpkg_about"
+    }
+  },
+  {
+    "url": "https://cdnjs.com/about",
+    "labels": {
+      "service": "cdnjs_about"
+    }
+  },
+  {
+    "url": "https://vultr.com/about",
+    "labels": {
+      "service": "vultr_about"
+    }
+  },
+  {
+    "url": "https://linode.com/about",
+    "labels": {
+      "service": "linode_about"
+    }
+  },
+  {
+    "url": "https://hetzner.com/about",
+    "labels": {
+      "service": "hetzner_about"
+    }
+  },
+  {
+    "url": "https://ovhcloud.com/about",
+    "labels": {
+      "service": "ovhcloud_about"
+    }
+  },
+  {
+    "url": "https://scaleway.com/about",
+    "labels": {
+      "service": "scaleway_about"
+    }
+  },
+  {
+    "url": "https://contabo.com/about",
+    "labels": {
+      "service": "contabo_about"
+    }
+  },
+  {
+    "url": "https://upcloud.com/about",
+    "labels": {
+      "service": "upcloud_about"
+    }
+  },
+  {
+    "url": "https://hostinger.com/about",
+    "labels": {
+      "service": "hostinger_about"
+    }
+  },
+  {
+    "url": "https://bluehost.com/about",
+    "labels": {
+      "service": "bluehost_about"
+    }
+  },
+  {
+    "url": "https://godaddy.com/about",
+    "labels": {
+      "service": "godaddy_about"
+    }
+  },
+  {
+    "url": "https://namecheap.com/about",
+    "labels": {
+      "service": "namecheap_about"
+    }
+  },
+  {
+    "url": "https://hover.com/about",
+    "labels": {
+      "service": "hover_about"
+    }
+  },
+  {
+    "url": "https://porkbun.com/about",
+    "labels": {
+      "service": "porkbun_about"
+    }
+  },
+  {
+    "url": "https://cloudns.net/about",
+    "labels": {
+      "service": "cloudns_about"
+    }
+  },
+  {
+    "url": "https://easydns.com/about",
+    "labels": {
+      "service": "easydns_about"
+    }
+  },
+  {
+    "url": "https://sentry.io/about",
+    "labels": {
+      "service": "sentry_about"
+    }
+  },
+  {
+    "url": "https://launchdarkly.com/about",
+    "labels": {
+      "service": "launchdarkly_about"
+    }
+  },
+  {
+    "url": "https://segment.com/about",
+    "labels": {
+      "service": "segment_about"
+    }
+  },
+  {
+    "url": "https://amplitude.com/about",
+    "labels": {
+      "service": "amplitude_about"
+    }
+  },
+  {
+    "url": "https://mixpanel.com/about",
+    "labels": {
+      "service": "mixpanel_about"
+    }
+  },
+  {
+    "url": "https://heap.io/about",
+    "labels": {
+      "service": "heap_about"
+    }
+  },
+  {
+    "url": "https://hotjar.com/about",
+    "labels": {
+      "service": "hotjar_about"
+    }
+  },
+  {
+    "url": "https://fullstory.com/about",
+    "labels": {
+      "service": "fullstory_about"
+    }
+  },
+  {
+    "url": "https://logrocket.com/about",
+    "labels": {
+      "service": "logrocket_about"
+    }
+  },
+  {
+    "url": "https://bugsnag.com/about",
+    "labels": {
+      "service": "bugsnag_about"
+    }
+  },
+  {
+    "url": "https://rollbar.com/about",
+    "labels": {
+      "service": "rollbar_about"
+    }
+  },
+  {
+    "url": "https://airbrake.io/about",
+    "labels": {
+      "service": "airbrake_about"
+    }
+  },
+  {
+    "url": "https://honeybadger.io/about",
+    "labels": {
+      "service": "honeybadger_about"
+    }
+  },
+  {
+    "url": "https://google.com/docs",
+    "labels": {
+      "service": "google_docs"
+    }
+  },
+  {
+    "url": "https://github.com/docs",
+    "labels": {
+      "service": "github_docs"
+    }
+  },
+  {
+    "url": "https://microsoft.com/docs",
+    "labels": {
+      "service": "microsoft_docs"
+    }
+  },
+  {
+    "url": "https://apple.com/docs",
+    "labels": {
+      "service": "apple_docs"
+    }
+  },
+  {
+    "url": "https://amazon.com/docs",
+    "labels": {
+      "service": "amazon_docs"
+    }
+  },
+  {
+    "url": "https://facebook.com/docs",
+    "labels": {
+      "service": "facebook_docs"
+    }
+  },
+  {
+    "url": "https://twitter.com/docs",
+    "labels": {
+      "service": "twitter_docs"
+    }
+  },
+  {
+    "url": "https://linkedin.com/docs",
+    "labels": {
+      "service": "linkedin_docs"
+    }
+  },
+  {
+    "url": "https://instagram.com/docs",
+    "labels": {
+      "service": "instagram_docs"
+    }
+  },
+  {
+    "url": "https://youtube.com/docs",
+    "labels": {
+      "service": "youtube_docs"
+    }
+  },
+  {
+    "url": "https://netflix.com/docs",
+    "labels": {
+      "service": "netflix_docs"
+    }
+  },
+  {
+    "url": "https://spotify.com/docs",
+    "labels": {
+      "service": "spotify_docs"
+    }
+  },
+  {
+    "url": "https://reddit.com/docs",
+    "labels": {
+      "service": "reddit_docs"
+    }
+  },
+  {
+    "url": "https://wikipedia.org/docs",
+    "labels": {
+      "service": "wikipedia_docs"
+    }
+  },
+  {
+    "url": "https://cloudflare.com/docs",
+    "labels": {
+      "service": "cloudflare_docs"
+    }
+  },
+  {
+    "url": "https://digitalocean.com/docs",
+    "labels": {
+      "service": "digitalocean_docs"
+    }
+  },
+  {
+    "url": "https://heroku.com/docs",
+    "labels": {
+      "service": "heroku_docs"
+    }
+  },
+  {
+    "url": "https://vercel.com/docs",
+    "labels": {
+      "service": "vercel_docs"
+    }
+  },
+  {
+    "url": "https://netlify.com/docs",
+    "labels": {
+      "service": "netlify_docs"
+    }
+  },
+  {
+    "url": "https://docker.com/docs",
+    "labels": {
+      "service": "docker_docs"
+    }
+  },
+  {
+    "url": "https://kubernetes.io/docs",
+    "labels": {
+      "service": "kubernetes_docs"
+    }
+  },
+  {
+    "url": "https://terraform.io/docs",
+    "labels": {
+      "service": "terraform_docs"
+    }
+  },
+  {
+    "url": "https://ansible.com/docs",
+    "labels": {
+      "service": "ansible_docs"
+    }
+  },
+  {
+    "url": "https://jenkins.io/docs",
+    "labels": {
+      "service": "jenkins_docs"
+    }
+  },
+  {
+    "url": "https://gitlab.com/docs",
+    "labels": {
+      "service": "gitlab_docs"
+    }
+  },
+  {
+    "url": "https://bitbucket.org/docs",
+    "labels": {
+      "service": "bitbucket_docs"
+    }
+  },
+  {
+    "url": "https://stackoverflow.com/docs",
+    "labels": {
+      "service": "stackoverflow_docs"
+    }
+  },
+  {
+    "url": "https://medium.com/docs",
+    "labels": {
+      "service": "medium_docs"
+    }
+  },
+  {
+    "url": "https://dev.to/docs",
+    "labels": {
+      "service": "dev_docs"
+    }
+  },
+  {
+    "url": "https://producthunt.com/docs",
+    "labels": {
+      "service": "producthunt_docs"
+    }
+  },
+  {
+    "url": "https://dribbble.com/docs",
+    "labels": {
+      "service": "dribbble_docs"
+    }
+  },
+  {
+    "url": "https://behance.net/docs",
+    "labels": {
+      "service": "behance_docs"
+    }
+  },
+  {
+    "url": "https://figma.com/docs",
+    "labels": {
+      "service": "figma_docs"
+    }
+  },
+  {
+    "url": "https://canva.com/docs",
+    "labels": {
+      "service": "canva_docs"
+    }
+  },
+  {
+    "url": "https://notion.so/docs",
+    "labels": {
+      "service": "notion_docs"
+    }
+  },
+  {
+    "url": "https://slack.com/docs",
+    "labels": {
+      "service": "slack_docs"
+    }
+  },
+  {
+    "url": "https://discord.com/docs",
+    "labels": {
+      "service": "discord_docs"
+    }
+  },
+  {
+    "url": "https://zoom.us/docs",
+    "labels": {
+      "service": "zoom_docs"
+    }
+  },
+  {
+    "url": "https://dropbox.com/docs",
+    "labels": {
+      "service": "dropbox_docs"
+    }
+  },
+  {
+    "url": "https://box.com/docs",
+    "labels": {
+      "service": "box_docs"
+    }
+  },
+  {
+    "url": "https://icloud.com/docs",
+    "labels": {
+      "service": "icloud_docs"
+    }
+  },
+  {
+    "url": "https://stripe.com/docs",
+    "labels": {
+      "service": "stripe_docs"
+    }
+  },
+  {
+    "url": "https://paypal.com/docs",
+    "labels": {
+      "service": "paypal_docs"
+    }
+  },
+  {
+    "url": "https://shopify.com/docs",
+    "labels": {
+      "service": "shopify_docs"
+    }
+  },
+  {
+    "url": "https://wix.com/docs",
+    "labels": {
+      "service": "wix_docs"
+    }
+  },
+  {
+    "url": "https://squarespace.com/docs",
+    "labels": {
+      "service": "squarespace_docs"
+    }
+  },
+  {
+    "url": "https://wordpress.com/docs",
+    "labels": {
+      "service": "wordpress_docs"
+    }
+  },
+  {
+    "url": "https://blogger.com/docs",
+    "labels": {
+      "service": "blogger_docs"
+    }
+  },
+  {
+    "url": "https://tumblr.com/docs",
+    "labels": {
+      "service": "tumblr_docs"
+    }
+  },
+  {
+    "url": "https://pinterest.com/docs",
+    "labels": {
+      "service": "pinterest_docs"
+    }
+  },
+  {
+    "url": "https://tiktok.com/docs",
+    "labels": {
+      "service": "tiktok_docs"
+    }
+  },
+  {
+    "url": "https://snapchat.com/docs",
+    "labels": {
+      "service": "snapchat_docs"
+    }
+  },
+  {
+    "url": "https://whatsapp.com/docs",
+    "labels": {
+      "service": "whatsapp_docs"
+    }
+  },
+  {
+    "url": "https://telegram.org/docs",
+    "labels": {
+      "service": "telegram_docs"
+    }
+  },
+  {
+    "url": "https://signal.org/docs",
+    "labels": {
+      "service": "signal_docs"
+    }
+  },
+  {
+    "url": "https://proton.me/docs",
+    "labels": {
+      "service": "proton_docs"
+    }
+  },
+  {
+    "url": "https://fastmail.com/docs",
+    "labels": {
+      "service": "fastmail_docs"
+    }
+  },
+  {
+    "url": "https://mailchimp.com/docs",
+    "labels": {
+      "service": "mailchimp_docs"
+    }
+  },
+  {
+    "url": "https://sendgrid.com/docs",
+    "labels": {
+      "service": "sendgrid_docs"
+    }
+  },
+  {
+    "url": "https://twilio.com/docs",
+    "labels": {
+      "service": "twilio_docs"
+    }
+  },
+  {
+    "url": "https://auth0.com/docs",
+    "labels": {
+      "service": "auth0_docs"
+    }
+  },
+  {
+    "url": "https://okta.com/docs",
+    "labels": {
+      "service": "okta_docs"
+    }
+  },
+  {
+    "url": "https://datadog.com/docs",
+    "labels": {
+      "service": "datadog_docs"
+    }
+  },
+  {
+    "url": "https://newrelic.com/docs",
+    "labels": {
+      "service": "newrelic_docs"
+    }
+  },
+  {
+    "url": "https://splunk.com/docs",
+    "labels": {
+      "service": "splunk_docs"
+    }
+  },
+  {
+    "url": "https://elastic.co/docs",
+    "labels": {
+      "service": "elastic_docs"
+    }
+  },
+  {
+    "url": "https://mongodb.com/docs",
+    "labels": {
+      "service": "mongodb_docs"
+    }
+  },
+  {
+    "url": "https://postgresql.org/docs",
+    "labels": {
+      "service": "postgresql_docs"
+    }
+  },
+  {
+    "url": "https://mysql.com/docs",
+    "labels": {
+      "service": "mysql_docs"
+    }
+  },
+  {
+    "url": "https://redis.io/docs",
+    "labels": {
+      "service": "redis_docs"
+    }
+  },
+  {
+    "url": "https://memcached.org/docs",
+    "labels": {
+      "service": "memcached_docs"
+    }
+  },
+  {
+    "url": "https://rabbitmq.com/docs",
+    "labels": {
+      "service": "rabbitmq_docs"
+    }
+  },
+  {
+    "url": "https://nginx.org/docs",
+    "labels": {
+      "service": "nginx_docs"
+    }
+  },
+  {
+    "url": "https://apache.org/docs",
+    "labels": {
+      "service": "apache_docs"
+    }
+  },
+  {
+    "url": "https://prometheus.io/docs",
+    "labels": {
+      "service": "prometheus_docs"
+    }
+  },
+  {
+    "url": "https://grafana.com/docs",
+    "labels": {
+      "service": "grafana_docs"
+    }
+  },
+  {
+    "url": "https://influxdata.com/docs",
+    "labels": {
+      "service": "influxdata_docs"
+    }
+  },
+  {
+    "url": "https://consul.io/docs",
+    "labels": {
+      "service": "consul_docs"
+    }
+  },
+  {
+    "url": "https://nomadproject.io/docs",
+    "labels": {
+      "service": "nomadproject_docs"
+    }
+  },
+  {
+    "url": "https://packer.io/docs",
+    "labels": {
+      "service": "packer_docs"
+    }
+  },
+  {
+    "url": "https://vagrantup.com/docs",
+    "labels": {
+      "service": "vagrantup_docs"
+    }
+  },
+  {
+    "url": "https://helm.sh/docs",
+    "labels": {
+      "service": "helm_docs"
+    }
+  },
+  {
+    "url": "https://istio.io/docs",
+    "labels": {
+      "service": "istio_docs"
+    }
+  },
+  {
+    "url": "https://envoyproxy.io/docs",
+    "labels": {
+      "service": "envoyproxy_docs"
+    }
+  },
+  {
+    "url": "https://linkerd.io/docs",
+    "labels": {
+      "service": "linkerd_docs"
+    }
+  },
+  {
+    "url": "https://fluxcd.io/docs",
+    "labels": {
+      "service": "fluxcd_docs"
+    }
+  },
+  {
+    "url": "https://crossplane.io/docs",
+    "labels": {
+      "service": "crossplane_docs"
+    }
+  },
+  {
+    "url": "https://kustomize.io/docs",
+    "labels": {
+      "service": "kustomize_docs"
+    }
+  },
+  {
+    "url": "https://rancher.com/docs",
+    "labels": {
+      "service": "rancher_docs"
+    }
+  },
+  {
+    "url": "https://portainer.io/docs",
+    "labels": {
+      "service": "portainer_docs"
+    }
+  },
+  {
+    "url": "https://traefik.io/docs",
+    "labels": {
+      "service": "traefik_docs"
+    }
+  },
+  {
+    "url": "https://caddyserver.com/docs",
+    "labels": {
+      "service": "caddyserver_docs"
+    }
+  },
+  {
+    "url": "https://oracle.com/docs",
+    "labels": {
+      "service": "oracle_docs"
+    }
+  },
+  {
+    "url": "https://ibm.com/docs",
+    "labels": {
+      "service": "ibm_docs"
+    }
+  },
+  {
+    "url": "https://salesforce.com/docs",
+    "labels": {
+      "service": "salesforce_docs"
+    }
+  },
+  {
+    "url": "https://adobe.com/docs",
+    "labels": {
+      "service": "adobe_docs"
+    }
+  },
+  {
+    "url": "https://atlassian.com/docs",
+    "labels": {
+      "service": "atlassian_docs"
+    }
+  },
+  {
+    "url": "https://jetbrains.com/docs",
+    "labels": {
+      "service": "jetbrains_docs"
+    }
+  },
+  {
+    "url": "https://npmjs.com/docs",
+    "labels": {
+      "service": "npmjs_docs"
+    }
+  },
+  {
+    "url": "https://pypi.org/docs",
+    "labels": {
+      "service": "pypi_docs"
+    }
+  },
+  {
+    "url": "https://rubygems.org/docs",
+    "labels": {
+      "service": "rubygems_docs"
+    }
+  },
+  {
+    "url": "https://nuget.org/docs",
+    "labels": {
+      "service": "nuget_docs"
+    }
+  },
+  {
+    "url": "https://gradle.org/docs",
+    "labels": {
+      "service": "gradle_docs"
+    }
+  },
+  {
+    "url": "https://rust-lang.org/docs",
+    "labels": {
+      "service": "rust_lang_docs"
+    }
+  },
+  {
+    "url": "https://golang.org/docs",
+    "labels": {
+      "service": "golang_docs"
+    }
+  },
+  {
+    "url": "https://python.org/docs",
+    "labels": {
+      "service": "python_docs"
+    }
+  },
+  {
+    "url": "https://nodejs.org/docs",
+    "labels": {
+      "service": "nodejs_docs"
+    }
+  },
+  {
+    "url": "https://php.net/docs",
+    "labels": {
+      "service": "php_docs"
+    }
+  },
+  {
+    "url": "https://ruby-lang.org/docs",
+    "labels": {
+      "service": "ruby_lang_docs"
+    }
+  },
+  {
+    "url": "https://swift.org/docs",
+    "labels": {
+      "service": "swift_docs"
+    }
+  },
+  {
+    "url": "https://kotlinlang.org/docs",
+    "labels": {
+      "service": "kotlinlang_docs"
+    }
+  },
+  {
+    "url": "https://typescriptlang.org/docs",
+    "labels": {
+      "service": "typescriptlang_docs"
+    }
+  },
+  {
+    "url": "https://dart.dev/docs",
+    "labels": {
+      "service": "dart_docs"
+    }
+  },
+  {
+    "url": "https://flutter.dev/docs",
+    "labels": {
+      "service": "flutter_docs"
+    }
+  },
+  {
+    "url": "https://reactjs.org/docs",
+    "labels": {
+      "service": "reactjs_docs"
+    }
+  },
+  {
+    "url": "https://vuejs.org/docs",
+    "labels": {
+      "service": "vuejs_docs"
+    }
+  },
+  {
+    "url": "https://angular.io/docs",
+    "labels": {
+      "service": "angular_docs"
+    }
+  },
+  {
+    "url": "https://svelte.dev/docs",
+    "labels": {
+      "service": "svelte_docs"
+    }
+  },
+  {
+    "url": "https://nextjs.org/docs",
+    "labels": {
+      "service": "nextjs_docs"
+    }
+  },
+  {
+    "url": "https://nuxt.com/docs",
+    "labels": {
+      "service": "nuxt_docs"
+    }
+  },
+  {
+    "url": "https://remix.run/docs",
+    "labels": {
+      "service": "remix_docs"
+    }
+  },
+  {
+    "url": "https://astro.build/docs",
+    "labels": {
+      "service": "astro_docs"
+    }
+  },
+  {
+    "url": "https://tailwindcss.com/docs",
+    "labels": {
+      "service": "tailwindcss_docs"
+    }
+  },
+  {
+    "url": "https://getbootstrap.com/docs",
+    "labels": {
+      "service": "getbootstrap_docs"
+    }
+  },
+  {
+    "url": "https://chakra-ui.com/docs",
+    "labels": {
+      "service": "chakra_ui_docs"
+    }
+  },
+  {
+    "url": "https://deno.land/docs",
+    "labels": {
+      "service": "deno_docs"
+    }
+  },
+  {
+    "url": "https://bun.sh/docs",
+    "labels": {
+      "service": "bun_docs"
+    }
+  },
+  {
+    "url": "https://vitejs.dev/docs",
+    "labels": {
+      "service": "vitejs_docs"
+    }
+  },
+  {
+    "url": "https://webpack.js.org/docs",
+    "labels": {
+      "service": "webpack_docs"
+    }
+  },
+  {
+    "url": "https://rollupjs.org/docs",
+    "labels": {
+      "service": "rollupjs_docs"
+    }
+  },
+  {
+    "url": "https://turbo.build/docs",
+    "labels": {
+      "service": "turbo_docs"
+    }
+  },
+  {
+    "url": "https://nx.dev/docs",
+    "labels": {
+      "service": "nx_docs"
+    }
+  },
+  {
+    "url": "https://pnpm.io/docs",
+    "labels": {
+      "service": "pnpm_docs"
+    }
+  },
+  {
+    "url": "https://yarnpkg.com/docs",
+    "labels": {
+      "service": "yarnpkg_docs"
+    }
+  },
+  {
+    "url": "https://brew.sh/docs",
+    "labels": {
+      "service": "brew_docs"
+    }
+  },
+  {
+    "url": "https://ubuntu.com/docs",
+    "labels": {
+      "service": "ubuntu_docs"
+    }
+  },
+  {
+    "url": "https://debian.org/docs",
+    "labels": {
+      "service": "debian_docs"
+    }
+  },
+  {
+    "url": "https://fedoraproject.org/docs",
+    "labels": {
+      "service": "fedoraproject_docs"
+    }
+  },
+  {
+    "url": "https://archlinux.org/docs",
+    "labels": {
+      "service": "archlinux_docs"
+    }
+  },
+  {
+    "url": "https://nixos.org/docs",
+    "labels": {
+      "service": "nixos_docs"
+    }
+  },
+  {
+    "url": "https://freebsd.org/docs",
+    "labels": {
+      "service": "freebsd_docs"
+    }
+  },
+  {
+    "url": "https://openbsd.org/docs",
+    "labels": {
+      "service": "openbsd_docs"
+    }
+  },
+  {
+    "url": "https://alpinelinux.org/docs",
+    "labels": {
+      "service": "alpinelinux_docs"
+    }
+  },
+  {
+    "url": "https://rockylinux.org/docs",
+    "labels": {
+      "service": "rockylinux_docs"
+    }
+  },
+  {
+    "url": "https://almalinux.org/docs",
+    "labels": {
+      "service": "almalinux_docs"
+    }
+  },
+  {
+    "url": "https://redhat.com/docs",
+    "labels": {
+      "service": "redhat_docs"
+    }
+  },
+  {
+    "url": "https://suse.com/docs",
+    "labels": {
+      "service": "suse_docs"
+    }
+  },
+  {
+    "url": "https://vmware.com/docs",
+    "labels": {
+      "service": "vmware_docs"
+    }
+  },
+  {
+    "url": "https://proxmox.com/docs",
+    "labels": {
+      "service": "proxmox_docs"
+    }
+  },
+  {
+    "url": "https://synology.com/docs",
+    "labels": {
+      "service": "synology_docs"
+    }
+  },
+  {
+    "url": "https://ubnt.com/docs",
+    "labels": {
+      "service": "ubnt_docs"
+    }
+  },
+  {
+    "url": "https://cisco.com/docs",
+    "labels": {
+      "service": "cisco_docs"
+    }
+  },
+  {
+    "url": "https://akamai.com/docs",
+    "labels": {
+      "service": "akamai_docs"
+    }
+  },
+  {
+    "url": "https://fastly.com/docs",
+    "labels": {
+      "service": "fastly_docs"
+    }
+  },
+  {
+    "url": "https://jsdelivr.com/docs",
+    "labels": {
+      "service": "jsdelivr_docs"
+    }
+  },
+  {
+    "url": "https://unpkg.com/docs",
+    "labels": {
+      "service": "unpkg_docs"
+    }
+  },
+  {
+    "url": "https://cdnjs.com/docs",
+    "labels": {
+      "service": "cdnjs_docs"
+    }
+  },
+  {
+    "url": "https://vultr.com/docs",
+    "labels": {
+      "service": "vultr_docs"
+    }
+  },
+  {
+    "url": "https://linode.com/docs",
+    "labels": {
+      "service": "linode_docs"
+    }
+  },
+  {
+    "url": "https://hetzner.com/docs",
+    "labels": {
+      "service": "hetzner_docs"
+    }
+  },
+  {
+    "url": "https://ovhcloud.com/docs",
+    "labels": {
+      "service": "ovhcloud_docs"
+    }
+  },
+  {
+    "url": "https://scaleway.com/docs",
+    "labels": {
+      "service": "scaleway_docs"
+    }
+  },
+  {
+    "url": "https://contabo.com/docs",
+    "labels": {
+      "service": "contabo_docs"
+    }
+  },
+  {
+    "url": "https://upcloud.com/docs",
+    "labels": {
+      "service": "upcloud_docs"
+    }
+  },
+  {
+    "url": "https://hostinger.com/docs",
+    "labels": {
+      "service": "hostinger_docs"
+    }
+  },
+  {
+    "url": "https://bluehost.com/docs",
+    "labels": {
+      "service": "bluehost_docs"
+    }
+  },
+  {
+    "url": "https://godaddy.com/docs",
+    "labels": {
+      "service": "godaddy_docs"
+    }
+  },
+  {
+    "url": "https://namecheap.com/docs",
+    "labels": {
+      "service": "namecheap_docs"
+    }
+  },
+  {
+    "url": "https://hover.com/docs",
+    "labels": {
+      "service": "hover_docs"
+    }
+  },
+  {
+    "url": "https://porkbun.com/docs",
+    "labels": {
+      "service": "porkbun_docs"
+    }
+  },
+  {
+    "url": "https://cloudns.net/docs",
+    "labels": {
+      "service": "cloudns_docs"
+    }
+  },
+  {
+    "url": "https://easydns.com/docs",
+    "labels": {
+      "service": "easydns_docs"
+    }
+  },
+  {
+    "url": "https://sentry.io/docs",
+    "labels": {
+      "service": "sentry_docs"
+    }
+  },
+  {
+    "url": "https://launchdarkly.com/docs",
+    "labels": {
+      "service": "launchdarkly_docs"
+    }
+  },
+  {
+    "url": "https://segment.com/docs",
+    "labels": {
+      "service": "segment_docs"
+    }
+  },
+  {
+    "url": "https://amplitude.com/docs",
+    "labels": {
+      "service": "amplitude_docs"
+    }
+  },
+  {
+    "url": "https://mixpanel.com/docs",
+    "labels": {
+      "service": "mixpanel_docs"
+    }
+  },
+  {
+    "url": "https://heap.io/docs",
+    "labels": {
+      "service": "heap_docs"
+    }
+  },
+  {
+    "url": "https://hotjar.com/docs",
+    "labels": {
+      "service": "hotjar_docs"
+    }
+  },
+  {
+    "url": "https://fullstory.com/docs",
+    "labels": {
+      "service": "fullstory_docs"
+    }
+  },
+  {
+    "url": "https://logrocket.com/docs",
+    "labels": {
+      "service": "logrocket_docs"
+    }
+  },
+  {
+    "url": "https://bugsnag.com/docs",
+    "labels": {
+      "service": "bugsnag_docs"
+    }
+  },
+  {
+    "url": "https://rollbar.com/docs",
+    "labels": {
+      "service": "rollbar_docs"
+    }
+  },
+  {
+    "url": "https://airbrake.io/docs",
+    "labels": {
+      "service": "airbrake_docs"
+    }
+  },
+  {
+    "url": "https://honeybadger.io/docs",
+    "labels": {
+      "service": "honeybadger_docs"
+    }
+  },
+  {
+    "url": "https://google.com/api",
+    "labels": {
+      "service": "google_api"
+    }
+  },
+  {
+    "url": "https://github.com/api",
+    "labels": {
+      "service": "github_api"
+    }
+  },
+  {
+    "url": "https://microsoft.com/api",
+    "labels": {
+      "service": "microsoft_api"
+    }
+  },
+  {
+    "url": "https://apple.com/api",
+    "labels": {
+      "service": "apple_api"
+    }
+  },
+  {
+    "url": "https://amazon.com/api",
+    "labels": {
+      "service": "amazon_api"
+    }
+  },
+  {
+    "url": "https://facebook.com/api",
+    "labels": {
+      "service": "facebook_api"
+    }
+  },
+  {
+    "url": "https://twitter.com/api",
+    "labels": {
+      "service": "twitter_api"
+    }
+  },
+  {
+    "url": "https://linkedin.com/api",
+    "labels": {
+      "service": "linkedin_api"
+    }
+  },
+  {
+    "url": "https://instagram.com/api",
+    "labels": {
+      "service": "instagram_api"
+    }
+  },
+  {
+    "url": "https://youtube.com/api",
+    "labels": {
+      "service": "youtube_api"
+    }
+  },
+  {
+    "url": "https://netflix.com/api",
+    "labels": {
+      "service": "netflix_api"
+    }
+  },
+  {
+    "url": "https://spotify.com/api",
+    "labels": {
+      "service": "spotify_api"
+    }
+  },
+  {
+    "url": "https://reddit.com/api",
+    "labels": {
+      "service": "reddit_api"
+    }
+  },
+  {
+    "url": "https://wikipedia.org/api",
+    "labels": {
+      "service": "wikipedia_api"
+    }
+  },
+  {
+    "url": "https://cloudflare.com/api",
+    "labels": {
+      "service": "cloudflare_api"
+    }
+  },
+  {
+    "url": "https://digitalocean.com/api",
+    "labels": {
+      "service": "digitalocean_api"
+    }
+  },
+  {
+    "url": "https://heroku.com/api",
+    "labels": {
+      "service": "heroku_api"
+    }
+  },
+  {
+    "url": "https://vercel.com/api",
+    "labels": {
+      "service": "vercel_api"
+    }
+  },
+  {
+    "url": "https://netlify.com/api",
+    "labels": {
+      "service": "netlify_api"
+    }
+  },
+  {
+    "url": "https://docker.com/api",
+    "labels": {
+      "service": "docker_api"
+    }
+  },
+  {
+    "url": "https://kubernetes.io/api",
+    "labels": {
+      "service": "kubernetes_api"
+    }
+  },
+  {
+    "url": "https://terraform.io/api",
+    "labels": {
+      "service": "terraform_api"
+    }
+  },
+  {
+    "url": "https://ansible.com/api",
+    "labels": {
+      "service": "ansible_api"
+    }
+  },
+  {
+    "url": "https://jenkins.io/api",
+    "labels": {
+      "service": "jenkins_api"
+    }
+  },
+  {
+    "url": "https://gitlab.com/api",
+    "labels": {
+      "service": "gitlab_api"
+    }
+  },
+  {
+    "url": "https://bitbucket.org/api",
+    "labels": {
+      "service": "bitbucket_api"
+    }
+  },
+  {
+    "url": "https://stackoverflow.com/api",
+    "labels": {
+      "service": "stackoverflow_api"
+    }
+  },
+  {
+    "url": "https://medium.com/api",
+    "labels": {
+      "service": "medium_api"
+    }
+  },
+  {
+    "url": "https://dev.to/api",
+    "labels": {
+      "service": "dev_api"
+    }
+  },
+  {
+    "url": "https://producthunt.com/api",
+    "labels": {
+      "service": "producthunt_api"
+    }
+  },
+  {
+    "url": "https://dribbble.com/api",
+    "labels": {
+      "service": "dribbble_api"
+    }
+  },
+  {
+    "url": "https://behance.net/api",
+    "labels": {
+      "service": "behance_api"
+    }
+  },
+  {
+    "url": "https://figma.com/api",
+    "labels": {
+      "service": "figma_api"
+    }
+  },
+  {
+    "url": "https://canva.com/api",
+    "labels": {
+      "service": "canva_api"
+    }
+  },
+  {
+    "url": "https://notion.so/api",
+    "labels": {
+      "service": "notion_api"
+    }
+  },
+  {
+    "url": "https://slack.com/api",
+    "labels": {
+      "service": "slack_api"
+    }
+  },
+  {
+    "url": "https://discord.com/api",
+    "labels": {
+      "service": "discord_api"
+    }
+  },
+  {
+    "url": "https://zoom.us/api",
+    "labels": {
+      "service": "zoom_api"
+    }
+  },
+  {
+    "url": "https://dropbox.com/api",
+    "labels": {
+      "service": "dropbox_api"
+    }
+  },
+  {
+    "url": "https://box.com/api",
+    "labels": {
+      "service": "box_api"
+    }
+  },
+  {
+    "url": "https://icloud.com/api",
+    "labels": {
+      "service": "icloud_api"
+    }
+  },
+  {
+    "url": "https://stripe.com/api",
+    "labels": {
+      "service": "stripe_api"
+    }
+  },
+  {
+    "url": "https://paypal.com/api",
+    "labels": {
+      "service": "paypal_api"
+    }
+  },
+  {
+    "url": "https://shopify.com/api",
+    "labels": {
+      "service": "shopify_api"
+    }
+  },
+  {
+    "url": "https://wix.com/api",
+    "labels": {
+      "service": "wix_api"
+    }
+  },
+  {
+    "url": "https://squarespace.com/api",
+    "labels": {
+      "service": "squarespace_api"
+    }
+  },
+  {
+    "url": "https://wordpress.com/api",
+    "labels": {
+      "service": "wordpress_api"
+    }
+  },
+  {
+    "url": "https://blogger.com/api",
+    "labels": {
+      "service": "blogger_api"
+    }
+  },
+  {
+    "url": "https://tumblr.com/api",
+    "labels": {
+      "service": "tumblr_api"
+    }
+  },
+  {
+    "url": "https://pinterest.com/api",
+    "labels": {
+      "service": "pinterest_api"
+    }
+  },
+  {
+    "url": "https://tiktok.com/api",
+    "labels": {
+      "service": "tiktok_api"
+    }
+  },
+  {
+    "url": "https://snapchat.com/api",
+    "labels": {
+      "service": "snapchat_api"
+    }
+  },
+  {
+    "url": "https://whatsapp.com/api",
+    "labels": {
+      "service": "whatsapp_api"
+    }
+  },
+  {
+    "url": "https://telegram.org/api",
+    "labels": {
+      "service": "telegram_api"
+    }
+  },
+  {
+    "url": "https://signal.org/api",
+    "labels": {
+      "service": "signal_api"
+    }
+  },
+  {
+    "url": "https://proton.me/api",
+    "labels": {
+      "service": "proton_api"
+    }
+  },
+  {
+    "url": "https://fastmail.com/api",
+    "labels": {
+      "service": "fastmail_api"
+    }
+  },
+  {
+    "url": "https://mailchimp.com/api",
+    "labels": {
+      "service": "mailchimp_api"
+    }
+  },
+  {
+    "url": "https://sendgrid.com/api",
+    "labels": {
+      "service": "sendgrid_api"
+    }
+  },
+  {
+    "url": "https://twilio.com/api",
+    "labels": {
+      "service": "twilio_api"
+    }
+  },
+  {
+    "url": "https://auth0.com/api",
+    "labels": {
+      "service": "auth0_api"
+    }
+  },
+  {
+    "url": "https://okta.com/api",
+    "labels": {
+      "service": "okta_api"
+    }
+  },
+  {
+    "url": "https://datadog.com/api",
+    "labels": {
+      "service": "datadog_api"
+    }
+  },
+  {
+    "url": "https://newrelic.com/api",
+    "labels": {
+      "service": "newrelic_api"
+    }
+  },
+  {
+    "url": "https://splunk.com/api",
+    "labels": {
+      "service": "splunk_api"
+    }
+  },
+  {
+    "url": "https://elastic.co/api",
+    "labels": {
+      "service": "elastic_api"
+    }
+  },
+  {
+    "url": "https://mongodb.com/api",
+    "labels": {
+      "service": "mongodb_api"
+    }
+  },
+  {
+    "url": "https://postgresql.org/api",
+    "labels": {
+      "service": "postgresql_api"
+    }
+  },
+  {
+    "url": "https://mysql.com/api",
+    "labels": {
+      "service": "mysql_api"
+    }
+  },
+  {
+    "url": "https://redis.io/api",
+    "labels": {
+      "service": "redis_api"
+    }
+  },
+  {
+    "url": "https://memcached.org/api",
+    "labels": {
+      "service": "memcached_api"
+    }
+  },
+  {
+    "url": "https://rabbitmq.com/api",
+    "labels": {
+      "service": "rabbitmq_api"
+    }
+  },
+  {
+    "url": "https://nginx.org/api",
+    "labels": {
+      "service": "nginx_api"
+    }
+  },
+  {
+    "url": "https://apache.org/api",
+    "labels": {
+      "service": "apache_api"
+    }
+  },
+  {
+    "url": "https://prometheus.io/api",
+    "labels": {
+      "service": "prometheus_api"
+    }
+  },
+  {
+    "url": "https://grafana.com/api",
+    "labels": {
+      "service": "grafana_api"
+    }
+  },
+  {
+    "url": "https://influxdata.com/api",
+    "labels": {
+      "service": "influxdata_api"
+    }
+  },
+  {
+    "url": "https://consul.io/api",
+    "labels": {
+      "service": "consul_api"
+    }
+  },
+  {
+    "url": "https://nomadproject.io/api",
+    "labels": {
+      "service": "nomadproject_api"
+    }
+  },
+  {
+    "url": "https://packer.io/api",
+    "labels": {
+      "service": "packer_api"
+    }
+  },
+  {
+    "url": "https://vagrantup.com/api",
+    "labels": {
+      "service": "vagrantup_api"
+    }
+  },
+  {
+    "url": "https://helm.sh/api",
+    "labels": {
+      "service": "helm_api"
+    }
+  },
+  {
+    "url": "https://istio.io/api",
+    "labels": {
+      "service": "istio_api"
+    }
+  },
+  {
+    "url": "https://envoyproxy.io/api",
+    "labels": {
+      "service": "envoyproxy_api"
+    }
+  },
+  {
+    "url": "https://linkerd.io/api",
+    "labels": {
+      "service": "linkerd_api"
+    }
+  },
+  {
+    "url": "https://fluxcd.io/api",
+    "labels": {
+      "service": "fluxcd_api"
+    }
+  },
+  {
+    "url": "https://crossplane.io/api",
+    "labels": {
+      "service": "crossplane_api"
+    }
+  },
+  {
+    "url": "https://kustomize.io/api",
+    "labels": {
+      "service": "kustomize_api"
+    }
+  },
+  {
+    "url": "https://rancher.com/api",
+    "labels": {
+      "service": "rancher_api"
+    }
+  },
+  {
+    "url": "https://portainer.io/api",
+    "labels": {
+      "service": "portainer_api"
+    }
+  },
+  {
+    "url": "https://traefik.io/api",
+    "labels": {
+      "service": "traefik_api"
+    }
+  },
+  {
+    "url": "https://caddyserver.com/api",
+    "labels": {
+      "service": "caddyserver_api"
+    }
+  },
+  {
+    "url": "https://oracle.com/api",
+    "labels": {
+      "service": "oracle_api"
+    }
+  },
+  {
+    "url": "https://ibm.com/api",
+    "labels": {
+      "service": "ibm_api"
+    }
+  },
+  {
+    "url": "https://salesforce.com/api",
+    "labels": {
+      "service": "salesforce_api"
+    }
+  },
+  {
+    "url": "https://adobe.com/api",
+    "labels": {
+      "service": "adobe_api"
+    }
+  },
+  {
+    "url": "https://atlassian.com/api",
+    "labels": {
+      "service": "atlassian_api"
+    }
+  },
+  {
+    "url": "https://jetbrains.com/api",
+    "labels": {
+      "service": "jetbrains_api"
+    }
+  },
+  {
+    "url": "https://npmjs.com/api",
+    "labels": {
+      "service": "npmjs_api"
+    }
+  },
+  {
+    "url": "https://pypi.org/api",
+    "labels": {
+      "service": "pypi_api"
+    }
+  },
+  {
+    "url": "https://rubygems.org/api",
+    "labels": {
+      "service": "rubygems_api"
+    }
+  },
+  {
+    "url": "https://nuget.org/api",
+    "labels": {
+      "service": "nuget_api"
+    }
+  },
+  {
+    "url": "https://gradle.org/api",
+    "labels": {
+      "service": "gradle_api"
+    }
+  },
+  {
+    "url": "https://rust-lang.org/api",
+    "labels": {
+      "service": "rust_lang_api"
+    }
+  },
+  {
+    "url": "https://golang.org/api",
+    "labels": {
+      "service": "golang_api"
+    }
+  },
+  {
+    "url": "https://python.org/api",
+    "labels": {
+      "service": "python_api"
+    }
+  },
+  {
+    "url": "https://nodejs.org/api",
+    "labels": {
+      "service": "nodejs_api"
+    }
+  },
+  {
+    "url": "https://php.net/api",
+    "labels": {
+      "service": "php_api"
+    }
+  },
+  {
+    "url": "https://ruby-lang.org/api",
+    "labels": {
+      "service": "ruby_lang_api"
+    }
+  },
+  {
+    "url": "https://swift.org/api",
+    "labels": {
+      "service": "swift_api"
+    }
+  },
+  {
+    "url": "https://kotlinlang.org/api",
+    "labels": {
+      "service": "kotlinlang_api"
+    }
+  },
+  {
+    "url": "https://typescriptlang.org/api",
+    "labels": {
+      "service": "typescriptlang_api"
+    }
+  },
+  {
+    "url": "https://dart.dev/api",
+    "labels": {
+      "service": "dart_api"
+    }
+  },
+  {
+    "url": "https://flutter.dev/api",
+    "labels": {
+      "service": "flutter_api"
+    }
+  },
+  {
+    "url": "https://reactjs.org/api",
+    "labels": {
+      "service": "reactjs_api"
+    }
+  },
+  {
+    "url": "https://vuejs.org/api",
+    "labels": {
+      "service": "vuejs_api"
+    }
+  },
+  {
+    "url": "https://angular.io/api",
+    "labels": {
+      "service": "angular_api"
+    }
+  },
+  {
+    "url": "https://svelte.dev/api",
+    "labels": {
+      "service": "svelte_api"
+    }
+  },
+  {
+    "url": "https://nextjs.org/api",
+    "labels": {
+      "service": "nextjs_api"
+    }
+  },
+  {
+    "url": "https://nuxt.com/api",
+    "labels": {
+      "service": "nuxt_api"
+    }
+  },
+  {
+    "url": "https://remix.run/api",
+    "labels": {
+      "service": "remix_api"
+    }
+  },
+  {
+    "url": "https://astro.build/api",
+    "labels": {
+      "service": "astro_api"
+    }
+  },
+  {
+    "url": "https://tailwindcss.com/api",
+    "labels": {
+      "service": "tailwindcss_api"
+    }
+  },
+  {
+    "url": "https://getbootstrap.com/api",
+    "labels": {
+      "service": "getbootstrap_api"
+    }
+  },
+  {
+    "url": "https://chakra-ui.com/api",
+    "labels": {
+      "service": "chakra_ui_api"
+    }
+  },
+  {
+    "url": "https://deno.land/api",
+    "labels": {
+      "service": "deno_api"
+    }
+  },
+  {
+    "url": "https://bun.sh/api",
+    "labels": {
+      "service": "bun_api"
+    }
+  },
+  {
+    "url": "https://vitejs.dev/api",
+    "labels": {
+      "service": "vitejs_api"
+    }
+  },
+  {
+    "url": "https://webpack.js.org/api",
+    "labels": {
+      "service": "webpack_api"
+    }
+  },
+  {
+    "url": "https://rollupjs.org/api",
+    "labels": {
+      "service": "rollupjs_api"
+    }
+  },
+  {
+    "url": "https://turbo.build/api",
+    "labels": {
+      "service": "turbo_api"
+    }
+  },
+  {
+    "url": "https://nx.dev/api",
+    "labels": {
+      "service": "nx_api"
+    }
+  },
+  {
+    "url": "https://pnpm.io/api",
+    "labels": {
+      "service": "pnpm_api"
+    }
+  },
+  {
+    "url": "https://yarnpkg.com/api",
+    "labels": {
+      "service": "yarnpkg_api"
+    }
+  },
+  {
+    "url": "https://brew.sh/api",
+    "labels": {
+      "service": "brew_api"
+    }
+  },
+  {
+    "url": "https://ubuntu.com/api",
+    "labels": {
+      "service": "ubuntu_api"
+    }
+  },
+  {
+    "url": "https://debian.org/api",
+    "labels": {
+      "service": "debian_api"
+    }
+  },
+  {
+    "url": "https://fedoraproject.org/api",
+    "labels": {
+      "service": "fedoraproject_api"
+    }
+  },
+  {
+    "url": "https://archlinux.org/api",
+    "labels": {
+      "service": "archlinux_api"
+    }
+  },
+  {
+    "url": "https://nixos.org/api",
+    "labels": {
+      "service": "nixos_api"
+    }
+  },
+  {
+    "url": "https://freebsd.org/api",
+    "labels": {
+      "service": "freebsd_api"
+    }
+  },
+  {
+    "url": "https://openbsd.org/api",
+    "labels": {
+      "service": "openbsd_api"
+    }
+  },
+  {
+    "url": "https://alpinelinux.org/api",
+    "labels": {
+      "service": "alpinelinux_api"
+    }
+  },
+  {
+    "url": "https://rockylinux.org/api",
+    "labels": {
+      "service": "rockylinux_api"
+    }
+  },
+  {
+    "url": "https://almalinux.org/api",
+    "labels": {
+      "service": "almalinux_api"
+    }
+  },
+  {
+    "url": "https://redhat.com/api",
+    "labels": {
+      "service": "redhat_api"
+    }
+  },
+  {
+    "url": "https://suse.com/api",
+    "labels": {
+      "service": "suse_api"
+    }
+  },
+  {
+    "url": "https://vmware.com/api",
+    "labels": {
+      "service": "vmware_api"
+    }
+  },
+  {
+    "url": "https://proxmox.com/api",
+    "labels": {
+      "service": "proxmox_api"
+    }
+  },
+  {
+    "url": "https://synology.com/api",
+    "labels": {
+      "service": "synology_api"
+    }
+  },
+  {
+    "url": "https://ubnt.com/api",
+    "labels": {
+      "service": "ubnt_api"
+    }
+  },
+  {
+    "url": "https://cisco.com/api",
+    "labels": {
+      "service": "cisco_api"
+    }
+  },
+  {
+    "url": "https://akamai.com/api",
+    "labels": {
+      "service": "akamai_api"
+    }
+  },
+  {
+    "url": "https://fastly.com/api",
+    "labels": {
+      "service": "fastly_api"
+    }
+  },
+  {
+    "url": "https://jsdelivr.com/api",
+    "labels": {
+      "service": "jsdelivr_api"
+    }
+  },
+  {
+    "url": "https://unpkg.com/api",
+    "labels": {
+      "service": "unpkg_api"
+    }
+  },
+  {
+    "url": "https://cdnjs.com/api",
+    "labels": {
+      "service": "cdnjs_api"
+    }
+  },
+  {
+    "url": "https://vultr.com/api",
+    "labels": {
+      "service": "vultr_api"
+    }
+  },
+  {
+    "url": "https://linode.com/api",
+    "labels": {
+      "service": "linode_api"
+    }
+  },
+  {
+    "url": "https://hetzner.com/api",
+    "labels": {
+      "service": "hetzner_api"
+    }
+  },
+  {
+    "url": "https://ovhcloud.com/api",
+    "labels": {
+      "service": "ovhcloud_api"
+    }
+  },
+  {
+    "url": "https://scaleway.com/api",
+    "labels": {
+      "service": "scaleway_api"
+    }
+  },
+  {
+    "url": "https://contabo.com/api",
+    "labels": {
+      "service": "contabo_api"
+    }
+  },
+  {
+    "url": "https://upcloud.com/api",
+    "labels": {
+      "service": "upcloud_api"
+    }
+  },
+  {
+    "url": "https://hostinger.com/api",
+    "labels": {
+      "service": "hostinger_api"
+    }
+  },
+  {
+    "url": "https://bluehost.com/api",
+    "labels": {
+      "service": "bluehost_api"
+    }
+  },
+  {
+    "url": "https://godaddy.com/api",
+    "labels": {
+      "service": "godaddy_api"
+    }
+  },
+  {
+    "url": "https://namecheap.com/api",
+    "labels": {
+      "service": "namecheap_api"
+    }
+  },
+  {
+    "url": "https://hover.com/api",
+    "labels": {
+      "service": "hover_api"
+    }
+  },
+  {
+    "url": "https://porkbun.com/api",
+    "labels": {
+      "service": "porkbun_api"
+    }
+  },
+  {
+    "url": "https://cloudns.net/api",
+    "labels": {
+      "service": "cloudns_api"
+    }
+  },
+  {
+    "url": "https://easydns.com/api",
+    "labels": {
+      "service": "easydns_api"
+    }
+  },
+  {
+    "url": "https://sentry.io/api",
+    "labels": {
+      "service": "sentry_api"
+    }
+  },
+  {
+    "url": "https://launchdarkly.com/api",
+    "labels": {
+      "service": "launchdarkly_api"
+    }
+  },
+  {
+    "url": "https://segment.com/api",
+    "labels": {
+      "service": "segment_api"
+    }
+  },
+  {
+    "url": "https://amplitude.com/api",
+    "labels": {
+      "service": "amplitude_api"
+    }
+  },
+  {
+    "url": "https://mixpanel.com/api",
+    "labels": {
+      "service": "mixpanel_api"
+    }
+  },
+  {
+    "url": "https://heap.io/api",
+    "labels": {
+      "service": "heap_api"
+    }
+  },
+  {
+    "url": "https://hotjar.com/api",
+    "labels": {
+      "service": "hotjar_api"
+    }
+  },
+  {
+    "url": "https://fullstory.com/api",
+    "labels": {
+      "service": "fullstory_api"
+    }
+  },
+  {
+    "url": "https://logrocket.com/api",
+    "labels": {
+      "service": "logrocket_api"
+    }
+  },
+  {
+    "url": "https://bugsnag.com/api",
+    "labels": {
+      "service": "bugsnag_api"
+    }
+  },
+  {
+    "url": "https://rollbar.com/api",
+    "labels": {
+      "service": "rollbar_api"
+    }
+  },
+  {
+    "url": "https://airbrake.io/api",
+    "labels": {
+      "service": "airbrake_api"
+    }
+  },
+  {
+    "url": "https://honeybadger.io/api",
+    "labels": {
+      "service": "honeybadger_api"
+    }
+  },
+  {
+    "url": "https://google.com/status",
+    "labels": {
+      "service": "google_status"
+    }
+  },
+  {
+    "url": "https://github.com/status",
+    "labels": {
+      "service": "github_status"
+    }
+  },
+  {
+    "url": "https://microsoft.com/status",
+    "labels": {
+      "service": "microsoft_status"
+    }
+  },
+  {
+    "url": "https://apple.com/status",
+    "labels": {
+      "service": "apple_status"
+    }
+  },
+  {
+    "url": "https://amazon.com/status",
+    "labels": {
+      "service": "amazon_status"
+    }
+  },
+  {
+    "url": "https://facebook.com/status",
+    "labels": {
+      "service": "facebook_status"
+    }
+  },
+  {
+    "url": "https://twitter.com/status",
+    "labels": {
+      "service": "twitter_status"
+    }
+  },
+  {
+    "url": "https://linkedin.com/status",
+    "labels": {
+      "service": "linkedin_status"
+    }
+  },
+  {
+    "url": "https://instagram.com/status",
+    "labels": {
+      "service": "instagram_status"
+    }
+  },
+  {
+    "url": "https://youtube.com/status",
+    "labels": {
+      "service": "youtube_status"
+    }
+  },
+  {
+    "url": "https://netflix.com/status",
+    "labels": {
+      "service": "netflix_status"
+    }
+  },
+  {
+    "url": "https://spotify.com/status",
+    "labels": {
+      "service": "spotify_status"
+    }
+  },
+  {
+    "url": "https://reddit.com/status",
+    "labels": {
+      "service": "reddit_status"
+    }
+  },
+  {
+    "url": "https://wikipedia.org/status",
+    "labels": {
+      "service": "wikipedia_status"
+    }
+  },
+  {
+    "url": "https://cloudflare.com/status",
+    "labels": {
+      "service": "cloudflare_status"
+    }
+  },
+  {
+    "url": "https://digitalocean.com/status",
+    "labels": {
+      "service": "digitalocean_status"
+    }
+  },
+  {
+    "url": "https://heroku.com/status",
+    "labels": {
+      "service": "heroku_status"
+    }
+  },
+  {
+    "url": "https://vercel.com/status",
+    "labels": {
+      "service": "vercel_status"
+    }
+  },
+  {
+    "url": "https://netlify.com/status",
+    "labels": {
+      "service": "netlify_status"
+    }
+  },
+  {
+    "url": "https://docker.com/status",
+    "labels": {
+      "service": "docker_status"
+    }
+  },
+  {
+    "url": "https://kubernetes.io/status",
+    "labels": {
+      "service": "kubernetes_status"
+    }
+  },
+  {
+    "url": "https://terraform.io/status",
+    "labels": {
+      "service": "terraform_status"
+    }
+  },
+  {
+    "url": "https://ansible.com/status",
+    "labels": {
+      "service": "ansible_status"
+    }
+  },
+  {
+    "url": "https://jenkins.io/status",
+    "labels": {
+      "service": "jenkins_status"
+    }
+  },
+  {
+    "url": "https://gitlab.com/status",
+    "labels": {
+      "service": "gitlab_status"
+    }
+  },
+  {
+    "url": "https://bitbucket.org/status",
+    "labels": {
+      "service": "bitbucket_status"
+    }
+  },
+  {
+    "url": "https://stackoverflow.com/status",
+    "labels": {
+      "service": "stackoverflow_status"
+    }
+  },
+  {
+    "url": "https://medium.com/status",
+    "labels": {
+      "service": "medium_status"
+    }
+  },
+  {
+    "url": "https://dev.to/status",
+    "labels": {
+      "service": "dev_status"
+    }
+  },
+  {
+    "url": "https://producthunt.com/status",
+    "labels": {
+      "service": "producthunt_status"
+    }
+  },
+  {
+    "url": "https://dribbble.com/status",
+    "labels": {
+      "service": "dribbble_status"
+    }
+  },
+  {
+    "url": "https://behance.net/status",
+    "labels": {
+      "service": "behance_status"
+    }
+  },
+  {
+    "url": "https://figma.com/status",
+    "labels": {
+      "service": "figma_status"
+    }
+  },
+  {
+    "url": "https://canva.com/status",
+    "labels": {
+      "service": "canva_status"
+    }
+  },
+  {
+    "url": "https://notion.so/status",
+    "labels": {
+      "service": "notion_status"
+    }
+  },
+  {
+    "url": "https://slack.com/status",
+    "labels": {
+      "service": "slack_status"
+    }
+  },
+  {
+    "url": "https://discord.com/status",
+    "labels": {
+      "service": "discord_status"
+    }
+  },
+  {
+    "url": "https://zoom.us/status",
+    "labels": {
+      "service": "zoom_status"
+    }
+  },
+  {
+    "url": "https://dropbox.com/status",
+    "labels": {
+      "service": "dropbox_status"
+    }
+  },
+  {
+    "url": "https://box.com/status",
+    "labels": {
+      "service": "box_status"
+    }
+  },
+  {
+    "url": "https://icloud.com/status",
+    "labels": {
+      "service": "icloud_status"
+    }
+  },
+  {
+    "url": "https://stripe.com/status",
+    "labels": {
+      "service": "stripe_status"
+    }
+  },
+  {
+    "url": "https://paypal.com/status",
+    "labels": {
+      "service": "paypal_status"
+    }
+  },
+  {
+    "url": "https://shopify.com/status",
+    "labels": {
+      "service": "shopify_status"
+    }
+  },
+  {
+    "url": "https://wix.com/status",
+    "labels": {
+      "service": "wix_status"
+    }
+  },
+  {
+    "url": "https://squarespace.com/status",
+    "labels": {
+      "service": "squarespace_status"
+    }
+  },
+  {
+    "url": "https://wordpress.com/status",
+    "labels": {
+      "service": "wordpress_status"
+    }
+  },
+  {
+    "url": "https://blogger.com/status",
+    "labels": {
+      "service": "blogger_status"
+    }
+  },
+  {
+    "url": "https://tumblr.com/status",
+    "labels": {
+      "service": "tumblr_status"
+    }
+  },
+  {
+    "url": "https://pinterest.com/status",
+    "labels": {
+      "service": "pinterest_status"
+    }
+  },
+  {
+    "url": "https://tiktok.com/status",
+    "labels": {
+      "service": "tiktok_status"
+    }
+  },
+  {
+    "url": "https://snapchat.com/status",
+    "labels": {
+      "service": "snapchat_status"
+    }
+  },
+  {
+    "url": "https://whatsapp.com/status",
+    "labels": {
+      "service": "whatsapp_status"
+    }
+  },
+  {
+    "url": "https://telegram.org/status",
+    "labels": {
+      "service": "telegram_status"
+    }
+  },
+  {
+    "url": "https://signal.org/status",
+    "labels": {
+      "service": "signal_status"
+    }
+  },
+  {
+    "url": "https://proton.me/status",
+    "labels": {
+      "service": "proton_status"
+    }
+  },
+  {
+    "url": "https://fastmail.com/status",
+    "labels": {
+      "service": "fastmail_status"
+    }
+  },
+  {
+    "url": "https://mailchimp.com/status",
+    "labels": {
+      "service": "mailchimp_status"
+    }
+  },
+  {
+    "url": "https://sendgrid.com/status",
+    "labels": {
+      "service": "sendgrid_status"
+    }
+  },
+  {
+    "url": "https://twilio.com/status",
+    "labels": {
+      "service": "twilio_status"
+    }
+  },
+  {
+    "url": "https://auth0.com/status",
+    "labels": {
+      "service": "auth0_status"
+    }
+  },
+  {
+    "url": "https://okta.com/status",
+    "labels": {
+      "service": "okta_status"
+    }
+  },
+  {
+    "url": "https://datadog.com/status",
+    "labels": {
+      "service": "datadog_status"
+    }
+  },
+  {
+    "url": "https://newrelic.com/status",
+    "labels": {
+      "service": "newrelic_status"
+    }
+  },
+  {
+    "url": "https://splunk.com/status",
+    "labels": {
+      "service": "splunk_status"
+    }
+  },
+  {
+    "url": "https://elastic.co/status",
+    "labels": {
+      "service": "elastic_status"
+    }
+  },
+  {
+    "url": "https://mongodb.com/status",
+    "labels": {
+      "service": "mongodb_status"
+    }
+  },
+  {
+    "url": "https://postgresql.org/status",
+    "labels": {
+      "service": "postgresql_status"
+    }
+  },
+  {
+    "url": "https://mysql.com/status",
+    "labels": {
+      "service": "mysql_status"
+    }
+  },
+  {
+    "url": "https://redis.io/status",
+    "labels": {
+      "service": "redis_status"
+    }
+  },
+  {
+    "url": "https://memcached.org/status",
+    "labels": {
+      "service": "memcached_status"
+    }
+  },
+  {
+    "url": "https://rabbitmq.com/status",
+    "labels": {
+      "service": "rabbitmq_status"
+    }
+  },
+  {
+    "url": "https://nginx.org/status",
+    "labels": {
+      "service": "nginx_status"
+    }
+  },
+  {
+    "url": "https://apache.org/status",
+    "labels": {
+      "service": "apache_status"
+    }
+  },
+  {
+    "url": "https://prometheus.io/status",
+    "labels": {
+      "service": "prometheus_status"
+    }
+  },
+  {
+    "url": "https://grafana.com/status",
+    "labels": {
+      "service": "grafana_status"
+    }
+  },
+  {
+    "url": "https://influxdata.com/status",
+    "labels": {
+      "service": "influxdata_status"
+    }
+  },
+  {
+    "url": "https://consul.io/status",
+    "labels": {
+      "service": "consul_status"
+    }
+  },
+  {
+    "url": "https://nomadproject.io/status",
+    "labels": {
+      "service": "nomadproject_status"
+    }
+  },
+  {
+    "url": "https://packer.io/status",
+    "labels": {
+      "service": "packer_status"
+    }
+  },
+  {
+    "url": "https://vagrantup.com/status",
+    "labels": {
+      "service": "vagrantup_status"
+    }
+  },
+  {
+    "url": "https://helm.sh/status",
+    "labels": {
+      "service": "helm_status"
+    }
+  },
+  {
+    "url": "https://istio.io/status",
+    "labels": {
+      "service": "istio_status"
+    }
+  },
+  {
+    "url": "https://envoyproxy.io/status",
+    "labels": {
+      "service": "envoyproxy_status"
+    }
+  },
+  {
+    "url": "https://linkerd.io/status",
+    "labels": {
+      "service": "linkerd_status"
+    }
+  },
+  {
+    "url": "https://fluxcd.io/status",
+    "labels": {
+      "service": "fluxcd_status"
+    }
+  },
+  {
+    "url": "https://crossplane.io/status",
+    "labels": {
+      "service": "crossplane_status"
+    }
+  },
+  {
+    "url": "https://kustomize.io/status",
+    "labels": {
+      "service": "kustomize_status"
+    }
+  },
+  {
+    "url": "https://rancher.com/status",
+    "labels": {
+      "service": "rancher_status"
+    }
+  },
+  {
+    "url": "https://portainer.io/status",
+    "labels": {
+      "service": "portainer_status"
+    }
+  },
+  {
+    "url": "https://traefik.io/status",
+    "labels": {
+      "service": "traefik_status"
+    }
+  },
+  {
+    "url": "https://caddyserver.com/status",
+    "labels": {
+      "service": "caddyserver_status"
+    }
+  },
+  {
+    "url": "https://oracle.com/status",
+    "labels": {
+      "service": "oracle_status"
+    }
+  },
+  {
+    "url": "https://ibm.com/status",
+    "labels": {
+      "service": "ibm_status"
+    }
+  },
+  {
+    "url": "https://salesforce.com/status",
+    "labels": {
+      "service": "salesforce_status"
+    }
+  },
+  {
+    "url": "https://adobe.com/status",
+    "labels": {
+      "service": "adobe_status"
+    }
+  },
+  {
+    "url": "https://atlassian.com/status",
+    "labels": {
+      "service": "atlassian_status"
+    }
+  },
+  {
+    "url": "https://jetbrains.com/status",
+    "labels": {
+      "service": "jetbrains_status"
+    }
+  },
+  {
+    "url": "https://npmjs.com/status",
+    "labels": {
+      "service": "npmjs_status"
+    }
+  },
+  {
+    "url": "https://pypi.org/status",
+    "labels": {
+      "service": "pypi_status"
+    }
+  },
+  {
+    "url": "https://rubygems.org/status",
+    "labels": {
+      "service": "rubygems_status"
+    }
+  },
+  {
+    "url": "https://nuget.org/status",
+    "labels": {
+      "service": "nuget_status"
+    }
+  },
+  {
+    "url": "https://gradle.org/status",
+    "labels": {
+      "service": "gradle_status"
+    }
+  },
+  {
+    "url": "https://rust-lang.org/status",
+    "labels": {
+      "service": "rust_lang_status"
+    }
+  },
+  {
+    "url": "https://golang.org/status",
+    "labels": {
+      "service": "golang_status"
+    }
+  },
+  {
+    "url": "https://python.org/status",
+    "labels": {
+      "service": "python_status"
+    }
+  },
+  {
+    "url": "https://nodejs.org/status",
+    "labels": {
+      "service": "nodejs_status"
+    }
+  },
+  {
+    "url": "https://php.net/status",
+    "labels": {
+      "service": "php_status"
+    }
+  },
+  {
+    "url": "https://ruby-lang.org/status",
+    "labels": {
+      "service": "ruby_lang_status"
+    }
+  },
+  {
+    "url": "https://swift.org/status",
+    "labels": {
+      "service": "swift_status"
+    }
+  },
+  {
+    "url": "https://kotlinlang.org/status",
+    "labels": {
+      "service": "kotlinlang_status"
+    }
+  },
+  {
+    "url": "https://typescriptlang.org/status",
+    "labels": {
+      "service": "typescriptlang_status"
+    }
+  },
+  {
+    "url": "https://dart.dev/status",
+    "labels": {
+      "service": "dart_status"
+    }
+  },
+  {
+    "url": "https://flutter.dev/status",
+    "labels": {
+      "service": "flutter_status"
+    }
+  },
+  {
+    "url": "https://reactjs.org/status",
+    "labels": {
+      "service": "reactjs_status"
+    }
+  },
+  {
+    "url": "https://vuejs.org/status",
+    "labels": {
+      "service": "vuejs_status"
+    }
+  },
+  {
+    "url": "https://angular.io/status",
+    "labels": {
+      "service": "angular_status"
+    }
+  },
+  {
+    "url": "https://svelte.dev/status",
+    "labels": {
+      "service": "svelte_status"
+    }
+  },
+  {
+    "url": "https://nextjs.org/status",
+    "labels": {
+      "service": "nextjs_status"
+    }
+  },
+  {
+    "url": "https://nuxt.com/status",
+    "labels": {
+      "service": "nuxt_status"
+    }
+  },
+  {
+    "url": "https://remix.run/status",
+    "labels": {
+      "service": "remix_status"
+    }
+  },
+  {
+    "url": "https://astro.build/status",
+    "labels": {
+      "service": "astro_status"
+    }
+  },
+  {
+    "url": "https://tailwindcss.com/status",
+    "labels": {
+      "service": "tailwindcss_status"
+    }
+  },
+  {
+    "url": "https://getbootstrap.com/status",
+    "labels": {
+      "service": "getbootstrap_status"
+    }
+  },
+  {
+    "url": "https://chakra-ui.com/status",
+    "labels": {
+      "service": "chakra_ui_status"
+    }
+  },
+  {
+    "url": "https://deno.land/status",
+    "labels": {
+      "service": "deno_status"
+    }
+  },
+  {
+    "url": "https://bun.sh/status",
+    "labels": {
+      "service": "bun_status"
+    }
+  },
+  {
+    "url": "https://vitejs.dev/status",
+    "labels": {
+      "service": "vitejs_status"
+    }
+  },
+  {
+    "url": "https://webpack.js.org/status",
+    "labels": {
+      "service": "webpack_status"
+    }
+  },
+  {
+    "url": "https://rollupjs.org/status",
+    "labels": {
+      "service": "rollupjs_status"
+    }
+  },
+  {
+    "url": "https://turbo.build/status",
+    "labels": {
+      "service": "turbo_status"
+    }
+  },
+  {
+    "url": "https://nx.dev/status",
+    "labels": {
+      "service": "nx_status"
+    }
+  },
+  {
+    "url": "https://pnpm.io/status",
+    "labels": {
+      "service": "pnpm_status"
+    }
+  },
+  {
+    "url": "https://yarnpkg.com/status",
+    "labels": {
+      "service": "yarnpkg_status"
+    }
+  },
+  {
+    "url": "https://brew.sh/status",
+    "labels": {
+      "service": "brew_status"
+    }
+  },
+  {
+    "url": "https://ubuntu.com/status",
+    "labels": {
+      "service": "ubuntu_status"
+    }
+  },
+  {
+    "url": "https://debian.org/status",
+    "labels": {
+      "service": "debian_status"
+    }
+  },
+  {
+    "url": "https://fedoraproject.org/status",
+    "labels": {
+      "service": "fedoraproject_status"
+    }
+  },
+  {
+    "url": "https://archlinux.org/status",
+    "labels": {
+      "service": "archlinux_status"
+    }
+  },
+  {
+    "url": "https://nixos.org/status",
+    "labels": {
+      "service": "nixos_status"
+    }
+  },
+  {
+    "url": "https://freebsd.org/status",
+    "labels": {
+      "service": "freebsd_status"
+    }
+  },
+  {
+    "url": "https://openbsd.org/status",
+    "labels": {
+      "service": "openbsd_status"
+    }
+  },
+  {
+    "url": "https://alpinelinux.org/status",
+    "labels": {
+      "service": "alpinelinux_status"
+    }
+  },
+  {
+    "url": "https://rockylinux.org/status",
+    "labels": {
+      "service": "rockylinux_status"
+    }
+  },
+  {
+    "url": "https://almalinux.org/status",
+    "labels": {
+      "service": "almalinux_status"
+    }
+  },
+  {
+    "url": "https://redhat.com/status",
+    "labels": {
+      "service": "redhat_status"
+    }
+  },
+  {
+    "url": "https://suse.com/status",
+    "labels": {
+      "service": "suse_status"
+    }
+  },
+  {
+    "url": "https://vmware.com/status",
+    "labels": {
+      "service": "vmware_status"
+    }
+  },
+  {
+    "url": "https://proxmox.com/status",
+    "labels": {
+      "service": "proxmox_status"
+    }
+  },
+  {
+    "url": "https://synology.com/status",
+    "labels": {
+      "service": "synology_status"
+    }
+  },
+  {
+    "url": "https://ubnt.com/status",
+    "labels": {
+      "service": "ubnt_status"
+    }
+  },
+  {
+    "url": "https://cisco.com/status",
+    "labels": {
+      "service": "cisco_status"
+    }
+  },
+  {
+    "url": "https://akamai.com/status",
+    "labels": {
+      "service": "akamai_status"
+    }
+  },
+  {
+    "url": "https://fastly.com/status",
+    "labels": {
+      "service": "fastly_status"
+    }
+  },
+  {
+    "url": "https://jsdelivr.com/status",
+    "labels": {
+      "service": "jsdelivr_status"
+    }
+  },
+  {
+    "url": "https://unpkg.com/status",
+    "labels": {
+      "service": "unpkg_status"
+    }
+  },
+  {
+    "url": "https://cdnjs.com/status",
+    "labels": {
+      "service": "cdnjs_status"
+    }
+  },
+  {
+    "url": "https://vultr.com/status",
+    "labels": {
+      "service": "vultr_status"
+    }
+  },
+  {
+    "url": "https://linode.com/status",
+    "labels": {
+      "service": "linode_status"
+    }
+  },
+  {
+    "url": "https://hetzner.com/status",
+    "labels": {
+      "service": "hetzner_status"
+    }
+  },
+  {
+    "url": "https://ovhcloud.com/status",
+    "labels": {
+      "service": "ovhcloud_status"
+    }
+  },
+  {
+    "url": "https://scaleway.com/status",
+    "labels": {
+      "service": "scaleway_status"
+    }
+  },
+  {
+    "url": "https://contabo.com/status",
+    "labels": {
+      "service": "contabo_status"
+    }
+  },
+  {
+    "url": "https://upcloud.com/status",
+    "labels": {
+      "service": "upcloud_status"
+    }
+  },
+  {
+    "url": "https://hostinger.com/status",
+    "labels": {
+      "service": "hostinger_status"
+    }
+  },
+  {
+    "url": "https://bluehost.com/status",
+    "labels": {
+      "service": "bluehost_status"
+    }
+  },
+  {
+    "url": "https://godaddy.com/status",
+    "labels": {
+      "service": "godaddy_status"
+    }
+  },
+  {
+    "url": "https://namecheap.com/status",
+    "labels": {
+      "service": "namecheap_status"
+    }
+  },
+  {
+    "url": "https://hover.com/status",
+    "labels": {
+      "service": "hover_status"
+    }
+  },
+  {
+    "url": "https://porkbun.com/status",
+    "labels": {
+      "service": "porkbun_status"
+    }
+  },
+  {
+    "url": "https://cloudns.net/status",
+    "labels": {
+      "service": "cloudns_status"
+    }
+  },
+  {
+    "url": "https://easydns.com/status",
+    "labels": {
+      "service": "easydns_status"
+    }
+  },
+  {
+    "url": "https://sentry.io/status",
+    "labels": {
+      "service": "sentry_status"
+    }
+  },
+  {
+    "url": "https://launchdarkly.com/status",
+    "labels": {
+      "service": "launchdarkly_status"
+    }
+  },
+  {
+    "url": "https://segment.com/status",
+    "labels": {
+      "service": "segment_status"
+    }
+  },
+  {
+    "url": "https://amplitude.com/status",
+    "labels": {
+      "service": "amplitude_status"
+    }
+  },
+  {
+    "url": "https://mixpanel.com/status",
+    "labels": {
+      "service": "mixpanel_status"
+    }
+  },
+  {
+    "url": "https://heap.io/status",
+    "labels": {
+      "service": "heap_status"
+    }
+  },
+  {
+    "url": "https://hotjar.com/status",
+    "labels": {
+      "service": "hotjar_status"
+    }
+  },
+  {
+    "url": "https://fullstory.com/status",
+    "labels": {
+      "service": "fullstory_status"
+    }
+  },
+  {
+    "url": "https://logrocket.com/status",
+    "labels": {
+      "service": "logrocket_status"
+    }
+  },
+  {
+    "url": "https://bugsnag.com/status",
+    "labels": {
+      "service": "bugsnag_status"
+    }
+  },
+  {
+    "url": "https://rollbar.com/status",
+    "labels": {
+      "service": "rollbar_status"
+    }
+  },
+  {
+    "url": "https://airbrake.io/status",
+    "labels": {
+      "service": "airbrake_status"
+    }
+  },
+  {
+    "url": "https://honeybadger.io/status",
+    "labels": {
+      "service": "honeybadger_status"
+    }
+  },
+  {
+    "url": "https://google.com",
+    "labels": {
+      "service": "google"
+    }
+  },
+  {
+    "url": "https://github.com",
+    "labels": {
+      "service": "github"
+    }
+  },
+  {
+    "url": "https://microsoft.com",
+    "labels": {
+      "service": "microsoft"
+    }
+  },
+  {
+    "url": "https://apple.com",
+    "labels": {
+      "service": "apple"
+    }
+  },
+  {
+    "url": "https://amazon.com",
+    "labels": {
+      "service": "amazon"
+    }
+  },
+  {
+    "url": "https://facebook.com",
+    "labels": {
+      "service": "facebook"
+    }
+  },
+  {
+    "url": "https://twitter.com",
+    "labels": {
+      "service": "twitter"
+    }
+  },
+  {
+    "url": "https://linkedin.com",
+    "labels": {
+      "service": "linkedin"
+    }
+  },
+  {
+    "url": "https://instagram.com",
+    "labels": {
+      "service": "instagram"
+    }
+  },
+  {
+    "url": "https://youtube.com",
+    "labels": {
+      "service": "youtube"
+    }
+  },
+  {
+    "url": "https://netflix.com",
+    "labels": {
+      "service": "netflix"
+    }
+  },
+  {
+    "url": "https://spotify.com",
+    "labels": {
+      "service": "spotify"
+    }
+  },
+  {
+    "url": "https://reddit.com",
+    "labels": {
+      "service": "reddit"
+    }
+  },
+  {
+    "url": "https://wikipedia.org",
+    "labels": {
+      "service": "wikipedia"
+    }
+  },
+  {
+    "url": "https://cloudflare.com",
+    "labels": {
+      "service": "cloudflare"
+    }
+  },
+  {
+    "url": "https://digitalocean.com",
+    "labels": {
+      "service": "digitalocean"
+    }
+  },
+  {
+    "url": "https://heroku.com",
+    "labels": {
+      "service": "heroku"
+    }
+  },
+  {
+    "url": "https://vercel.com",
+    "labels": {
+      "service": "vercel"
+    }
+  },
+  {
+    "url": "https://netlify.com",
+    "labels": {
+      "service": "netlify"
+    }
+  },
+  {
+    "url": "https://docker.com",
+    "labels": {
+      "service": "docker"
+    }
+  },
+  {
+    "url": "https://kubernetes.io",
+    "labels": {
+      "service": "kubernetes"
+    }
+  },
+  {
+    "url": "https://terraform.io",
+    "labels": {
+      "service": "terraform"
+    }
+  },
+  {
+    "url": "https://ansible.com",
+    "labels": {
+      "service": "ansible"
+    }
+  },
+  {
+    "url": "https://jenkins.io",
+    "labels": {
+      "service": "jenkins"
+    }
+  },
+  {
+    "url": "https://gitlab.com",
+    "labels": {
+      "service": "gitlab"
+    }
+  },
+  {
+    "url": "https://bitbucket.org",
+    "labels": {
+      "service": "bitbucket"
+    }
+  },
+  {
+    "url": "https://stackoverflow.com",
+    "labels": {
+      "service": "stackoverflow"
+    }
+  },
+  {
+    "url": "https://medium.com",
+    "labels": {
+      "service": "medium"
+    }
+  },
+  {
+    "url": "https://dev.to",
+    "labels": {
+      "service": "dev"
+    }
+  },
+  {
+    "url": "https://producthunt.com",
+    "labels": {
+      "service": "producthunt"
+    }
+  },
+  {
+    "url": "https://dribbble.com",
+    "labels": {
+      "service": "dribbble"
+    }
+  },
+  {
+    "url": "https://behance.net",
+    "labels": {
+      "service": "behance"
+    }
+  },
+  {
+    "url": "https://figma.com",
+    "labels": {
+      "service": "figma"
+    }
+  },
+  {
+    "url": "https://canva.com",
+    "labels": {
+      "service": "canva"
+    }
+  },
+  {
+    "url": "https://notion.so",
+    "labels": {
+      "service": "notion"
+    }
+  },
+  {
+    "url": "https://slack.com",
+    "labels": {
+      "service": "slack"
+    }
+  },
+  {
+    "url": "https://discord.com",
+    "labels": {
+      "service": "discord"
+    }
+  },
+  {
+    "url": "https://zoom.us",
+    "labels": {
+      "service": "zoom"
+    }
+  },
+  {
+    "url": "https://dropbox.com",
+    "labels": {
+      "service": "dropbox"
+    }
+  },
+  {
+    "url": "https://box.com",
+    "labels": {
+      "service": "box"
+    }
+  },
+  {
+    "url": "https://icloud.com",
+    "labels": {
+      "service": "icloud"
+    }
+  },
+  {
+    "url": "https://stripe.com",
+    "labels": {
+      "service": "stripe"
+    }
+  },
+  {
+    "url": "https://paypal.com",
+    "labels": {
+      "service": "paypal"
+    }
+  },
+  {
+    "url": "https://shopify.com",
+    "labels": {
+      "service": "shopify"
+    }
+  },
+  {
+    "url": "https://wix.com",
+    "labels": {
+      "service": "wix"
+    }
+  },
+  {
+    "url": "https://squarespace.com",
+    "labels": {
+      "service": "squarespace"
+    }
+  },
+  {
+    "url": "https://wordpress.com",
+    "labels": {
+      "service": "wordpress"
+    }
+  },
+  {
+    "url": "https://blogger.com",
+    "labels": {
+      "service": "blogger"
+    }
+  },
+  {
+    "url": "https://tumblr.com",
+    "labels": {
+      "service": "tumblr"
+    }
+  },
+  {
+    "url": "https://pinterest.com",
+    "labels": {
+      "service": "pinterest"
+    }
+  },
+  {
+    "url": "https://tiktok.com",
+    "labels": {
+      "service": "tiktok"
+    }
+  },
+  {
+    "url": "https://snapchat.com",
+    "labels": {
+      "service": "snapchat"
+    }
+  },
+  {
+    "url": "https://whatsapp.com",
+    "labels": {
+      "service": "whatsapp"
+    }
+  },
+  {
+    "url": "https://telegram.org",
+    "labels": {
+      "service": "telegram"
+    }
+  },
+  {
+    "url": "https://signal.org",
+    "labels": {
+      "service": "signal"
+    }
+  },
+  {
+    "url": "https://proton.me",
+    "labels": {
+      "service": "proton"
+    }
+  },
+  {
+    "url": "https://fastmail.com",
+    "labels": {
+      "service": "fastmail"
+    }
+  },
+  {
+    "url": "https://mailchimp.com",
+    "labels": {
+      "service": "mailchimp"
+    }
+  },
+  {
+    "url": "https://sendgrid.com",
+    "labels": {
+      "service": "sendgrid"
+    }
+  },
+  {
+    "url": "https://twilio.com",
+    "labels": {
+      "service": "twilio"
+    }
+  },
+  {
+    "url": "https://auth0.com",
+    "labels": {
+      "service": "auth0"
+    }
+  },
+  {
+    "url": "https://okta.com",
+    "labels": {
+      "service": "okta"
+    }
+  },
+  {
+    "url": "https://datadog.com",
+    "labels": {
+      "service": "datadog"
+    }
+  },
+  {
+    "url": "https://newrelic.com",
+    "labels": {
+      "service": "newrelic"
+    }
+  },
+  {
+    "url": "https://splunk.com",
+    "labels": {
+      "service": "splunk"
+    }
+  },
+  {
+    "url": "https://elastic.co",
+    "labels": {
+      "service": "elastic"
+    }
+  },
+  {
+    "url": "https://mongodb.com",
+    "labels": {
+      "service": "mongodb"
+    }
+  },
+  {
+    "url": "https://postgresql.org",
+    "labels": {
+      "service": "postgresql"
+    }
+  },
+  {
+    "url": "https://mysql.com",
+    "labels": {
+      "service": "mysql"
+    }
+  },
+  {
+    "url": "https://redis.io",
+    "labels": {
+      "service": "redis"
+    }
+  },
+  {
+    "url": "https://memcached.org",
+    "labels": {
+      "service": "memcached"
+    }
+  },
+  {
+    "url": "https://rabbitmq.com",
+    "labels": {
+      "service": "rabbitmq"
+    }
+  },
+  {
+    "url": "https://nginx.org",
+    "labels": {
+      "service": "nginx"
+    }
+  },
+  {
+    "url": "https://apache.org",
+    "labels": {
+      "service": "apache"
+    }
+  },
+  {
+    "url": "https://prometheus.io",
+    "labels": {
+      "service": "prometheus"
+    }
+  }
+]

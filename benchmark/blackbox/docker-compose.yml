@@ -1,0 +1,102 @@
+services:
+  zookoo:
+    build:
+      context: ../..
+      dockerfile: .docker/alpine.dockerfile
+    container_name: zookoo-benchmark
+    volumes:
+      - ./config.hcl:/config/config.hcl:ro
+      - ./targets-1000.json:/config/targets.json:ro
+    command: ["/app/zookoo", "--config", "/config/config.hcl"]
+    depends_on:
+      - prometheus
+    networks:
+      - benchmark-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-benchmark
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-remote-write-receiver'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - benchmark-net
+
+  blackbox:
+    image: prom/blackbox-exporter:latest
+    container_name: blackbox-benchmark
+    command:
+      - '--config.file=/etc/blackbox/blackbox.yml'
+    volumes:
+      - ./blackbox.yml:/etc/blackbox/blackbox.yml:ro
+    ports:
+      - "9115:9115"
+    networks:
+      - benchmark-net
+
+  otel:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-benchmark
+    command:
+      - '--config=/etc/otel/config.yaml'
+    volumes:
+      - ./opentelemetry.yml:/etc/otel/config.yaml:ro
+      - ./targets-1000.json:/etc/otel/blackbox-targets.json:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8889:8889"   # Prometheus exporter
+    depends_on:
+      - blackbox
+      - prometheus
+    networks:
+      - benchmark-net
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor-benchmark
+    privileged: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - benchmark-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-benchmark
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_JSON_ENABLED=true
+      - GF_DASHBOARDS_JSON_PATH=/var/lib/grafana/dashboards
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - benchmark-net
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  benchmark-net:
+    driver: bridge

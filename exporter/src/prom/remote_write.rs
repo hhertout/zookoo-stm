@@ -135,23 +135,10 @@ impl PrometheusRemoteWrite {
         let mut timeseries = Vec::new();
 
         for (metric_name, value, labels) in metrics {
-            let mut time_series_labels = vec![
-                Label { name: "__name__".to_string(), value: metric_name },
-                Label { name: "job".to_string(), value: self.config.job.clone() },
-            ];
+            let mut time_series_labels =
+                vec![Label { name: "__name__".to_string(), value: metric_name }];
 
-            // Add instance if configured
-            if let Some(instance) = &self.config.instance {
-                time_series_labels
-                    .push(Label { name: "instance".to_string(), value: instance.clone() });
-            }
-
-            // Add extra labels from config
-            for (key, val) in &self.config.extra_labels {
-                time_series_labels.push(Label { name: key.clone(), value: val.clone() });
-            }
-
-            // Add metric-specific labels
+            // Add metric-specific labels (which already contain job, instance, etc.)
             for (key, val) in labels {
                 time_series_labels.push(Label { name: key, value: val });
             }
