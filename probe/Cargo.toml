@@ -7,21 +7,30 @@ edition = "2024"
 configuration = { path = "../configuration" }
 discovery = { path = "../discovery" }
 tokio = { version = "1.45.1", features = ["full"] }
-openssl = "0.10.73"
 log = "0.4.27"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 futures = "0.3.31"
-reqwest = { version = "0.12.20", features = ["json", "native-tls"] }
-ping = "0.7.0"
-native-tls = "0.2.14"
-tokio-native-tls = "0.3.1"
 chrono = "0.4.41"
 url = "2.5.4"
+
+# OpenTelemetry for tracing
 opentelemetry = { version = "0.31.0", features = ["internal-logs"] }
 opentelemetry_sdk = { version = "0.31.0", features = ["internal-logs"] }
 opentelemetry-stdout = { version = "0.31.0", features = ["trace"] }
 opentelemetry-otlp = { version = "0.31.0", features = ["grpc-tonic", "tls", "internal-logs"] }
-sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# HTTP client low-level stack
+hyper = { version = "1", features = ["client", "http1", "http2"] }
+hyper-util = { version = "0.1", features = ["client", "client-legacy", "tokio", "http1", "http2"] }
+http-body-util = "0.1"
+tokio-rustls = "0.26"
+rustls = { version = "0.23", default-features = false, features = ["std", "tls12"] }
+rustls-pki-types = "1.13"
+webpki-roots = "1.0.4"
+hickory-resolver = "0.25"
+x509-parser = "0.18"
+bytes = "1.11"
+base64 = "0.22"

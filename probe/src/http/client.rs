@@ -1,0 +1,311 @@
+//! Low-level HTTP Client
+//!
+//! Performs HTTP requests with phase-by-phase timing using hyper.
+//! Measures DNS, TCP connect, TLS handshake, TTFB, and content transfer separately.
+
+use std::collections::HashMap;
+use std::net::SocketAddr;
+use std::time::{Duration, Instant};
+
+use base64::Engine;
+use bytes::Bytes;
+use http_body_util::{BodyExt, Empty};
+use hyper::header::{AUTHORIZATION, HOST};
+use hyper::{Method, Request};
+use hyper_util::rt::TokioIo;
+use opentelemetry::Context;
+use opentelemetry::trace::{Span, TraceContextExt};
+use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::net::TcpStream;
+
+use super::metrics::HttpProbeMetrics;
+use super::resolver::{DnsResolver, extract_host, extract_port};
+use super::tls::TlsHandler;
+use crate::observability::get_empty_attributes;
+
+/// HTTP request configuration
+#[derive(Debug, Clone)]
+pub struct HttpRequestConfig {
+    pub url: String,
+    pub method: String,
+    pub headers: Option<HashMap<String, String>>,
+    pub expected_status_code: u16,
+    pub timeout_sec: u16,
+    pub skip_tls: bool,
+    pub follow_redirect: bool,
+    pub auth: Option<AuthConfig>,
+}
+
+#[derive(Debug, Clone)]
+pub struct AuthConfig {
+    pub username: Option<String>,
+    pub password: Option<String>,
+    pub bearer: Option<String>,
+}
+
+/// Low-level HTTP client with phase timing
+pub struct HttpClient {
+    resolver: DnsResolver,
+}
+
+impl HttpClient {
+    pub fn new() -> Self {
+        crate::span!("http_client_new".to_string(), get_empty_attributes());
+        Self { resolver: DnsResolver::new() }
+    }
+
+    /// Execute an HTTP request with full phase timing
+    pub async fn execute(&self, config: &HttpRequestConfig) -> HttpProbeMetrics {
+        let mut attr = HashMap::new();
+        attr.insert("url", config.url.clone());
+        attr.insert("method", config.method.clone());
+        let _ctx = crate::span!("http_client_execute".to_string(), attr);
+
+        let total_start = Instant::now();
+        let mut metrics = HttpProbeMetrics::new();
+
+        // Parse URL components
+        let host = match extract_host(&config.url) {
+            Ok(h) => h,
+            Err(e) => {
+                log::error!("event=error msg=invalid_url url={} err={}", config.url, e);
+                return metrics;
+            }
+        };
+
+        let port = match extract_port(&config.url) {
+            Ok(p) => p,
+            Err(e) => {
+                log::error!("event=error msg=invalid_port url={} err={}", config.url, e);
+                return metrics;
+            }
+        };
+
+        let is_https = config.url.starts_with("https://");
+
+        // === Phase 1: DNS Resolution ===
+        let mut dns_attr = HashMap::new();
+        dns_attr.insert("host", host.clone());
+        let _dns_ctx =
+            crate::child_span!(Context::current(), "dns_resolution".to_string(), dns_attr);
+
+        let (ip_addr, dns_duration) = match self.resolver.resolve_first_ipv4(&host).await {
+            Ok((ip, dur)) => (ip, dur),
+            Err(e) => {
+                log::error!("event=error msg=dns_failed host={} err={}", host, e);
+                metrics.dns_duration = total_start.elapsed();
+                return metrics;
+            }
+        };
+        metrics.dns_duration = dns_duration;
+        metrics.resolved_ip = Some(ip_addr.to_string());
+
+        // === Phase 2: TCP Connect ===
+        let mut tcp_attr = HashMap::new();
+        tcp_attr.insert("ip", ip_addr.to_string());
+        tcp_attr.insert("port", port.to_string());
+        let _tcp_ctx = crate::child_span!(Context::current(), "tcp_connect".to_string(), tcp_attr);
+
+        let tcp_start = Instant::now();
+        let socket_addr = SocketAddr::new(ip_addr, port);
+
+        let tcp_stream = match tokio::time::timeout(
+            Duration::from_secs(config.timeout_sec as u64),
+            TcpStream::connect(socket_addr),
+        )
+        .await
+        {
+            Ok(Ok(stream)) => stream,
+            Ok(Err(e)) => {
+                log::error!("event=error msg=tcp_connect_failed addr={} err={}", socket_addr, e);
+                metrics.tcp_connect_duration = tcp_start.elapsed();
+                return metrics;
+            }
+            Err(_) => {
+                log::error!("event=error msg=tcp_connect_timeout addr={}", socket_addr);
+                metrics.tcp_connect_duration = tcp_start.elapsed();
+                return metrics;
+            }
+        };
+        metrics.tcp_connect_duration = tcp_start.elapsed();
+        metrics.up = true; // TCP connection succeeded
+
+        // === Phase 3: TLS Handshake (if HTTPS) ===
+        if is_https {
+            let mut tls_attr = HashMap::new();
+            tls_attr.insert("host", host.clone());
+            tls_attr.insert("skip_verify", config.skip_tls.to_string());
+            let _tls_ctx =
+                crate::child_span!(Context::current(), "tls_handshake".to_string(), tls_attr);
+
+            let tls_handler = match TlsHandler::new(config.skip_tls) {
+                Ok(h) => h,
+                Err(e) => {
+                    log::error!("event=error msg=tls_init_failed err={}", e);
+                    return metrics;
+                }
+            };
+
+            let tls_result = match tls_handler.handshake(tcp_stream, &host).await {
+                Ok(r) => r,
+                Err(e) => {
+                    log::error!("event=error msg=tls_handshake_failed host={} err={}", host, e);
+                    return metrics;
+                }
+            };
+
+            metrics.tls_handshake_duration = Some(tls_result.handshake_duration);
+            metrics.tls_version = Some(tls_result.cert_info.tls_version);
+            metrics.cert_expiration_ts = tls_result.cert_info.not_after;
+            metrics.cert_begin_ts = tls_result.cert_info.not_before;
+            metrics.cert_issuer = tls_result.cert_info.issuer;
+            metrics.cert_subject = tls_result.cert_info.subject;
+
+            // Execute HTTP request over TLS
+            self.execute_http_request(TokioIo::new(tls_result.stream), config, &host, &mut metrics)
+                .await;
+        } else {
+            // Execute HTTP request over plain TCP
+            self.execute_http_request(TokioIo::new(tcp_stream), config, &host, &mut metrics).await;
+        }
+
+        metrics.total_duration = total_start.elapsed();
+        metrics
+    }
+
+    /// Execute the HTTP request and measure TTFB + content transfer
+    async fn execute_http_request<S>(
+        &self,
+        io: TokioIo<S>,
+        config: &HttpRequestConfig,
+        host: &str,
+        metrics: &mut HttpProbeMetrics,
+    ) where
+        S: AsyncRead + AsyncWrite + Unpin + Send + 'static,
+    {
+        let mut attr = HashMap::new();
+        attr.insert("host", host.to_string());
+        attr.insert("method", config.method.clone());
+        let _ctx = crate::child_span!(Context::current(), "http_request".to_string(), attr);
+
+        let ttfb_start = Instant::now();
+
+        // Build HTTP connection
+        let (mut sender, conn) = match hyper::client::conn::http1::handshake(io).await {
+            Ok(r) => r,
+            Err(e) => {
+                log::error!("event=error msg=http_handshake_failed err={}", e);
+                return;
+            }
+        };
+
+        // Spawn connection driver
+        tokio::spawn(async move {
+            if let Err(e) = conn.await {
+                log::error!("event=error msg=http_connection_error err={}", e);
+            }
+        });
+
+        // Build request
+        let method = match config.method.to_uppercase().as_str() {
+            "GET" => Method::GET,
+            "POST" => Method::POST,
+            "PUT" => Method::PUT,
+            "DELETE" => Method::DELETE,
+            "HEAD" => Method::HEAD,
+            "OPTIONS" => Method::OPTIONS,
+            "PATCH" => Method::PATCH,
+            _ => Method::GET,
+        };
+
+        let uri = match config.url.parse::<hyper::Uri>() {
+            Ok(u) => u,
+            Err(e) => {
+                log::error!("event=error msg=invalid_uri url={} err={}", config.url, e);
+                return;
+            }
+        };
+
+        let path_and_query = uri.path_and_query().map(|p| p.as_str()).unwrap_or("/");
+
+        let mut req_builder =
+            Request::builder().method(method).uri(path_and_query).header(HOST, host);
+
+        // Add custom headers
+        if let Some(headers) = &config.headers {
+            for (key, value) in headers {
+                req_builder = req_builder.header(key.as_str(), value.as_str());
+            }
+        }
+
+        // Add authentication
+        if let Some(auth) = &config.auth {
+            if let Some(bearer) = &auth.bearer {
+                req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", bearer));
+            } else if let (Some(user), Some(pass)) = (&auth.username, &auth.password) {
+                let credentials =
+                    base64::engine::general_purpose::STANDARD.encode(format!("{}:{}", user, pass));
+                req_builder = req_builder.header(AUTHORIZATION, format!("Basic {}", credentials));
+            }
+        }
+
+        let request = match req_builder.body(Empty::<Bytes>::new()) {
+            Ok(r) => r,
+            Err(e) => {
+                log::error!("event=error msg=request_build_failed err={}", e);
+                return;
+            }
+        };
+
+        // Send request and wait for response headers
+        let response = match sender.send_request(request).await {
+            Ok(r) => r,
+            Err(e) => {
+                log::error!("event=error msg=request_failed err={}", e);
+                return;
+            }
+        };
+
+        metrics.time_to_first_byte = ttfb_start.elapsed();
+        metrics.status_code = response.status().as_u16();
+        metrics.http_version = format!("{:?}", response.version());
+
+        // Get content length if available
+        metrics.content_length = response
+            .headers()
+            .get(hyper::header::CONTENT_LENGTH)
+            .and_then(|v| v.to_str().ok())
+            .and_then(|s| s.parse().ok());
+
+        // === Phase 5: Content Transfer ===
+        let _content_ctx = crate::child_span!(
+            Context::current(),
+            "content_transfer".to_string(),
+            get_empty_attributes()
+        );
+        let content_start = Instant::now();
+
+        // Consume the body
+        let body = response.into_body();
+        if let Err(e) = body.collect().await {
+            log::warn!("event=warning msg=body_read_error err={}", e);
+        }
+
+        metrics.content_transfer_duration = content_start.elapsed();
+
+        // Check if probe is successful
+        metrics.success = metrics.status_code == config.expected_status_code;
+    }
+}
+
+impl Default for HttpClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Clone for HttpClient {
+    fn clone(&self) -> Self {
+        Self { resolver: self.resolver.clone() }
+    }
+}

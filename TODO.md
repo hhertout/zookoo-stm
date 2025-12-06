@@ -12,6 +12,7 @@
 
   - TCP connect probe
   - UDP probe
+  - DNS probe
 
 - Defaults:
 
@@ -28,7 +29,7 @@
   - Skip tls option on requests
 
 - Discovery:
-  - Discovery API http targets
+  - Discovery API http targets (important)
 
 - Exporter:
   - Kafka exporter

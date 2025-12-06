@@ -12,6 +12,9 @@ pub struct HttpMetricsParams {
     pub up: u8,
     pub success: u8,
     pub dns_lookup_duration: u128,
+    pub tcp_connect_duration: u128,
+    pub time_to_first_byte: u128,
+    pub content_transfer_duration: u128,
     pub http_status_code: u16,
     pub http_request_duration: u128,
     pub http_tls_lookup_duration: Option<u128>,
@@ -94,6 +97,57 @@ impl MetricsExporter {
             Some(String::from("ms")),
             String::from("dns lookup duration repartition"),
             params.dns_lookup_duration as f64,
+            &labels,
+        );
+
+        // TCP connect duration
+        self.set_gauge_metrics(
+            format!("{}tcp_connect_duration", self.prefix),
+            Some(String::from("ms")),
+            String::from("tcp connect duration"),
+            params.tcp_connect_duration as u64,
+            &labels,
+        );
+
+        self.record_histogram(
+            format!("{}tcp_connect_duration", self.prefix),
+            Some(String::from("ms")),
+            String::from("tcp connect duration repartition"),
+            params.tcp_connect_duration as f64,
+            &labels,
+        );
+
+        // Time to first byte (TTFB)
+        self.set_gauge_metrics(
+            format!("{}time_to_first_byte", self.prefix),
+            Some(String::from("ms")),
+            String::from("time to first byte"),
+            params.time_to_first_byte as u64,
+            &labels,
+        );
+
+        self.record_histogram(
+            format!("{}time_to_first_byte", self.prefix),
+            Some(String::from("ms")),
+            String::from("time to first byte repartition"),
+            params.time_to_first_byte as f64,
+            &labels,
+        );
+
+        // Content transfer duration
+        self.set_gauge_metrics(
+            format!("{}content_transfer_duration", self.prefix),
+            Some(String::from("ms")),
+            String::from("content transfer duration"),
+            params.content_transfer_duration as u64,
+            &labels,
+        );
+
+        self.record_histogram(
+            format!("{}content_transfer_duration", self.prefix),
+            Some(String::from("ms")),
+            String::from("content transfer duration repartition"),
+            params.content_transfer_duration as f64,
             &labels,
         );
 
