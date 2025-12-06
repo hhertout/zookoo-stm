@@ -8,17 +8,22 @@ For configuration of Zookoo, you need to create a configuration file where you w
 
 This is a simple configuration file to scrape a single target.
 
-```toml
-# config.toml
+```hcl
+# config.hcl
+defaults {
+    log_level = "info"
+}
 
-[defaults]
-log_level = "info"
+exporter "otel" "otlp" {
+    url = "http://localhost:4317"
+}
 
-[exporter.otel]
-url = "http://localhost:4317"
-
-[http]
-targets = [
-    { url = "https://google.com/", labels = { "env" = "test", "service_name" = "google" }, scrap_interval = "10s" },
-]
+probe "http" "default" {
+    targets = [
+        { 
+            url = "https://google.com/", 
+            labels = { "env" = "test", "service_name" = "google" }, scrap_interval = "10s"
+        }
+    ]
+}
 ```

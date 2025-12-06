@@ -7,7 +7,7 @@ sidebar_position: 2
 The easiest way to test Zookoo is to run it with docker
 
 ```bash
-docker run neryo/zookoo:latest -v ./config.toml:/etc/zookoo/config.toml
+docker run neryo/zookoo:latest -v ./config.toml:/etc/zookoo/config.hcl
 ```
 
 or with a docker compose file
@@ -17,7 +17,7 @@ services:
   zoukouzoukou:
     image: neryo/zookoo:latest
     volumes:
-      - ./config.toml:/etc/zookoo/config.toml
+      - ./config.hcl:/etc/zookoo/config.hcl
     ports:
       - 12345:12345
 ```
