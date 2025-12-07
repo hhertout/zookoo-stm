@@ -1,3 +1,4 @@
+use core::panic;
 use std::{fmt::Debug, sync::Arc, time::Duration};
 
 use async_trait::async_trait;
@@ -213,7 +214,7 @@ impl PipelineBuilder {
                     label,
                     target_from
                 );
-                return pipelines;
+                panic!("Could not resolve target_from: {}", target_from);
             }
         } else if let Some(ref targets) = http_config.targets {
             targets.clone()

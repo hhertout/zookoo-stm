@@ -15,11 +15,14 @@ use opentelemetry_sdk::{Resource, metrics::SdkMeterProvider};
 use crate::config::OtelGrpcExporterConfiguration;
 use std::fs;
 
+pub mod exporter;
 pub mod metrics;
-pub mod otel_exporter;
 
 #[cfg(test)]
 mod metrics_tests;
+
+#[cfg(test)]
+mod exporter_tests;
 
 pub enum AuthHeader {
     Bearer(String),
@@ -48,7 +51,7 @@ fn get_resource() -> Resource {
 }
 
 pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterProvider {
-    log::warn!("sending otel metrics with grpc to '{}' endpoint", config.url);
+    log::info!("event=init_otel_exporter endpoint={}", config.url);
 
     let mut builder = MetricExporter::builder().with_tonic().with_endpoint(config.url.clone());
 

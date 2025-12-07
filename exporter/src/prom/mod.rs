@@ -7,5 +7,8 @@ mod remote_write_tests;
 #[cfg(test)]
 mod metrics_tests;
 
+#[cfg(test)]
+mod exporter_tests;
+
 pub use metrics::PrometheusRemoteWriteExporter;
 pub use remote_write::{PrometheusRemoteWrite, PrometheusRemoteWriteConfig};

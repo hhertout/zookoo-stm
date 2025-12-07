@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::net::{TcpStream, ToSocketAddrs};
+use std::time::Duration;
 
 use opentelemetry::global;
 use opentelemetry::trace::{Span, SpanKind, TraceContextExt, Tracer};
@@ -8,6 +10,7 @@ use opentelemetry_otlp::{MetricExporter, SpanExporter, WithExportConfig, WithTon
 use opentelemetry_sdk::Resource;
 use opentelemetry_sdk::metrics::SdkMeterProvider;
 use opentelemetry_sdk::trace::SdkTracerProvider;
+use tokio::time::sleep;
 
 pub type BoxedTracer = opentelemetry::global::BoxedTracer;
 pub type BoxedSpan = opentelemetry::global::BoxedSpan;
@@ -48,6 +51,39 @@ pub fn init_tracer_provider(
     provider
 }
 
+/// Extract host and port from an endpoint URL (e.g., "http://localhost:4317" -> ("localhost", 4317))
+fn parse_otel_endpoint(url: &str) -> Option<(String, u16)> {
+    let without_scheme =
+        url.strip_prefix("https://").or_else(|| url.strip_prefix("http://")).unwrap_or(url);
+
+    let parts: Vec<&str> = without_scheme.split('/').next()?.split(':').collect();
+
+    match parts.len() {
+        1 => Some((parts[0].to_string(), 4317)), // Default gRPC port
+        2 => {
+            let port = parts[1].parse().ok()?;
+            Some((parts[0].to_string(), port))
+        }
+        _ => None,
+    }
+}
+
+/// Check if the OTEL endpoint is reachable via TCP
+fn check_otel_endpoint_reachable(host: &str, port: u16) -> bool {
+    let addr = format!("{}:{}", host, port);
+    let timeout = Duration::from_secs(3);
+
+    // Try to resolve and connect
+    if let Ok(addrs) = addr.to_socket_addrs() {
+        for socket_addr in addrs {
+            if TcpStream::connect_timeout(&socket_addr, timeout).is_ok() {
+                return true;
+            }
+        }
+    }
+    false
+}
+
 /// Initialize the OpenTelemetry meter provider for metrics export.
 /// This function sets up the meter provider with OTLP gRPC export to the specified endpoint.
 pub fn init_meter_provider(
@@ -57,7 +93,28 @@ pub fn init_meter_provider(
     zone: Option<String>,
 ) -> SdkMeterProvider {
     use opentelemetry_sdk::metrics::PeriodicReader;
-    use std::time::Duration;
+
+    // Health check: verify endpoint is reachable
+    if let Some((host, port)) = parse_otel_endpoint(&endpoint) {
+        if check_otel_endpoint_reachable(&host, port) {
+            log::info!("event=otel_endpoint_reachable host={} port={}", host, port);
+        } else {
+            let _host = host.clone();
+            tokio::spawn(async move {
+                loop {
+                    log::error!(
+                        "event=otel_endpoint_unreachable host={} port={} msg=OTEL endpoint is not reachable. Exporting failed!",
+                        _host,
+                        port
+                    );
+
+                    sleep(Duration::from_secs(10)).await;
+                }
+            });
+        }
+    } else {
+        log::warn!("event=otel_endpoint_parse_failed url={}", endpoint);
+    }
 
     let mut builder =
         MetricExporter::builder().with_tonic().with_endpoint(format!("{}/v1/metrics", endpoint));

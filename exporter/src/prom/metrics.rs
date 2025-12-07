@@ -15,8 +15,13 @@ pub struct HttpMetricsParams {
     pub target_labels: HashMap<String, String>,
 }
 
+use configuration::model::Configuration;
+
 use super::remote_write::PrometheusRemoteWrite;
-use crate::{Exporter, MetricData};
+use crate::{
+    Exporter, ExportersMap, MetricData, config::AuthConfiguration, labels,
+    prom::PrometheusRemoteWriteConfig,
+};
 
 /// Prometheus metrics exporter that uses the remote_write API.
 /// This is similar to the OTLP MetricsExporter but for Prometheus.
@@ -79,6 +84,57 @@ impl PrometheusRemoteWriteExporter {
 }
 
 impl Exporter for PrometheusRemoteWriteExporter {
+    fn build(config: &Configuration, exporters: &mut ExportersMap) {
+        let exporter_wrapper = match config.exporter {
+            Some(ref wrapper) => wrapper,
+            None => {
+                log::info!("no exporters configured");
+                return;
+            }
+        };
+
+        for (label, prom_config) in &exporter_wrapper.prometheus_remote_write {
+            let key = format!("exporter.prometheus_remote_write.{}", label);
+            log::info!(
+                "event=create_exporter type=prometheus_remote_write key={} endpoint={}",
+                key,
+                prom_config.url
+            );
+
+            let mut override_labels: HashMap<String, String> = HashMap::new();
+            override_labels.insert("exporter".to_string(), label.clone());
+            let mut labels = labels::set_defaults_labels(&config.defaults, override_labels);
+            labels::sanitize_labels(&mut labels);
+
+            let remote_write_config = PrometheusRemoteWriteConfig {
+                url: prom_config.url.clone(),
+                auth: prom_config.auth.as_ref().map(|a| AuthConfiguration {
+                    username: a.username.clone(),
+                    password: a.password.clone(),
+                    bearer: a.bearer.clone(),
+                }),
+                job: prom_config.job.clone(),
+                instance: prom_config.instance.clone(),
+                extra_labels: labels.clone(),
+            };
+
+            match PrometheusRemoteWrite::new(remote_write_config) {
+                Ok(remote_write) => {
+                    let exporter =
+                        PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
+                    exporters.insert(key, Arc::new(exporter));
+                }
+                Err(e) => {
+                    log::error!(
+                        "event=exporter_creation_failed type=prometheus_remote_write label={} error={}",
+                        label,
+                        e
+                    );
+                }
+            }
+        }
+    }
+
     fn export(&self, probe_type: crate::ProbeType, metric_data: MetricData) {
         use crate::ProbeType;
 
