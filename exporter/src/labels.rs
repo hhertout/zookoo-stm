@@ -27,3 +27,15 @@ pub fn set_defaults_labels(
 
     labels
 }
+
+pub fn sanitize_labels(labels: &mut HashMap<String, String>) {
+    let keys_to_sanitize: Vec<String> =
+        labels.keys().filter(|k| k.contains(' ')).cloned().collect();
+
+    for key in keys_to_sanitize {
+        if let Some(value) = labels.remove(&key) {
+            let sanitized_key = key.replace(' ', "_");
+            labels.insert(sanitized_key, value);
+        }
+    }
+}

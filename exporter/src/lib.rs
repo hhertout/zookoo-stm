@@ -15,7 +15,7 @@ use configuration::model::Configuration;
 use crate::types::{ExportersMap, ProbeType};
 
 pub mod config;
-mod defaults_labels;
+mod labels;
 pub mod otel;
 pub mod prom;
 pub mod timescale;

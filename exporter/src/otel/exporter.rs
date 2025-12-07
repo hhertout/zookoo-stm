@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use configuration::model::Configuration;
 
 use crate::{
-    Exporter, ExportersMap, MetricData, ProbeType, defaults_labels,
+    Exporter, ExportersMap, MetricData, ProbeType, labels,
     otel::metrics::{HttpMetricsParams, MetricsExporter},
 };
 
@@ -32,7 +32,8 @@ impl Exporter for OtelExporter {
 
             let mut override_labels: HashMap<String, String> = HashMap::new();
             override_labels.insert("exporter".to_string(), label.clone());
-            let labels = defaults_labels::set_defaults_labels(&config.defaults, override_labels);
+            let mut labels = labels::set_defaults_labels(&config.defaults, override_labels);
+            labels::sanitize_labels(&mut labels);
 
             let exporter = OtelExporter::new(labels);
             exporters.insert(key, Arc::new(exporter));

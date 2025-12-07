@@ -19,7 +19,7 @@ use configuration::model::Configuration;
 
 use super::remote_write::PrometheusRemoteWrite;
 use crate::{
-    Exporter, ExportersMap, MetricData, config::AuthConfiguration, defaults_labels,
+    Exporter, ExportersMap, MetricData, config::AuthConfiguration, labels,
     prom::PrometheusRemoteWriteConfig,
 };
 
@@ -103,7 +103,8 @@ impl Exporter for PrometheusRemoteWriteExporter {
 
             let mut override_labels: HashMap<String, String> = HashMap::new();
             override_labels.insert("exporter".to_string(), label.clone());
-            let labels = defaults_labels::set_defaults_labels(&config.defaults, override_labels);
+            let mut labels = labels::set_defaults_labels(&config.defaults, override_labels);
+            labels::sanitize_labels(&mut labels);
 
             let remote_write_config = PrometheusRemoteWriteConfig {
                 url: prom_config.url.clone(),
