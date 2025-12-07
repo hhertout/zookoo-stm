@@ -4,11 +4,11 @@ pub(crate) enum ProbeType {
     Icmp,
 }
 
-impl From<ProbeType> for exporter::ProbeType {
-    fn from(pt: ProbeType) -> exporter::ProbeType {
+impl From<ProbeType> for exporter::types::ProbeType {
+    fn from(pt: ProbeType) -> exporter::types::ProbeType {
         match pt {
-            ProbeType::Http => exporter::ProbeType::Http,
-            ProbeType::Icmp => exporter::ProbeType::Icmp,
+            ProbeType::Http => exporter::types::ProbeType::Http,
+            ProbeType::Icmp => exporter::types::ProbeType::Icmp,
         }
     }
 }

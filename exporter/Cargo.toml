@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+configuration ={ path = "../configuration" }
 opentelemetry = { version = "0.31.0" }
 opentelemetry_sdk = { version = "0.31.0", features = ["rt-tokio"] }
 sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio", "tls-native-tls", "chrono"] }

@@ -1,7 +1,9 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
+
+use configuration::model::Configuration;
 
 use crate::{
-    Exporter, MetricData, ProbeType,
+    Exporter, ExportersMap, MetricData, ProbeType, defaults_labels,
     otel::metrics::{HttpMetricsParams, MetricsExporter},
 };
 
@@ -16,6 +18,27 @@ impl OtelExporter {
 }
 
 impl Exporter for OtelExporter {
+    fn build(config: &Configuration, exporters: &mut ExportersMap) {
+        let exporter_wrapper = match config.exporter {
+            Some(ref wrapper) => wrapper,
+            None => {
+                log::info!("no exporters configured");
+                return;
+            }
+        };
+        for (label, otel_config) in &exporter_wrapper.otel {
+            let key = format!("exporter.otel.{}", label);
+            log::info!("event=create_exporter type=otel key={} endpoint={}", key, otel_config.url);
+
+            let mut override_labels: HashMap<String, String> = HashMap::new();
+            override_labels.insert("exporter".to_string(), label.clone());
+            let labels = defaults_labels::set_defaults_labels(&config.defaults, override_labels);
+
+            let exporter = OtelExporter::new(labels);
+            exporters.insert(key, Arc::new(exporter));
+        }
+    }
+
     fn export(&self, probe_type: ProbeType, metric_data: MetricData) {
         let metrics = &metric_data.metrics;
         let target_labels = &metric_data.labels;

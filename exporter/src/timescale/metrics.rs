@@ -1,6 +1,8 @@
 use crate::Exporter;
+use crate::ExportersMap;
 use crate::MetricData;
 use crate::timescale::repository::{HttpMetricRow, IcmpMetricRow, TimescaleRepository};
+use configuration::model::Configuration;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -203,6 +205,20 @@ impl TimescaleExporter {
 }
 
 impl Exporter for TimescaleExporter {
+    fn build(config: &Configuration, _exporters: &mut ExportersMap) {
+        let exporter_wrapper = match config.exporter {
+            Some(ref wrapper) => wrapper,
+            None => {
+                log::info!("no exporters configured");
+                return;
+            }
+        };
+
+        for label in exporter_wrapper.timescale.keys() {
+            log::error!("event=exporter_not_implemented type=timescale label={}", label);
+        }
+    }
+
     fn export(&self, probe_type: crate::ProbeType, metric_data: MetricData) {
         use crate::ProbeType;
 

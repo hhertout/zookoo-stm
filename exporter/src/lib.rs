@@ -8,29 +8,30 @@
 //! - Prometheus Pushgateway
 //!
 
-use std::{collections::HashMap, fmt};
+use std::collections::HashMap;
+
+use configuration::model::Configuration;
+
+use crate::types::{ExportersMap, ProbeType};
 
 pub mod config;
+mod defaults_labels;
 pub mod otel;
 pub mod prom;
 pub mod timescale;
+pub mod types;
 
 #[cfg(test)]
 mod config_tests;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProbeType {
-    Http,
-    Icmp,
-}
+pub trait Exporter: Send + Sync {
+    /// Build the exporter.
+    fn build(config: &Configuration, exporters: &mut ExportersMap)
+    where
+        Self: Sized;
 
-impl fmt::Display for ProbeType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            ProbeType::Http => write!(f, "HTTP"),
-            ProbeType::Icmp => write!(f, "ICMP"),
-        }
-    }
+    /// Export metrics for a given probe type.
+    fn export(&self, probe_type: ProbeType, metric_data: MetricData);
 }
 
 /// Metric data containing both numeric metrics and string labels from targets
@@ -73,7 +74,13 @@ impl Default for MetricData {
     }
 }
 
-pub trait Exporter: Send + Sync {
-    /// Export metrics for a given probe type.
-    fn export(&self, probe_type: ProbeType, metric_data: MetricData);
+pub fn build_exporters(config: &Configuration, exporters: &mut ExportersMap) {
+    if config.exporter.is_none() {
+        log::error!("event=error msg=no_exporters_configured");
+        panic!("No exporters configured, exiting...");
+    }
+
+    otel::exporter::OtelExporter::build(config, exporters);
+    prom::PrometheusRemoteWriteExporter::build(config, exporters);
+    timescale::TimescaleExporter::build(config, exporters);
 }
