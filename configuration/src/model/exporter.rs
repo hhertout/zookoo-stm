@@ -13,8 +13,6 @@ use std::collections::HashMap;
 #[derive(Debug, Deserialize)]
 pub struct ExporterConfiguration {
     pub otel: Option<HashMap<String, OtelGrpcExporterConfiguration>>,
-    pub metrics: Option<HashMap<String, MetricsExporterConfiguration>>,
-    pub kafka: Option<HashMap<String, KafkaExporterConfiguration>>,
     pub prometheus_remote_write: Option<HashMap<String, PrometheusRemoteWriteConfiguration>>,
     pub timescale: Option<HashMap<String, TimescaleExporterConfiguration>>,
 }
@@ -26,19 +24,7 @@ pub struct OtelGrpcExporterConfiguration {
     pub cert_path: Option<String>,
     #[serde(default = "default_tls_insecure")]
     pub tls_insecure: bool,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct KafkaExporterConfiguration {
-    pub broker: String,
-    pub topic: String,
-    pub auth: Option<AuthConfiguration>,
-    pub cert_path: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct MetricsExporterConfiguration {
-    pub endpoint: String,
+    pub metric_prefix: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -55,6 +41,7 @@ pub struct PrometheusRemoteWriteConfiguration {
     pub job: String,
     pub instance: Option<String>,
     pub auth: Option<AuthConfiguration>,
+    pub metric_prefix: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

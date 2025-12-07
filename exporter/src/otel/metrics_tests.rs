@@ -6,7 +6,7 @@ mod tests {
     #[test]
     fn test_metrics_exporter_creation() {
         let labels = HashMap::new();
-        let _exporter = MetricsExporter::new(labels);
+        let _exporter = MetricsExporter::new(labels, None);
 
         // Verify exporter can be created
         // We can't test actual OTEL operations without infrastructure
@@ -20,7 +20,7 @@ mod tests {
         labels.insert("zone".to_string(), "eu-west-1".to_string());
         labels.insert("env".to_string(), "production".to_string());
 
-        let _exporter = MetricsExporter::new(labels);
+        let _exporter = MetricsExporter::new(labels, None);
         // Exporter should be created successfully
     }
 
@@ -59,14 +59,14 @@ mod tests {
         labels.insert("zone".to_string(), "us-east-1".to_string());
         labels.insert("tag".to_string(), "key:value".to_string());
 
-        let _exporter = MetricsExporter::new(labels);
+        let _exporter = MetricsExporter::new(labels, None);
         // Should handle special characters in labels
     }
 
     #[test]
     fn test_empty_labels() {
         let labels = HashMap::new();
-        let _exporter = MetricsExporter::new(labels);
+        let _exporter = MetricsExporter::new(labels, None);
         // Should work with empty labels
     }
 
@@ -107,7 +107,58 @@ mod tests {
             labels.insert(format!("label_{}", i), format!("value_{}", i));
         }
 
-        let _exporter = MetricsExporter::new(labels);
+        let _exporter = MetricsExporter::new(labels, None);
         // Should handle many labels
+    }
+
+    #[test]
+    fn test_metric_prefix_default() {
+        let labels = HashMap::new();
+        let exporter = MetricsExporter::new(labels, None);
+
+        // Default prefix should be "probe_"
+        // We test this indirectly by creating the exporter
+        // The prefix is used internally when exporting metrics
+        assert!(exporter.get_prefix() == "probe_");
+    }
+
+    #[test]
+    fn test_metric_prefix_custom() {
+        let labels = HashMap::new();
+        let custom_prefix = Some("zookoo_".to_string());
+        let exporter = MetricsExporter::new(labels, custom_prefix);
+
+        // Custom prefix should be applied
+        assert!(exporter.get_prefix() == "zookoo_");
+    }
+
+    #[test]
+    fn test_metric_prefix_empty() {
+        let labels = HashMap::new();
+        let empty_prefix = Some("".to_string());
+        let exporter = MetricsExporter::new(labels, empty_prefix);
+
+        // Empty prefix should work (no prefix)
+        assert!(exporter.get_prefix() == "");
+    }
+
+    #[test]
+    fn test_metric_prefix_with_underscore() {
+        let labels = HashMap::new();
+        let prefix_with_underscore = Some("my_custom_prefix_".to_string());
+        let exporter = MetricsExporter::new(labels, prefix_with_underscore);
+
+        // Prefix ending with underscore should be used as-is
+        assert!(exporter.get_prefix() == "my_custom_prefix_");
+    }
+
+    #[test]
+    fn test_metric_prefix_without_underscore() {
+        let labels = HashMap::new();
+        let prefix_without_underscore = Some("myprefix".to_string());
+        let exporter = MetricsExporter::new(labels, prefix_without_underscore);
+
+        // Prefix without underscore should work
+        assert!(exporter.get_prefix() == "myprefix_");
     }
 }

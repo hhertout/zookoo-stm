@@ -33,10 +33,6 @@ pub struct ExporterWrapper {
     #[serde(default)]
     pub otel: HashMap<String, exporter::OtelGrpcExporterConfiguration>,
     #[serde(default)]
-    pub metrics: HashMap<String, exporter::MetricsExporterConfiguration>,
-    #[serde(default)]
-    pub kafka: HashMap<String, exporter::KafkaExporterConfiguration>,
-    #[serde(default)]
     pub prometheus_remote_write: HashMap<String, exporter::PrometheusRemoteWriteConfiguration>,
     #[serde(default)]
     pub timescale: HashMap<String, exporter::TimescaleExporterConfiguration>,

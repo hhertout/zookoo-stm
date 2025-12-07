@@ -33,8 +33,21 @@ pub struct PrometheusRemoteWriteExporter {
 
 impl PrometheusRemoteWriteExporter {
     /// Create a new Prometheus remote_write exporter with the given labels and default prefix
-    pub fn new(labels: HashMap<String, String>, remote_write: Arc<PrometheusRemoteWrite>) -> Self {
-        Self { prefix: "zookoo_".to_string(), default_labels: labels, remote_write }
+    pub fn new(
+        labels: HashMap<String, String>,
+        remote_write: Arc<PrometheusRemoteWrite>,
+        prefix: Option<String>,
+    ) -> Self {
+        let mut prefix = prefix.unwrap_or_else(|| "probe_".to_string());
+        if !prefix.ends_with("_") {
+            prefix.push('_');
+        }
+
+        Self { prefix, default_labels: labels, remote_write }
+    }
+
+    pub fn get_prefix(&self) -> &str {
+        &self.prefix
     }
 
     /// Create a new Prometheus remote_write exporter with a custom prefix
@@ -120,8 +133,14 @@ impl Exporter for PrometheusRemoteWriteExporter {
 
             match PrometheusRemoteWrite::new(remote_write_config) {
                 Ok(remote_write) => {
+                    // Prefix from exporter config takes precedence over default config
+                    let prefix = prom_config
+                        .metric_prefix
+                        .clone()
+                        .or_else(|| config.defaults.metric_prefix.clone());
+
                     let exporter =
-                        PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
+                        PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write), prefix);
                     exporters.insert(key, Arc::new(exporter));
                 }
                 Err(e) => {

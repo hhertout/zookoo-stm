@@ -21,12 +21,11 @@ mod tests {
                 probe_location: None,
                 probe_zone: None,
                 self_monitoring: None,
+                metric_prefix: None,
             },
             probe: None,
             exporter: Some(ExporterWrapper {
                 otel: otel_configs,
-                metrics: HashMap::new(),
-                kafka: HashMap::new(),
                 prometheus_remote_write: HashMap::new(),
                 timescale: HashMap::new(),
             }),
@@ -43,6 +42,7 @@ mod tests {
                 probe_location: None,
                 probe_zone: None,
                 self_monitoring: None,
+                metric_prefix: None,
             },
             probe: None,
             exporter: None,
@@ -72,6 +72,7 @@ mod tests {
                 auth: None,
                 cert_path: None,
                 tls_insecure: false,
+                metric_prefix: None,
             },
         );
 
@@ -97,6 +98,7 @@ mod tests {
                 auth: None,
                 cert_path: None,
                 tls_insecure: false,
+                metric_prefix: None,
             },
         );
         otel_configs.insert(
@@ -106,6 +108,7 @@ mod tests {
                 auth: None,
                 cert_path: None,
                 tls_insecure: true,
+                metric_prefix: None,
             },
         );
 
@@ -129,6 +132,7 @@ mod tests {
                 auth: None,
                 cert_path: None,
                 tls_insecure: false,
+                metric_prefix: None,
             },
         );
 
@@ -149,7 +153,7 @@ mod tests {
     #[test]
     fn test_otel_exporter_new_with_empty_labels() {
         let labels = HashMap::new();
-        let exporter = OtelExporter::new(labels);
+        let exporter = OtelExporter::new(labels, None);
 
         // Should create successfully
         let _: &dyn Exporter = &exporter;
@@ -162,7 +166,7 @@ mod tests {
         labels.insert("env".to_string(), "production".to_string());
         labels.insert("zone".to_string(), "eu-west-1".to_string());
 
-        let exporter = OtelExporter::new(labels);
+        let exporter = OtelExporter::new(labels, None);
 
         // Should create successfully with labels
         let _: &dyn Exporter = &exporter;
@@ -173,7 +177,7 @@ mod tests {
     #[test]
     fn test_export_http_metrics_extracts_correct_values() {
         let labels = HashMap::new();
-        let exporter = OtelExporter::new(labels);
+        let exporter = OtelExporter::new(labels, None);
 
         let mut metrics = HashMap::new();
         metrics.insert("up".to_string(), 1);
@@ -197,7 +201,7 @@ mod tests {
     #[test]
     fn test_export_http_metrics_with_optional_tls_fields() {
         let labels = HashMap::new();
-        let exporter = OtelExporter::new(labels);
+        let exporter = OtelExporter::new(labels, None);
 
         let mut metrics = HashMap::new();
         metrics.insert("up".to_string(), 1);
@@ -218,7 +222,7 @@ mod tests {
     #[test]
     fn test_export_http_metrics_with_missing_optional_fields() {
         let labels = HashMap::new();
-        let exporter = OtelExporter::new(labels);
+        let exporter = OtelExporter::new(labels, None);
 
         // Minimal metrics - only required fields
         let mut metrics = HashMap::new();
@@ -233,7 +237,7 @@ mod tests {
     #[test]
     fn test_export_icmp_metrics() {
         let labels = HashMap::new();
-        let exporter = OtelExporter::new(labels);
+        let exporter = OtelExporter::new(labels, None);
 
         let mut metrics = HashMap::new();
         metrics.insert("up".to_string(), 1);
@@ -251,7 +255,7 @@ mod tests {
     #[test]
     fn test_export_icmp_metrics_with_missing_rtt() {
         let labels = HashMap::new();
-        let exporter = OtelExporter::new(labels);
+        let exporter = OtelExporter::new(labels, None);
 
         let mut metrics = HashMap::new();
         metrics.insert("up".to_string(), 0);

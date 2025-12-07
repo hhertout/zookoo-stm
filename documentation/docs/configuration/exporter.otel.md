@@ -12,6 +12,9 @@ You can use the following arguments with exporter.otel:
 | tls_insecure | boolean | Skip TLS certificate verification. | false | no |
 | auth | object | Authentication configuration (see auth block below). | | no |
 | cert_path | string | Path to a custom CA certificate file for TLS verification. | | no |
+| metric_prefix | string | Optional prefix to prepend to all metric names. | probe_ | no |
+
+`metric_prefix` is an optional string that, if provided, will be prepended to all metric names exported by this exporter. This can be useful for namespacing metrics in environments where multiple applications or services are sending metrics to the same backend. If not specified, prefix applied is `probe_`.
 
 ### Auth Block
 

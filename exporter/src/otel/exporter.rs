@@ -12,8 +12,8 @@ pub struct OtelExporter {
 }
 
 impl OtelExporter {
-    pub fn new(labels: HashMap<String, String>) -> Self {
-        OtelExporter { metric_exporter: MetricsExporter::new(labels) }
+    pub fn new(labels: HashMap<String, String>, metric_prefix: Option<String>) -> Self {
+        OtelExporter { metric_exporter: MetricsExporter::new(labels, metric_prefix) }
     }
 }
 
@@ -35,7 +35,11 @@ impl Exporter for OtelExporter {
             let mut labels = labels::set_defaults_labels(&config.defaults, override_labels);
             labels::sanitize_labels(&mut labels);
 
-            let exporter = OtelExporter::new(labels);
+            // Prefix from exporter config takes precedence over default config
+            let prefix =
+                otel_config.metric_prefix.clone().or_else(|| config.defaults.metric_prefix.clone());
+
+            let exporter = OtelExporter::new(labels, prefix);
             exporters.insert(key, Arc::new(exporter));
         }
     }
