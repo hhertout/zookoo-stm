@@ -205,7 +205,7 @@ impl TimescaleExporter {
 }
 
 impl Exporter for TimescaleExporter {
-    fn build(config: &Configuration, _exporters: &mut ExportersMap) {
+    fn build(config: &Configuration, exporters: &mut ExportersMap) {
         let exporter_wrapper = match config.exporter {
             Some(ref wrapper) => wrapper,
             None => {
@@ -214,8 +214,41 @@ impl Exporter for TimescaleExporter {
             }
         };
 
-        for label in exporter_wrapper.timescale.keys() {
-            log::error!("event=exporter_not_implemented type=timescale label={}", label);
+        for (label, timescale_config) in &exporter_wrapper.timescale {
+            let key = format!("exporter.timescale.{}", label);
+            log::info!(
+                "event=create_exporter type=timescale key={} conn_str={}",
+                key,
+                timescale_config.connection_string
+            );
+
+            // Parse connection string and create PgPool
+            let pool = match PgPool::connect_lazy(&timescale_config.connection_string) {
+                Ok(pool) => Arc::new(pool),
+                Err(e) => {
+                    log::error!(
+                        "Failed to create PgPool for timescale exporter '{}': {}",
+                        label,
+                        e
+                    );
+                    continue;
+                }
+            };
+
+            // Set default labels
+            let mut override_labels = HashMap::new();
+            override_labels.insert("exporter".to_string(), label.clone());
+            let mut labels = crate::labels::set_defaults_labels(&config.defaults, override_labels);
+            crate::labels::sanitize_labels(&mut labels);
+
+            // Use schema if provided, else default
+            let exporter = if timescale_config.schema != "public" {
+                TimescaleExporter::with_schema(pool, labels, timescale_config.schema.clone())
+            } else {
+                TimescaleExporter::new(pool, labels)
+            };
+
+            exporters.insert(key, Arc::new(exporter));
         }
     }
 

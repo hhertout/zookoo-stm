@@ -1,7 +1,36 @@
 #[cfg(test)]
 mod tests {
     use crate::ProbeType;
+    use crate::timescale::metrics::TimescaleExporter;
+    use crate::{Exporter, ExportersMap};
+    use configuration::model::{
+        Configuration, ExporterWrapper, defaults::Defaults,
+        exporter::TimescaleExporterConfiguration,
+    };
     use std::collections::HashMap;
+
+    fn create_test_config_with_timescale(
+        timescale_map: std::collections::HashMap<String, TimescaleExporterConfiguration>,
+    ) -> Configuration {
+        Configuration {
+            defaults: Defaults {
+                log_level: "info".to_string(),
+                job: "test-job".to_string(),
+                service_name: "test-service".to_string(),
+                probe_location: None,
+                probe_zone: None,
+                self_monitoring: None,
+                metric_prefix: None,
+            },
+            probe: None,
+            exporter: Some(ExporterWrapper {
+                otel: std::collections::HashMap::new(),
+                prometheus_remote_write: std::collections::HashMap::new(),
+                timescale: timescale_map,
+            }),
+            discovery: None,
+        }
+    }
 
     #[test]
     fn test_timescale_exporter_structure() {
@@ -174,5 +203,75 @@ mod tests {
 
         // Verify we can represent at least 290 million years
         assert!(years > 290_000_000.0);
+    }
+
+    #[test]
+    fn test_build_with_no_timescale_exporters_configured() {
+        let config = create_test_config_with_timescale(std::collections::HashMap::new());
+        let mut exporters: ExportersMap = std::collections::HashMap::new();
+        TimescaleExporter::build(&config, &mut exporters);
+        assert!(
+            exporters.is_empty(),
+            "No timescale exporters should be created when none configured"
+        );
+    }
+
+    #[test]
+    fn test_build_with_single_timescale_exporter() {
+        let mut timescale_map = std::collections::HashMap::new();
+        timescale_map.insert(
+            "main".to_string(),
+            TimescaleExporterConfiguration {
+                connection_string: "postgres://user:pass@localhost/db".to_string(),
+                schema: "public".to_string(),
+            },
+        );
+        let config = create_test_config_with_timescale(timescale_map);
+        let mut exporters: ExportersMap = std::collections::HashMap::new();
+        TimescaleExporter::build(&config, &mut exporters);
+        assert_eq!(exporters.len(), 1, "One timescale exporter should be created");
+        assert!(exporters.contains_key("exporter.timescale.main"));
+    }
+
+    #[test]
+    fn test_build_with_multiple_timescale_exporters() {
+        let mut timescale_map = std::collections::HashMap::new();
+        timescale_map.insert(
+            "main".to_string(),
+            TimescaleExporterConfiguration {
+                connection_string: "postgres://user:pass@localhost/db1".to_string(),
+                schema: "public".to_string(),
+            },
+        );
+        timescale_map.insert(
+            "analytics".to_string(),
+            TimescaleExporterConfiguration {
+                connection_string: "postgres://user:pass@localhost/db2".to_string(),
+                schema: "analytics".to_string(),
+            },
+        );
+        let config = create_test_config_with_timescale(timescale_map);
+        let mut exporters: ExportersMap = std::collections::HashMap::new();
+        TimescaleExporter::build(&config, &mut exporters);
+        assert_eq!(exporters.len(), 2, "Two timescale exporters should be created");
+        assert!(exporters.contains_key("exporter.timescale.main"));
+        assert!(exporters.contains_key("exporter.timescale.analytics"));
+    }
+
+    #[test]
+    fn test_build_timescale_exporter_with_custom_schema() {
+        let mut timescale_map = std::collections::HashMap::new();
+        timescale_map.insert(
+            "custom".to_string(),
+            TimescaleExporterConfiguration {
+                connection_string: "postgres://user:pass@localhost/db".to_string(),
+                schema: "custom_schema".to_string(),
+            },
+        );
+        let config = create_test_config_with_timescale(timescale_map);
+        let mut exporters: ExportersMap = std::collections::HashMap::new();
+        TimescaleExporter::build(&config, &mut exporters);
+        assert_eq!(exporters.len(), 1);
+        assert!(exporters.contains_key("exporter.timescale.custom"));
     }
 }
