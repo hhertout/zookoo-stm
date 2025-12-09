@@ -46,10 +46,10 @@ probe "http" "google_check" {
     }
   ]
 
-  forward_to = [exporter.otel.otlp]
+  forward_to = [exporter.otlp.otlp]
 }
 
-exporter "otel" "otlp" {
+exporter "otlp" "otlp" {
   url = "http://localhost:4317"
   tls_insecure = true
 }

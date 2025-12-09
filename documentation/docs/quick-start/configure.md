@@ -14,7 +14,7 @@ defaults {
     log_level = "info"
 }
 
-exporter "otel" "otlp" {
+exporter "otlp" "otlp" {
     url = "http://localhost:4317"
 }
 

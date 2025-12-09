@@ -19,8 +19,7 @@ use configuration::model::Configuration;
 
 use super::remote_write::PrometheusRemoteWrite;
 use crate::{
-    Exporter, ExportersMap, MetricData, config::AuthConfiguration, labels,
-    prom::PrometheusRemoteWriteConfig,
+    config::AuthConfiguration, labels, prometheus::PrometheusRemoteWriteConfig, Exporter, ExportersMap, MetricData, DEFAULT_METRIC_PREFIX
 };
 
 /// Prometheus metrics exporter that uses the remote_write API.
@@ -39,6 +38,11 @@ impl PrometheusRemoteWriteExporter {
         prefix: Option<String>,
     ) -> Self {
         let mut prefix = prefix.unwrap_or_else(|| "probe_".to_string());
+
+        if prefix.is_empty() {
+            prefix = DEFAULT_METRIC_PREFIX.to_string();
+        }
+
         if !prefix.ends_with("_") {
             prefix.push('_');
         }

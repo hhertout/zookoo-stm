@@ -55,7 +55,7 @@ probe "http" "google_check" {
     }
   ]
 
-  forward_to = [exporter.otel.otlp]
+  forward_to = [exporter.otlp.otlp]
 }
 ```
 
@@ -68,7 +68,7 @@ discovery "file" "json_targets" {
 
 probe "http" "test" {
   target_from = discovery.file.json_targets
-  forward_to = [exporter.otel.otlp]
+  forward_to = [exporter.otlp.otlp]
 }
 ```
 

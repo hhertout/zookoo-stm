@@ -16,7 +16,7 @@ defaults {
   probe_zone = "DEV"
 }
 
-exporter "otel" "main" {
+exporter "otlp" "main" {
   url = "http://localhost:4317"
   tls_insecure = true
 }

@@ -365,7 +365,7 @@ impl PipelineBuilder {
     }
 
     /// Resolve exporters from forward_to references
-    /// References can be like "exporter.otel.otlp" or "${exporter.otel.otlp}"
+    /// References can be like "exporter.otlp.main" or "${exporter.otlp.main}"
     fn resolve_exporters(
         forward_to: &[String],
         all_exporters: &ExportersMap,

@@ -41,15 +41,15 @@ probe "http" "api_monitoring" {
     }
   ]
 
-  forward_to = [exporter.otel.main]
+  forward_to = [exporter.otlp.main]
 }
 
 probe "http" "json_monitoring" {
   target_from = discovery.file.json_targets
-  forward_to = [exporter.otel.main]
+  forward_to = [exporter.otlp.main]
 }
 
-exporter "otel" "main" {
+exporter "otlp" "main" {
   url = "https://otel-grpc.neryolab.com"
   tls_insecure = false
 }

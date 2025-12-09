@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use opentelemetry::{InstrumentationScope, KeyValue, global};
 
+use crate::DEFAULT_METRIC_PREFIX;
+
 pub struct MetricsExporter {
     prefix: String,
     default_labels: HashMap<String, String>,
@@ -26,7 +28,12 @@ pub struct HttpMetricsParams {
 
 impl MetricsExporter {
     pub fn new(labels: HashMap<String, String>, prefix: Option<String>) -> Self {
-        let mut prefix = prefix.unwrap_or_else(|| "probe_".to_string());
+        let mut prefix = prefix.unwrap_or_else(|| DEFAULT_METRIC_PREFIX.to_string());
+        
+        if prefix.is_empty() {
+            prefix = DEFAULT_METRIC_PREFIX.to_string();
+        }
+        
         if !prefix.ends_with("_") {
             prefix.push('_');
         }

@@ -51,7 +51,7 @@ probe "icmp" "servers" {
     }
   ]
 
-  forward_to = [exporter.otel.otlp]
+  forward_to = [exporter.otlp.otlp]
 }
 ```
 
@@ -79,7 +79,7 @@ probe "icmp" "endpoints" {
     }
   ]
 
-  forward_to = [exporter.otel.otlp]
+  forward_to = [exporter.otlp.otlp]
 }
 ```
 
@@ -92,7 +92,7 @@ discovery "file" "icmp_targets" {
 
 probe "icmp" "discovered" {
   target_from = discovery.file.icmp_targets
-  forward_to = [exporter.otel.otlp]
+  forward_to = [exporter.otlp.otlp]
 }
 ```
 

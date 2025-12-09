@@ -31,7 +31,7 @@ pub struct ProbeWrapper {
 #[derive(Debug, Deserialize)]
 pub struct ExporterWrapper {
     #[serde(default)]
-    pub otel: HashMap<String, exporter::OtelGrpcExporterConfiguration>,
+    pub otlp: HashMap<String, exporter::OtelGrpcExporterConfiguration>,
     #[serde(default)]
     pub prometheus_remote_write: HashMap<String, exporter::PrometheusRemoteWriteConfiguration>,
     #[serde(default)]

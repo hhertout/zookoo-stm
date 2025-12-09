@@ -12,7 +12,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Deserialize)]
 pub struct ExporterConfiguration {
-    pub otel: Option<HashMap<String, OtelGrpcExporterConfiguration>>,
+    pub otlp: Option<HashMap<String, OtelGrpcExporterConfiguration>>,
     pub prometheus_remote_write: Option<HashMap<String, PrometheusRemoteWriteConfiguration>>,
     pub timescale: Option<HashMap<String, TimescaleExporterConfiguration>>,
 }

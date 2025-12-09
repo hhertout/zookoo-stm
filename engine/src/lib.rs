@@ -54,7 +54,7 @@ impl Engine {
 
         // Initialize meter provider from first OTEL exporter
         if let Some(ref exporter_wrapper) = config.exporter
-            && let Some((label, otel_config)) = exporter_wrapper.otel.iter().next()
+            && let Some((label, otel_config)) = exporter_wrapper.otlp.iter().next()
         {
             log::info!("event=init_meter_provider exporter={} endpoint={}", label, otel_config.url);
             self.meter_provider = Some(init_meter_provider(

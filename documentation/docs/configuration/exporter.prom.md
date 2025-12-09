@@ -39,7 +39,7 @@ You can use the following arguments with exporter.prometheus_remote_write:
 | auth | object | Authentication configuration (see auth block below). | | no |
 | metric_prefix | string | Optional prefix to prepend to all metric names. | probe_ | no |
 
-`metric_prefix` is an optional string that, if provided, will be prepended to all metric names exported by this exporter. This can be useful for namespacing metrics in environments where multiple applications or services are sending metrics to the same backend. If not specified, prefix applied is `probe_`.
+`metric_prefix` is an optional string that, if provided, will be prepended to all metric names exported by this exporter. This can be useful for namespacing metrics in environments where multiple applications or services are sending metrics to the same backend. If not specified or empty, prefix applied is `probe_`.
 
 ### Auth Block
 

@@ -8,8 +8,8 @@ mod tests {
         exporter::PrometheusRemoteWriteConfiguration,
     };
 
-    use crate::prom::metrics::PrometheusRemoteWriteExporter;
-    use crate::prom::remote_write::{PrometheusRemoteWrite, PrometheusRemoteWriteConfig};
+    use crate::prometheus::metrics::PrometheusRemoteWriteExporter;
+    use crate::prometheus::remote_write::{PrometheusRemoteWrite, PrometheusRemoteWriteConfig};
     use crate::{Exporter, ExportersMap};
 
     /// Helper to create a minimal Configuration for testing
@@ -28,7 +28,7 @@ mod tests {
             },
             probe: None,
             exporter: Some(ExporterWrapper {
-                otel: HashMap::new(),
+                otlp: HashMap::new(),
                 prometheus_remote_write: prom_configs,
                 timescale: HashMap::new(),
             }),

@@ -1,8 +1,8 @@
-use crate::otel::AuthHeader;
+use crate::otlp::AuthHeader;
 
 #[derive(Debug, Clone)]
 pub struct ExporterConfiguration {
-    pub otel: Option<OtelGrpcExporterConfiguration>,
+    pub otlp: Option<OtelGrpcExporterConfiguration>,
     pub metrics: Option<MetricsExporterConfiguration>,
     pub kafka: Option<KafkaExporterConfiguration>,
     pub prometheus: Option<PrometheusPushgatewayConfiguration>,

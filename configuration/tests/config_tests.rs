@@ -60,7 +60,7 @@ mod configuration_tests {
 
         // Test exporter.otlp configuration
         let exporter = config.exporter.as_ref().unwrap();
-        let otel = exporter.otel.get("main").expect("main exporter should exist");
+        let otel = exporter.otlp.get("main").expect("main exporter should exist");
         assert_eq!(otel.url, "https://otel-grpc.neryolab.com");
     }
 
@@ -119,7 +119,7 @@ mod configuration_tests {
         let exporter =
             config.exporter.as_ref().expect("exporter configuration should be configured");
 
-        let otel = exporter.otel.get("main").expect("main exporter should exist");
+        let otel = exporter.otlp.get("main").expect("main exporter should exist");
         assert_eq!(otel.url, "https://otel-grpc.neryolab.com");
 
         // Verify default values for optional fields

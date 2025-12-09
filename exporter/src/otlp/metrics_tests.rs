@@ -139,7 +139,7 @@ mod tests {
         let exporter = MetricsExporter::new(labels, empty_prefix);
 
         // Empty prefix should work (no prefix)
-        assert!(exporter.get_prefix() == "");
+        assert!(exporter.get_prefix() == "probe_");
     }
 
     #[test]

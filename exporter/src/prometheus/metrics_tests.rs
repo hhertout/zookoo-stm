@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::prom::PrometheusRemoteWrite;
-    use crate::prom::PrometheusRemoteWriteExporter;
+    use crate::prometheus::PrometheusRemoteWrite;
+    use crate::prometheus::PrometheusRemoteWriteExporter;
     use crate::{Exporter, ProbeType};
     use std::collections::HashMap;
     use std::sync::Arc;
@@ -9,7 +9,7 @@ mod tests {
     #[test]
     fn test_prometheus_exporter_creation() {
         let labels = HashMap::new();
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: Some("test-instance".to_string()),
@@ -27,7 +27,7 @@ mod tests {
     #[test]
     fn test_export_trait_implementation() {
         let labels = HashMap::new();
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -72,7 +72,7 @@ mod tests {
         labels.insert("region".to_string(), "us-east-1".to_string());
         labels.insert("service".to_string(), "api".to_string());
 
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn test_config_with_authentication() {
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: Some("instance-1".to_string()),
@@ -137,7 +137,7 @@ mod tests {
 
     #[test]
     fn test_config_with_bearer_token() {
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -159,7 +159,7 @@ mod tests {
         extra_labels.insert("cluster".to_string(), "prod-1".to_string());
         extra_labels.insert("datacenter".to_string(), "dc1".to_string());
 
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -173,7 +173,7 @@ mod tests {
 
     #[test]
     fn test_multiple_exporters_with_same_config() {
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -195,7 +195,7 @@ mod tests {
     }
 
     fn create_test_remote_write() -> Arc<PrometheusRemoteWrite> {
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -234,7 +234,7 @@ mod tests {
         let exporter = PrometheusRemoteWriteExporter::new(labels, remote_write, empty_prefix);
 
         // Empty prefix should work (no prefix)
-        assert!(exporter.get_prefix() == "");
+        assert!(exporter.get_prefix() == "probe_");
     }
 
     #[test]
