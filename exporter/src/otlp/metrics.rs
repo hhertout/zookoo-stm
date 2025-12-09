@@ -29,11 +29,11 @@ pub struct HttpMetricsParams {
 impl MetricsExporter {
     pub fn new(labels: HashMap<String, String>, prefix: Option<String>) -> Self {
         let mut prefix = prefix.unwrap_or_else(|| DEFAULT_METRIC_PREFIX.to_string());
-        
+
         if prefix.is_empty() {
             prefix = DEFAULT_METRIC_PREFIX.to_string();
         }
-        
+
         if !prefix.ends_with("_") {
             prefix.push('_');
         }

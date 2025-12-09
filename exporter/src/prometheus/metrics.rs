@@ -19,7 +19,8 @@ use configuration::model::Configuration;
 
 use super::remote_write::PrometheusRemoteWrite;
 use crate::{
-    config::AuthConfiguration, labels, prometheus::PrometheusRemoteWriteConfig, Exporter, ExportersMap, MetricData, DEFAULT_METRIC_PREFIX
+    DEFAULT_METRIC_PREFIX, Exporter, ExportersMap, MetricData, config::AuthConfiguration, labels,
+    prometheus::PrometheusRemoteWriteConfig,
 };
 
 /// Prometheus metrics exporter that uses the remote_write API.
