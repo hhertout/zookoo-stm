@@ -47,6 +47,7 @@ pub struct Defaults {
     pub probe_location: Option<ProbeLocation>,
     pub probe_zone: Option<String>,
     pub self_monitoring: Option<SelfMonitoringConfig>,
+    pub metric_prefix: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

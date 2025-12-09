@@ -113,9 +113,9 @@ mod tests {
     #[test]
     fn test_exporter_configuration_empty() {
         let config =
-            ExporterConfiguration { otel: None, metrics: None, kafka: None, prometheus: None };
+            ExporterConfiguration { otlp: None, metrics: None, kafka: None, prometheus: None };
 
-        assert!(config.otel.is_none());
+        assert!(config.otlp.is_none());
         assert!(config.metrics.is_none());
         assert!(config.kafka.is_none());
         assert!(config.prometheus.is_none());

@@ -16,13 +16,15 @@ use crate::types::{ExportersMap, ProbeType};
 
 pub mod config;
 mod labels;
-pub mod otel;
-pub mod prom;
+pub mod otlp;
+pub mod prometheus;
 pub mod timescale;
 pub mod types;
 
 #[cfg(test)]
 mod config_tests;
+
+pub const DEFAULT_METRIC_PREFIX: &str = "probe_";
 
 pub trait Exporter: Send + Sync {
     /// Build the exporter.
@@ -80,7 +82,7 @@ pub fn build_exporters(config: &Configuration, exporters: &mut ExportersMap) {
         panic!("No exporters configured, exiting...");
     }
 
-    otel::exporter::OtelExporter::build(config, exporters);
-    prom::PrometheusRemoteWriteExporter::build(config, exporters);
+    otlp::exporter::OtelExporter::build(config, exporters);
+    prometheus::PrometheusRemoteWriteExporter::build(config, exporters);
     timescale::TimescaleExporter::build(config, exporters);
 }

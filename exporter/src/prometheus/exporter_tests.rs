@@ -8,8 +8,8 @@ mod tests {
         exporter::PrometheusRemoteWriteConfiguration,
     };
 
-    use crate::prom::metrics::PrometheusRemoteWriteExporter;
-    use crate::prom::remote_write::{PrometheusRemoteWrite, PrometheusRemoteWriteConfig};
+    use crate::prometheus::metrics::PrometheusRemoteWriteExporter;
+    use crate::prometheus::remote_write::{PrometheusRemoteWrite, PrometheusRemoteWriteConfig};
     use crate::{Exporter, ExportersMap};
 
     /// Helper to create a minimal Configuration for testing
@@ -24,12 +24,11 @@ mod tests {
                 probe_location: None,
                 probe_zone: None,
                 self_monitoring: None,
+                metric_prefix: None,
             },
             probe: None,
             exporter: Some(ExporterWrapper {
-                otel: HashMap::new(),
-                metrics: HashMap::new(),
-                kafka: HashMap::new(),
+                otlp: HashMap::new(),
                 prometheus_remote_write: prom_configs,
                 timescale: HashMap::new(),
             }),
@@ -46,6 +45,7 @@ mod tests {
                 probe_location: None,
                 probe_zone: None,
                 self_monitoring: None,
+                metric_prefix: None,
             },
             probe: None,
             exporter: None,
@@ -86,6 +86,7 @@ mod tests {
                 job: "test-job".to_string(),
                 instance: None,
                 auth: None,
+                metric_prefix: None,
             },
         );
 
@@ -111,6 +112,7 @@ mod tests {
                 job: "zookoo".to_string(),
                 instance: Some("instance-1".to_string()),
                 auth: None,
+                metric_prefix: None,
             },
         );
         prom_configs.insert(
@@ -120,6 +122,7 @@ mod tests {
                 job: "zookoo".to_string(),
                 instance: None,
                 auth: None,
+                metric_prefix: None,
             },
         );
 
@@ -143,6 +146,7 @@ mod tests {
                 job: "test".to_string(),
                 instance: None,
                 auth: None,
+                metric_prefix: None,
             },
         );
 
@@ -164,7 +168,7 @@ mod tests {
     fn test_prometheus_exporter_new_with_empty_labels() {
         let labels = HashMap::new();
         let remote_write = create_test_remote_write();
-        let exporter = PrometheusRemoteWriteExporter::new(labels, remote_write);
+        let exporter = PrometheusRemoteWriteExporter::new(labels, remote_write, None);
 
         // Should create successfully
         let _: &dyn Exporter = &exporter;
@@ -177,7 +181,7 @@ mod tests {
         labels.insert("env".to_string(), "production".to_string());
 
         let remote_write = create_test_remote_write();
-        let exporter = PrometheusRemoteWriteExporter::new(labels, remote_write);
+        let exporter = PrometheusRemoteWriteExporter::new(labels, remote_write, None);
 
         let _: &dyn Exporter = &exporter;
     }

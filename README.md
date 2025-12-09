@@ -29,7 +29,6 @@ It is built as a synthetic monitoring tool (STM) that allows you to scrape targe
 
 **Exporter** :
 
-- self (via a dedicated endpoint)
 - Open telemetry (http/protobuf & grpc)
 - Prometheus Remote Write (compatible with Grafana Alloy, Prometheus, Mimir, etc.)
 - TimescaleDB (PostgreSQL with time-series extension)
@@ -42,9 +41,11 @@ In large-scale environments, we've found Blackbox Exporter to present limitation
 - Offering a more predictable performance profile
 - Being easy to configure and integrate in modern observability stacks
 
+Performance comparison between Blackbox Exporter available [here](https://zookoo-stm.neryolab.com/benchmark/blackbox/REPORT-1000-URLS.md).
+
 # Documentation
 
-For more information on how to use Zookoo, please refer to the [documentation](). (coming soon)
+For more information on how to use Zookoo, please refer to the [documentation](https://zookoo-stm.neryolab.com), or in this repository under the `documentation` -> `docs` folder.
 
 # Installation
 
@@ -71,6 +72,52 @@ cargo build # build the project accordingly to your system
 
 # Usage
 
-# Configuration
+Define your monitoring setup by using a clear and concise HCL configuration file.
+Configure the pipeline you need in a single place. It offer flexibility and simplicity.
+
+Use a single, unified config file written in HCL:
+
+```hcl
+defaults {
+  log_level = "info"
+  probe_zone = "eu-west-1"
+  service_name = "zookoo"
+  job = "zookoo"
+
+  probe_location {
+    latitude = 48.858370
+    longitude = 2.29448
+  }
+}
+
+probe "http" "google_check" {
+  scrape_interval = "30s"
+  targets = [
+    {
+      url = "https://www.google.com"
+      method = "GET"
+      expected_status_code = 200
+      labels = {
+        service = "google"
+        env = "test"
+      }
+    }
+  ]
+
+  forward_to = [exporter.otlp.default]
+}
+
+exporter "otlp" "default" {
+  url = "http://localhost:4317"
+  tls_insecure = true
+}
+
+```
+
+For more examples, please refer to the [documentation](https://zookoo-stm.neryolab.com).
 
 # Contribution
+
+If you want to contribute to this project, feel free to open issues or submit pull requests on GitHub.
+
+More details in the [contribution guide](CONTRIBUTING.md).

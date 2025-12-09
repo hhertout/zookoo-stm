@@ -14,10 +14,6 @@ defaults {
     log_level = "info"
 }
 
-exporter "otel" "otlp" {
-    url = "http://localhost:4317"
-}
-
 probe "http" "default" {
     targets = [
         { 
@@ -25,5 +21,11 @@ probe "http" "default" {
             labels = { "env" = "test", "service_name" = "google" }, scrap_interval = "10s"
         }
     ]
+
+    forward_to = [exporter.otlp.default]
+}
+
+exporter "otlp" "default" {
+    url = "http://localhost:4317"
 }
 ```

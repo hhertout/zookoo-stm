@@ -1,10 +1,10 @@
-# exporter.otel
+# exporter.otlp
 
-OpenTelemetry (OTel) exporter allows you to send monitoring data to any backend that supports the OpenTelemetry Protocol (OTLP). This enables integration with a wide range of observability platforms and tools.
+OpenTelemetry Protocol (OTLP) exporter allows you to send monitoring data to any backend that supports the OpenTelemetry Protocol (OTLP). This enables integration with a wide range of observability platforms and tools.
 
 ## Arguments
 
-You can use the following arguments with exporter.otel:
+You can use the following arguments with exporter.otlp:
 
 | Name | Type | Description | Default | Required |
 |------|------|-------------|---------|----------|
@@ -12,6 +12,9 @@ You can use the following arguments with exporter.otel:
 | tls_insecure | boolean | Skip TLS certificate verification. | false | no |
 | auth | object | Authentication configuration (see auth block below). | | no |
 | cert_path | string | Path to a custom CA certificate file for TLS verification. | | no |
+| metric_prefix | string | Optional prefix to prepend to all metric names. | probe_ | no |
+
+`metric_prefix` is an optional string that, if provided, will be prepended to all metric names exported by this exporter. This can be useful for namespacing metrics in environments where multiple applications or services are sending metrics to the same backend. If not specified or empty, prefix applied is `probe_`.
 
 ### Auth Block
 
@@ -24,7 +27,7 @@ You can use the following arguments with exporter.otel:
 ## Example
 
 ```hcl
-exporter "otel" "default" {
+exporter "otlp" "default" {
   url = "http://localhost:4317"
   tls_insecure = true
 }

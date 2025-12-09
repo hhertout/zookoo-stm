@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::prom::PrometheusRemoteWrite;
-    use crate::prom::PrometheusRemoteWriteExporter;
+    use crate::prometheus::PrometheusRemoteWrite;
+    use crate::prometheus::PrometheusRemoteWriteExporter;
     use crate::{Exporter, ProbeType};
     use std::collections::HashMap;
     use std::sync::Arc;
@@ -9,7 +9,7 @@ mod tests {
     #[test]
     fn test_prometheus_exporter_creation() {
         let labels = HashMap::new();
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: Some("test-instance".to_string()),
@@ -19,7 +19,7 @@ mod tests {
 
         let remote_write =
             PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
-        let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
+        let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write), None);
 
         // Exporter should be created successfully
     }
@@ -27,7 +27,7 @@ mod tests {
     #[test]
     fn test_export_trait_implementation() {
         let labels = HashMap::new();
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -37,7 +37,7 @@ mod tests {
 
         let remote_write =
             PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
-        let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
+        let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write), None);
 
         // Verify Exporter trait is implemented
         let _: &dyn Exporter = &_exporter;
@@ -72,7 +72,7 @@ mod tests {
         labels.insert("region".to_string(), "us-east-1".to_string());
         labels.insert("service".to_string(), "api".to_string());
 
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -82,7 +82,7 @@ mod tests {
 
         let remote_write =
             PrometheusRemoteWrite::new(config).expect("Failed to create remote write");
-        let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write));
+        let _exporter = PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write), None);
 
         // Should handle custom labels
     }
@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn test_config_with_authentication() {
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: Some("instance-1".to_string()),
@@ -137,7 +137,7 @@ mod tests {
 
     #[test]
     fn test_config_with_bearer_token() {
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -159,7 +159,7 @@ mod tests {
         extra_labels.insert("cluster".to_string(), "prod-1".to_string());
         extra_labels.insert("datacenter".to_string(), "dc1".to_string());
 
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -173,7 +173,7 @@ mod tests {
 
     #[test]
     fn test_multiple_exporters_with_same_config() {
-        let config = crate::prom::PrometheusRemoteWriteConfig {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
@@ -186,9 +186,96 @@ mod tests {
         let labels1 = HashMap::from([("instance".to_string(), "1".to_string())]);
         let labels2 = HashMap::from([("instance".to_string(), "2".to_string())]);
 
-        let _exporter1 = PrometheusRemoteWriteExporter::new(labels1, Arc::clone(&remote_write));
-        let _exporter2 = PrometheusRemoteWriteExporter::new(labels2, Arc::clone(&remote_write));
+        let _exporter1 =
+            PrometheusRemoteWriteExporter::new(labels1, Arc::clone(&remote_write), None);
+        let _exporter2 =
+            PrometheusRemoteWriteExporter::new(labels2, Arc::clone(&remote_write), None);
 
         // Multiple exporters can share the same remote_write
+    }
+
+    fn create_test_remote_write() -> Arc<PrometheusRemoteWrite> {
+        let config = crate::prometheus::PrometheusRemoteWriteConfig {
+            url: "http://localhost:9090/api/v1/write".to_string(),
+            job: "test".to_string(),
+            instance: None,
+            auth: None,
+            extra_labels: HashMap::new(),
+        };
+        Arc::new(PrometheusRemoteWrite::new(config).expect("Failed to create remote write"))
+    }
+
+    #[test]
+    fn test_metric_prefix_default() {
+        let labels = HashMap::new();
+        let remote_write = create_test_remote_write();
+        let exporter = PrometheusRemoteWriteExporter::new(labels, remote_write, None);
+
+        // Default prefix should be "probe_"
+        assert!(exporter.get_prefix() == "probe_");
+    }
+
+    #[test]
+    fn test_metric_prefix_custom() {
+        let labels = HashMap::new();
+        let remote_write = create_test_remote_write();
+        let custom_prefix = Some("zookoo_".to_string());
+        let exporter = PrometheusRemoteWriteExporter::new(labels, remote_write, custom_prefix);
+
+        // Custom prefix should be applied
+        assert!(exporter.get_prefix() == "zookoo_");
+    }
+
+    #[test]
+    fn test_metric_prefix_empty() {
+        let labels = HashMap::new();
+        let remote_write = create_test_remote_write();
+        let empty_prefix = Some("".to_string());
+        let exporter = PrometheusRemoteWriteExporter::new(labels, remote_write, empty_prefix);
+
+        // Empty prefix should work (no prefix)
+        assert!(exporter.get_prefix() == "probe_");
+    }
+
+    #[test]
+    fn test_metric_prefix_with_prefix_method() {
+        let labels = HashMap::new();
+        let remote_write = create_test_remote_write();
+        let exporter =
+            PrometheusRemoteWriteExporter::with_prefix("custom_".to_string(), labels, remote_write);
+
+        // with_prefix should set the prefix correctly
+        assert!(exporter.get_prefix() == "custom_");
+    }
+
+    #[test]
+    fn test_metric_prefix_with_prefix_auto_underscore() {
+        let labels = HashMap::new();
+        let remote_write = create_test_remote_write();
+
+        // Prefix without trailing underscore should get one added
+        let exporter = PrometheusRemoteWriteExporter::with_prefix(
+            "myprefix".to_string(),
+            labels,
+            remote_write,
+        );
+
+        // with_prefix should auto-append underscore if missing
+        assert!(exporter.get_prefix() == "myprefix_");
+    }
+
+    #[test]
+    fn test_metric_prefix_preserves_trailing_underscore() {
+        let labels = HashMap::new();
+        let remote_write = create_test_remote_write();
+
+        // Prefix with trailing underscore should stay as-is
+        let exporter = PrometheusRemoteWriteExporter::with_prefix(
+            "myprefix_".to_string(),
+            labels,
+            remote_write,
+        );
+
+        assert!(exporter.get_prefix() == "myprefix_");
     }
 }
