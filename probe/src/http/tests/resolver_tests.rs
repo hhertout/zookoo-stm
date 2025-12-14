@@ -101,9 +101,7 @@ async fn test_resolve_localhost() {
     let result = resolver.resolve("localhost").await;
 
     // localhost should always resolve
-    assert!(result.is_ok(), "localhost should resolve: {:?}", result.err());
-
-    let dns_result = result.unwrap();
+    let dns_result = result.expect("localhost should resolve");
     assert!(!dns_result.addresses.is_empty(), "Should have at least one address");
     assert!(dns_result.duration.as_nanos() > 0, "Duration should be non-zero");
 }
@@ -114,8 +112,7 @@ async fn test_resolve_google_dns() {
     let result = resolver.resolve("dns.google").await;
 
     // dns.google should resolve (Google's public DNS)
-    if result.is_ok() {
-        let dns_result = result.unwrap();
+    if let Ok(dns_result) = result {
         assert!(!dns_result.addresses.is_empty());
     }
     // Note: We allow this to fail in isolated environments
@@ -134,9 +131,7 @@ async fn test_resolve_first_ipv4_localhost() {
     let resolver = DnsResolver::new();
     let result = resolver.resolve_first_ipv4("localhost").await;
 
-    assert!(result.is_ok(), "localhost should resolve: {:?}", result.err());
-
-    let (ip, duration) = result.unwrap();
+    let (ip, duration) = result.expect("localhost should resolve");
     assert!(ip.is_ipv4() || ip.is_ipv6(), "Should be a valid IP");
     assert!(duration.as_nanos() > 0, "Duration should be non-zero");
 }
