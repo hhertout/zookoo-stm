@@ -2,6 +2,7 @@ pub mod defaults;
 pub mod discovery;
 pub mod exporter;
 pub mod probe;
+pub mod refresh_interval;
 pub mod scrape_interval;
 pub mod target;
 
@@ -9,6 +10,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 
 // Re-export HasScrapeInterval trait
+pub use refresh_interval::RefreshInterval;
 pub use scrape_interval::HasScrapeInterval;
 pub use scrape_interval::ScrapeInterval;
 
@@ -42,4 +44,6 @@ pub struct ExporterWrapper {
 pub struct DiscoveryWrapper {
     #[serde(default)]
     pub file: HashMap<String, discovery::DiscoveryFile>,
+    #[serde(default)]
+    pub api: HashMap<String, discovery::DiscoveryApi>,
 }

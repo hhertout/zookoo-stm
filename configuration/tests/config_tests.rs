@@ -2,6 +2,8 @@ use configuration::{ConfigParser, Parse};
 
 #[cfg(test)]
 mod configuration_tests {
+    use configuration::model::RefreshInterval;
+
     use super::*;
 
     #[test]
@@ -77,7 +79,27 @@ mod configuration_tests {
         // The HCL format uses discovery.file "json_targets" which should be parsed correctly
         assert!(file_configs.contains_key("json_targets"));
         let file_config = file_configs.get("json_targets").unwrap();
-        assert_eq!(file_config.path, vec!["/etc/zookoo/targets.json"]);
+        assert_eq!(file_config.path, "/etc/zookoo/targets.json");
+    }
+
+    #[test]
+    fn test_parse_hcl_discovery_api() {
+        let parser = ConfigParser;
+        let config = parser
+            .parse_from_file::<configuration::HCL>("tests/test_config.hcl")
+            .expect("Failed to parse HCL config file");
+
+        let discovery = config.discovery.as_ref().unwrap();
+        let api_configs = &discovery.api;
+
+        assert!(api_configs.contains_key("dynamic_targets"));
+        let api_config = api_configs.get("dynamic_targets").unwrap();
+        assert_eq!(api_config.url, "https://example.com/api/targets");
+        let headers = api_config.headers.as_ref().unwrap();
+        assert_eq!(headers.get("Authorization"), Some(&"Bearer your_api_token".to_string()));
+        assert_eq!(api_config.basic_auth, Some("dXNlcjpwYXNzd29yZCAtbgo=".to_string()));
+
+        assert_eq!(api_config.refresh_interval, RefreshInterval::H1);
     }
 
     #[test]

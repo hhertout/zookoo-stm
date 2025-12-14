@@ -55,5 +55,14 @@ exporter "otlp" "main" {
 }
 
 discovery "file" "json_targets" {
-  path = ["/etc/zookoo/targets.json"]
+  path = "/etc/zookoo/targets.json"
+}
+
+discovery "api" "dynamic_targets" {
+  url = "https://example.com/api/targets"
+  headers = {
+    Authorization = "Bearer your_api_token"
+  }
+  basic_auth = "dXNlcjpwYXNzd29yZCAtbgo="
+  refresh_interval = "1h"
 }

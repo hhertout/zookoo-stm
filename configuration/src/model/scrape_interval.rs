@@ -8,6 +8,8 @@ pub enum ScrapeInterval {
     S5,
     #[serde(rename = "10s")]
     S10,
+    #[serde(rename = "15s")]
+    S15,
     #[serde(rename = "30s")]
     S30,
     #[serde(rename = "1m")]
@@ -35,6 +37,7 @@ impl ScrapeInterval {
         match self {
             ScrapeInterval::S5 => Duration::from_secs(5),
             ScrapeInterval::S10 => Duration::from_secs(10),
+            ScrapeInterval::S15 => Duration::from_secs(15),
             ScrapeInterval::S30 => Duration::from_secs(30),
             ScrapeInterval::M1 => Duration::from_secs(60),
             ScrapeInterval::M5 => Duration::from_secs(5 * 60),

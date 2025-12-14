@@ -7,7 +7,6 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 
-use configuration::model::scrape_interval::ScrapeInterval;
 use configuration::model::target::HttpTarget;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
@@ -297,7 +296,6 @@ async fn test_http_probe_set_targets() {
             follow_redirect: true,
             auth: None,
             labels: None,
-            scrape_interval: ScrapeInterval::S30,
         },
         HttpTarget {
             url: "http://example.org".to_string(),
@@ -309,7 +307,6 @@ async fn test_http_probe_set_targets() {
             follow_redirect: false,
             auth: None,
             labels: None,
-            scrape_interval: ScrapeInterval::S30,
         },
     ];
 
@@ -336,7 +333,6 @@ async fn test_http_probe_scrape_and_get_metrics() {
             ("service".to_string(), "test-service".to_string()),
             ("env".to_string(), "test".to_string()),
         ])),
-        scrape_interval: ScrapeInterval::S30,
     }];
 
     probe.set_targets(targets);
@@ -379,7 +375,6 @@ async fn test_http_probe_multiple_targets() {
             follow_redirect: true,
             auth: None,
             labels: Some(HashMap::from([("name".to_string(), "server1".to_string())])),
-            scrape_interval: ScrapeInterval::S30,
         },
         HttpTarget {
             url: server2.url(),
@@ -391,7 +386,6 @@ async fn test_http_probe_multiple_targets() {
             follow_redirect: true,
             auth: None,
             labels: Some(HashMap::from([("name".to_string(), "server2".to_string())])),
-            scrape_interval: ScrapeInterval::S30,
         },
     ];
 
@@ -425,7 +419,6 @@ async fn test_http_probe_metrics_cleared_after_get() {
         follow_redirect: true,
         auth: None,
         labels: None,
-        scrape_interval: ScrapeInterval::S30,
     }];
 
     probe.set_targets(targets);
@@ -468,7 +461,6 @@ async fn test_probe_concurrent_scrapes() {
         follow_redirect: true,
         auth: None,
         labels: None,
-        scrape_interval: ScrapeInterval::S30,
     }];
 
     {
