@@ -67,7 +67,7 @@ fn icmp_target(ipv4: &str) -> IcmpTarget {
 
 fn exporters_with(reference: &str) -> ExportersMap {
     let mut exporters: ExportersMap = HashMap::new();
-    exporters.insert(reference.to_string(), Arc::new(NoopExporter::default()));
+    exporters.insert(reference.to_string(), Arc::new(NoopExporter));
     exporters
 }
 

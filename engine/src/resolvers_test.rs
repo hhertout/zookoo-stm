@@ -68,7 +68,7 @@ async fn start_one_shot_http_server(
 
         let response = format!(
             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
-            json_body.as_bytes().len(),
+            json_body.len(),
             json_body
         );
 
@@ -81,7 +81,7 @@ async fn start_one_shot_http_server(
 
 fn exporters_with(reference: &str) -> ExportersMap {
     let mut exporters: ExportersMap = HashMap::new();
-    exporters.insert(reference.to_string(), Arc::new(NoopExporter::default()));
+    exporters.insert(reference.to_string(), Arc::new(NoopExporter));
     exporters
 }
 

@@ -59,7 +59,7 @@ where
             return;
         };
 
-        let _ = discovery.update();
+        discovery.update();
         self.discovery_updates = discovery.subscribe();
     }
 
