@@ -78,4 +78,12 @@ discovery "api" "dynamic_targets" {
 
   refresh_interval = "1h"
 }
+
+probe "http" "dynamic_http_checks" {
+  scrape_interval = "30s"
+  target_from = discovery.api.dynamic_targets
+  refresh_interval = "15s"
+
+  forward_to = [exporter.otlp.default]
+}
 ```
