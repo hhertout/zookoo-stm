@@ -158,7 +158,7 @@ where
         }
     }
 
-    fn update(&self) -> () {
+    fn update(&self) {
         // Prevent spawning multiple concurrent update loops if several pipelines share
         // the same discovery instance (e.g. grouped by scrape interval).
         if self.update_started.swap(true, Ordering::SeqCst) {
@@ -167,7 +167,7 @@ where
         }
 
         let this = self.clone();
-        let _ = tokio::spawn(async move {
+        tokio::spawn(async move {
             log::warn!(
                 "event=warn msg=starting_api_discovery_update_task interval_ms={}",
                 this.refresh_interval.to_duration().as_millis()

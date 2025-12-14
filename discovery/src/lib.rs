@@ -37,7 +37,7 @@ pub trait Discovery: Send + Sync {
     async fn get_targets(&self) -> Vec<Self::Target>;
 
     /// Refresh discovery state (async operation).
-    fn update(&self) -> () {}
+    fn update(&self) {}
 
     /// Monotonic version number for the cached targets.
     ///
