@@ -24,7 +24,6 @@ You can use the following arguments with probe.http:
 | headers | map(string) | Custom HTTP headers to send with the request. | | no |
 | labels | map(string) | Labels to attach to this target. | | no |
 | auth | object | Authentication configuration (see auth block below). | | no |
-| scrape_interval | duration | Override global scrape interval for this target. | 1m | no |
 | follow_redirect | boolean | Whether to follow HTTP redirects. | false | no |
 | skip_tls | boolean | Skip TLS certificate validation. | false | no |
 

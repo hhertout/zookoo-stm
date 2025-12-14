@@ -21,7 +21,6 @@ You can use the following arguments with probe.icmp:
 | fqdn | string | Fully qualified domain name to ping (will be resolved to IP). | | no* |
 | timeout_sec | integer | Timeout in seconds for the ICMP request. | 15 | no |
 | labels | map(string) | Labels to attach to this target. | | no |
-| scrape_interval | duration | Override global scrape interval for this target. | 1m | no |
 
 *At least one of `ipv4` or `fqdn` must be provided.
 

@@ -10,11 +10,19 @@ use exporter::Exporter;
 use opentelemetry_sdk::{metrics::SdkMeterProvider, trace::SdkTracerProvider};
 use probe::observability::{init_meter_provider, init_tracer_provider};
 
-use crate::pipeline::{PipelineBuilder, RunnablePipeline};
+use crate::pipeline::RunnablePipeline;
 
-mod group_by;
+//mod group_by;
+pub(crate) mod factory;
 pub(crate) mod pipeline;
+pub(crate) mod resolvers;
 pub(crate) mod types;
+
+#[cfg(test)]
+mod factory_tests;
+
+#[cfg(test)]
+mod resolvers_test;
 
 /// Type alias for labeled exporters map
 pub type ExportersMap = HashMap<String, Arc<dyn Exporter + Send + Sync>>;
@@ -90,9 +98,10 @@ impl Engine {
     }
 
     /// Build pipelines from configuration
-    fn build_pipelines(&mut self) {
+    async fn build_pipelines(&mut self) {
         let config = self.config.as_ref().expect("Configuration must be loaded first");
-        self.pipelines = PipelineBuilder::from_config(config, self.exporters.clone());
+        self.pipelines =
+            factory::PipelineBuilder::from_config(config, self.exporters.clone()).await;
         log::info!("event=pipelines_created count={}", self.pipelines.len());
     }
 
@@ -110,7 +119,7 @@ impl Engine {
         self.build_exporters();
 
         // Phase 3: Build pipelines
-        self.build_pipelines();
+        self.build_pipelines().await;
 
         if self.pipelines.is_empty() {
             log::warn!("event=no_pipelines");

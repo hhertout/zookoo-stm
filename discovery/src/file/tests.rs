@@ -2,6 +2,7 @@
 mod file_tests {
     use super::super::FileDiscovery;
     use crate::Discovery;
+    use configuration::model::discovery::DiscoveryFile;
     use serde::{Deserialize, Serialize};
     use std::io::Write;
     use tempfile::NamedTempFile;
@@ -24,12 +25,23 @@ mod file_tests {
         file
     }
 
+    fn file_conf(path: impl Into<String>) -> DiscoveryFile {
+        DiscoveryFile { path: path.into(), labels: None, scrape_interval: None, probe_type: None }
+    }
+
     #[tokio::test]
     async fn test_file_discovery_with_valid_file() {
         let json_content = r#"[{"url": "https://example.com", "name": "Test"}]"#;
         let temp_file = create_temp_json_file(json_content);
-        let discovery = FileDiscovery::<TestHttpTarget>::new(temp_file.path());
-        let targets = discovery.discover();
+        let discovery = FileDiscovery::<TestHttpTarget>::new(file_conf(
+            temp_file.path().to_string_lossy().to_string(),
+        ));
+
+        // new() no longer loads targets
+        assert!(discovery.get_targets().await.is_empty());
+
+        discovery.discover().await;
+        let targets = discovery.get_targets().await;
         assert_eq!(targets.len(), 1, "Should load targets from valid file");
     }
 
@@ -43,9 +55,13 @@ mod file_tests {
         let temp_file = create_temp_json_file(json_content);
         let file_path = temp_file.path().to_path_buf();
 
-        let discovery = FileDiscovery::<TestHttpTarget>::new(file_path);
+        let discovery = FileDiscovery::<TestHttpTarget>::new(file_conf(
+            file_path.to_string_lossy().to_string(),
+        ));
 
-        let targets = discovery.discover();
+        discovery.discover().await;
+
+        let targets = discovery.get_targets().await;
         assert_eq!(targets.len(), 2);
         assert_eq!(targets[0].url, "https://example.com");
         assert_eq!(targets[0].name, "Example");
@@ -63,9 +79,13 @@ mod file_tests {
         let temp_file = create_temp_json_file(json_content);
         let file_path = temp_file.path().to_path_buf();
 
-        let discovery = FileDiscovery::<TestIcmpTarget>::new(file_path);
+        let discovery = FileDiscovery::<TestIcmpTarget>::new(file_conf(
+            file_path.to_string_lossy().to_string(),
+        ));
 
-        let targets = discovery.discover();
+        discovery.discover().await;
+
+        let targets = discovery.get_targets().await;
         assert_eq!(targets.len(), 2);
         assert_eq!(targets[0].ip, "8.8.8.8");
         assert_eq!(targets[0].name, "Google DNS");
@@ -80,16 +100,23 @@ mod file_tests {
         let temp_file = create_temp_json_file(json_content);
         let file_path = temp_file.path().to_path_buf();
 
-        let discovery = FileDiscovery::<TestHttpTarget>::new(file_path);
+        let discovery = FileDiscovery::<TestHttpTarget>::new(file_conf(
+            file_path.to_string_lossy().to_string(),
+        ));
 
-        let targets = discovery.discover();
+        discovery.discover().await;
+
+        let targets = discovery.get_targets().await;
         assert_eq!(targets.len(), 0, "Empty JSON should result in no targets");
     }
 
     #[tokio::test]
     #[should_panic(expected = "Error while reading file")]
     async fn test_file_discovery_nonexistent_file() {
-        let _discovery = FileDiscovery::<TestHttpTarget>::new("/nonexistent/path/to/file.json");
+        let discovery = FileDiscovery::<TestHttpTarget>::new(file_conf(
+            "/nonexistent/path/to/file.json".to_string(),
+        ));
+        discovery.discover().await;
     }
 
     #[tokio::test]
@@ -101,17 +128,22 @@ mod file_tests {
         let temp_file = create_temp_json_file(json_content);
         let file_path = temp_file.path().to_path_buf();
 
-        let discovery = FileDiscovery::<TestHttpTarget>::new(file_path);
+        let discovery = FileDiscovery::<TestHttpTarget>::new(file_conf(
+            file_path.to_string_lossy().to_string(),
+        ));
 
-        // Call update (spawns async task)
-        discovery.update();
-
-        // Give it a moment to complete
-        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-
-        let targets = discovery.discover();
+        // Load once
+        discovery.discover().await;
+        let targets = discovery.get_targets().await;
         assert_eq!(targets.len(), 1);
         assert_eq!(targets[0].url, "https://example.com");
+
+        // update() is currently a no-op for FileDiscovery (default trait impl)
+        discovery.update();
+        tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
+
+        let targets = discovery.get_targets().await;
+        assert_eq!(targets.len(), 1);
     }
 
     #[tokio::test]
@@ -123,14 +155,18 @@ mod file_tests {
         let temp_file = create_temp_json_file(json_content);
         let file_path = temp_file.path().to_path_buf();
 
-        let discovery = FileDiscovery::<TestHttpTarget>::new(file_path);
+        let discovery = FileDiscovery::<TestHttpTarget>::new(file_conf(
+            file_path.to_string_lossy().to_string(),
+        ));
 
-        // Spawn multiple concurrent reads
+        discovery.discover().await;
+
+        // Spawn multiple concurrent reads of cached targets
         let handles: Vec<_> = (0..10)
             .map(|_| {
                 let disc = discovery.clone();
                 tokio::spawn(async move {
-                    let targets = disc.discover();
+                    let targets = disc.get_targets().await;
                     assert_eq!(targets.len(), 1);
                 })
             })
@@ -144,7 +180,7 @@ mod file_tests {
 
     #[tokio::test]
     async fn test_file_discovery_targets_loaded_at_creation() {
-        // FileDiscovery loads targets at creation time, not on each discover() call
+        // FileDiscovery now initializes empty and loads on discover().
         let json_content_v1 = r#"[
             {"url": "https://v1.com", "name": "Version 1"}
         ]"#;
@@ -152,23 +188,35 @@ mod file_tests {
         let temp_file = create_temp_json_file(json_content_v1);
         let file_path = temp_file.path().to_path_buf();
 
-        let discovery = FileDiscovery::<TestHttpTarget>::new(&file_path);
+        let discovery = FileDiscovery::<TestHttpTarget>::new(file_conf(
+            file_path.to_string_lossy().to_string(),
+        ));
 
-        let targets = discovery.discover();
+        assert!(discovery.get_targets().await.is_empty());
+
+        discovery.discover().await;
+        let targets = discovery.get_targets().await;
         assert_eq!(targets.len(), 1);
         assert_eq!(targets[0].url, "https://v1.com");
 
-        // Update file content - discover() won't see the changes without explicit reload
+        // Update file content - discover().await won't see the changes without explicit reload
         let json_content_v2 = r#"[
             {"url": "https://v2.com", "name": "Version 2"},
             {"url": "https://v3.com", "name": "Version 3"}
         ]"#;
         std::fs::write(&file_path, json_content_v2).expect("Failed to update file");
 
-        // Targets are cached, so we still get the original values
-        let targets = discovery.discover();
+        // Targets are cached, so without calling discover() again we still get the original values
+        let targets = discovery.get_targets().await;
         assert_eq!(targets.len(), 1);
         assert_eq!(targets[0].url, "https://v1.com");
+
+        // Reload from disk
+        discovery.discover().await;
+        let targets = discovery.get_targets().await;
+        assert_eq!(targets.len(), 2);
+        assert_eq!(targets[0].url, "https://v2.com");
+        assert_eq!(targets[1].url, "https://v3.com");
     }
 
     #[tokio::test]
@@ -180,13 +228,16 @@ mod file_tests {
         let temp_file = create_temp_json_file(json_content);
         let file_path = temp_file.path().to_path_buf();
 
-        let discovery1 = FileDiscovery::<TestHttpTarget>::new(file_path);
+        let discovery1 = FileDiscovery::<TestHttpTarget>::new(file_conf(
+            file_path.to_string_lossy().to_string(),
+        ));
 
         // Clone should share the same Arc<RwLock<Vec<T>>>
         let discovery2 = discovery1.clone();
 
-        let targets1 = discovery1.discover();
-        let targets2 = discovery2.discover();
+        discovery1.discover().await;
+        let targets1 = discovery1.get_targets().await;
+        let targets2 = discovery2.get_targets().await;
 
         assert_eq!(targets1.len(), 1);
         assert_eq!(targets2.len(), 1);
