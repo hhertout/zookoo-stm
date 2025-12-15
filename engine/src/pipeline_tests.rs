@@ -86,12 +86,10 @@ impl probe::Probe for NoopProbe {
         });
     }
 
-    fn scrape(&self) -> impl std::future::Future<Output = ()> + Send {
-        async {}
-    }
+    async fn scrape(&self) {}
 
-    fn get_metrics(&self) -> impl std::future::Future<Output = Vec<probe::MetricData>> + Send {
-        async { Vec::new() }
+    async fn get_metrics(&self) -> Vec<probe::MetricData> {
+        Vec::new()
     }
 }
 
@@ -131,7 +129,7 @@ async fn pipeline_processes_discovery_updates_even_when_starting_empty() {
     tokio::task::yield_now().await;
 
     assert!(
-        discovery.get_targets_calls() >= calls_after_start + 1,
+        discovery.get_targets_calls() > calls_after_start,
         "pipeline should refresh targets in response to discovery update"
     );
 
