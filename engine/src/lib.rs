@@ -15,14 +15,13 @@ use crate::pipeline::RunnablePipeline;
 //mod group_by;
 pub(crate) mod factory;
 pub(crate) mod pipeline;
-pub(crate) mod resolvers;
 pub(crate) mod types;
 
 #[cfg(test)]
-mod factory_tests;
+mod pipeline_tests;
 
 #[cfg(test)]
-mod resolvers_test;
+mod factory_tests;
 
 /// Type alias for labeled exporters map
 pub type ExportersMap = HashMap<String, Arc<dyn Exporter + Send + Sync>>;

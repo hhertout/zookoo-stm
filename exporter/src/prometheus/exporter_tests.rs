@@ -260,7 +260,7 @@ mod tests {
 
     #[test]
     fn test_remote_write_config_with_auth() {
-        use crate::config::AuthConfiguration;
+        use configuration::model::exporter::AuthConfiguration;
 
         let config = PrometheusRemoteWriteConfig {
             url: "http://localhost:9090/api/v1/write".to_string(),

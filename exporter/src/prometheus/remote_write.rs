@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::error::Error as StdError;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use crate::config::AuthConfiguration;
+use configuration::model::exporter::AuthConfiguration;
 
 /// Prometheus remote_write sample
 #[derive(Clone, PartialEq, Message)]

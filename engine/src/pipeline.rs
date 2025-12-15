@@ -59,8 +59,9 @@ where
             return;
         };
 
-        discovery.update();
+        // Subscribe first so we don't miss a fast initial notification.
         self.discovery_updates = discovery.subscribe();
+        discovery.update();
     }
 
     async fn refresh_targets_from_discovery(&mut self) {
@@ -79,7 +80,6 @@ where
                 "event=pipeline_no_targets pipeline={} recovery=retry_next_tick",
                 self.label,
             );
-            tokio::time::sleep(self.scrape_interval).await;
             return;
         }
 
