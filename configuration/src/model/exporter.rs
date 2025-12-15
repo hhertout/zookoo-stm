@@ -17,7 +17,7 @@ pub struct ExporterConfiguration {
     pub timescale: Option<HashMap<String, TimescaleExporterConfiguration>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct OtelGrpcExporterConfiguration {
     pub url: String,
     pub auth: Option<AuthConfiguration>,
@@ -27,14 +27,14 @@ pub struct OtelGrpcExporterConfiguration {
     pub metric_prefix: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct AuthConfiguration {
     pub username: Option<String>,
     pub password: Option<String>,
     pub bearer: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct PrometheusRemoteWriteConfiguration {
     pub url: String,
     #[serde(default = "default_prometheus_job")]
@@ -44,7 +44,7 @@ pub struct PrometheusRemoteWriteConfiguration {
     pub metric_prefix: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct TimescaleExporterConfiguration {
     pub connection_string: String,
     #[serde(default = "default_schema")]

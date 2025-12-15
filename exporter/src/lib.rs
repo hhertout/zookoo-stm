@@ -14,15 +14,15 @@ use configuration::model::Configuration;
 
 use crate::types::{ExportersMap, ProbeType};
 
-pub mod config;
 mod labels;
 pub mod otlp;
 pub mod prometheus;
+pub mod resolvers;
 pub mod timescale;
 pub mod types;
 
 #[cfg(test)]
-mod config_tests;
+mod resolvers_tests;
 
 pub const DEFAULT_METRIC_PREFIX: &str = "probe_";
 

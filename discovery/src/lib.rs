@@ -1,28 +1,19 @@
 pub(crate) mod api;
+pub mod builder;
 pub(crate) mod file;
+pub mod resolver;
 
 use async_trait::async_trait;
 use configuration::model::discovery::{DiscoveryApi, DiscoveryFile};
-use serde::de::DeserializeOwned;
-use std::sync::Arc;
 use tokio::sync::watch;
 
-use crate::{api::ApiDiscovery, file::FileDiscovery};
+#[cfg(test)]
+mod resolvers_test;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum DiscoveryType {
-    File,
-    Api,
-}
-
-impl From<&str> for DiscoveryType {
-    fn from(s: &str) -> Self {
-        match s {
-            "file" => DiscoveryType::File,
-            "api" => DiscoveryType::Api,
-            _ => panic!("Unknown discovery type: {}", s),
-        }
-    }
+    File(DiscoveryFile),
+    Api(DiscoveryApi),
 }
 
 #[async_trait]
@@ -54,24 +45,4 @@ pub trait Discovery: Send + Sync {
     fn subscribe(&self) -> Option<watch::Receiver<u64>> {
         None
     }
-}
-
-pub async fn build_discovery_file<T>(config: DiscoveryFile) -> Arc<dyn Discovery<Target = T>>
-where
-    T: Clone + std::fmt::Debug + Send + Sync + DeserializeOwned + 'static,
-{
-    let file_discovery = FileDiscovery::<T>::new(config);
-    file_discovery.discover().await;
-
-    Arc::new(file_discovery)
-}
-
-pub async fn build_discovery_api<T>(config: DiscoveryApi) -> Arc<dyn Discovery<Target = T>>
-where
-    T: Clone + std::fmt::Debug + Send + Sync + DeserializeOwned + 'static,
-{
-    let api_discovery = ApiDiscovery::<T>::new(config);
-    api_discovery.discover().await;
-
-    Arc::new(api_discovery)
 }

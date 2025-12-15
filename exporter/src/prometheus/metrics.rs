@@ -19,7 +19,7 @@ use configuration::model::Configuration;
 
 use super::remote_write::PrometheusRemoteWrite;
 use crate::{
-    DEFAULT_METRIC_PREFIX, Exporter, ExportersMap, MetricData, config::AuthConfiguration, labels,
+    DEFAULT_METRIC_PREFIX, Exporter, ExportersMap, MetricData, labels,
     prometheus::PrometheusRemoteWriteConfig,
 };
 
@@ -126,11 +126,7 @@ impl Exporter for PrometheusRemoteWriteExporter {
 
             let remote_write_config = PrometheusRemoteWriteConfig {
                 url: prom_config.url.clone(),
-                auth: prom_config.auth.as_ref().map(|a| AuthConfiguration {
-                    username: a.username.clone(),
-                    password: a.password.clone(),
-                    bearer: a.bearer.clone(),
-                }),
+                auth: prom_config.auth.clone(),
                 job: prom_config.job.clone(),
                 instance: prom_config.instance.clone(),
                 extra_labels: labels.clone(),

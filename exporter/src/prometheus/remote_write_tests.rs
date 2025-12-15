@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
     use super::super::remote_write::*;
+    use configuration::model::exporter::AuthConfiguration;
     use std::collections::HashMap;
 
     #[test]
@@ -62,7 +63,7 @@ mod tests {
 
     #[test]
     fn test_config_with_auth() {
-        let mut auth = crate::config::AuthConfiguration {
+        let mut auth = AuthConfiguration {
             username: Some("user".to_string()),
             password: Some("pass".to_string()),
             bearer: None,

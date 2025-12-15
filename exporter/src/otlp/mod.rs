@@ -12,7 +12,7 @@ use opentelemetry_otlp::{
 };
 use opentelemetry_sdk::{Resource, metrics::SdkMeterProvider};
 
-use crate::config::OtelGrpcExporterConfiguration;
+use configuration::model::exporter::{AuthConfiguration, OtelGrpcExporterConfiguration};
 use std::fs;
 
 pub mod exporter;
@@ -70,7 +70,7 @@ pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterP
     }
 
     // Configure authentication if needed
-    if let Some(auth) = config.auth_header() {
+    if let Some(auth) = auth_header(&config.auth) {
         log::warn!("otel authentication enable");
         builder = builder.with_metadata(auth.to_metadata());
     }
@@ -98,6 +98,18 @@ pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterP
 
     global::set_meter_provider(meter_provider.clone());
     meter_provider
+}
+
+fn auth_header(auth: &Option<AuthConfiguration>) -> Option<AuthHeader> {
+    auth.as_ref().and_then(|auth| {
+        if let Some(bearer) = &auth.bearer {
+            Some(AuthHeader::Bearer(bearer.clone()))
+        } else if let (Some(username), Some(password)) = (&auth.username, &auth.password) {
+            Some(AuthHeader::Basic { username: username.clone(), password: password.clone() })
+        } else {
+            None
+        }
+    })
 }
 
 pub fn shutdown(meter_exporter: SdkMeterProvider) -> Result<(), String> {

@@ -4,13 +4,13 @@ use configuration::model::{
     Configuration, ScrapeInterval,
     target::{HttpConfiguration, HttpTarget, IcmpConfiguration, IcmpTarget},
 };
-use discovery::Discovery;
+use discovery::{Discovery, resolver::resolve_discovery};
+use exporter::resolvers::resolve_exporters;
 use probe::{HttpProbe, IcmpProbe, Probe};
 
 use crate::{
     ExportersMap,
     pipeline::{Pipeline, RunnablePipeline},
-    resolvers::{resolve_discovery, resolve_exporters},
     types::ProbeType,
 };
 
@@ -105,8 +105,8 @@ impl PipelineBuilder {
             return pipelines;
         }
 
+        // Resolve exporters
         let resolved_exporters = resolve_exporters(probe_config.forward_to(), exporters);
-
         log::info!(
             "event=pipeline_created pipeline={} targets={} interval={:?}",
             label,
@@ -114,6 +114,7 @@ impl PipelineBuilder {
             probe_config.scrape_interval()
         );
 
+        // Create pipeline
         let mut pipeline = Pipeline::new(
             label.to_string(),
             probe_type,

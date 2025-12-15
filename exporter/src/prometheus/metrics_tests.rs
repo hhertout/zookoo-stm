@@ -123,7 +123,7 @@ mod tests {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: Some("instance-1".to_string()),
-            auth: Some(crate::config::AuthConfiguration {
+            auth: Some(configuration::model::exporter::AuthConfiguration {
                 username: Some("user".to_string()),
                 password: Some("pass".to_string()),
                 bearer: None,
@@ -141,7 +141,7 @@ mod tests {
             url: "http://localhost:9090/api/v1/write".to_string(),
             job: "test".to_string(),
             instance: None,
-            auth: Some(crate::config::AuthConfiguration {
+            auth: Some(configuration::model::exporter::AuthConfiguration {
                 username: None,
                 password: None,
                 bearer: Some("token123".to_string()),

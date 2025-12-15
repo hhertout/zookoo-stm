@@ -15,10 +15,11 @@ defaults {
 }
 
 probe "http" "default" {
+    scrap_interval = "10s"
     targets = [
         { 
             url = "https://google.com/", 
-            labels = { "env" = "test", "service_name" = "google" }, scrap_interval = "10s"
+            labels = { "env" = "test", "service_name" = "google" }
         }
     ]
 

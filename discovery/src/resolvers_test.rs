@@ -3,7 +3,6 @@ use std::{
     fs,
     net::SocketAddr,
     path::PathBuf,
-    sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
 };
 
@@ -12,29 +11,12 @@ use configuration::model::{
     defaults::Defaults,
     discovery::{DiscoveryApi, DiscoveryFile},
 };
-use exporter::{Exporter, MetricData};
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     net::TcpListener,
 };
 
-use crate::{
-    ExportersMap,
-    resolvers::{resolve_discovery, resolve_exporters},
-};
-
-#[derive(Default)]
-struct NoopExporter;
-
-impl Exporter for NoopExporter {
-    fn build(_config: &Configuration, _exporters: &mut exporter::types::ExportersMap)
-    where
-        Self: Sized,
-    {
-    }
-
-    fn export(&self, _probe_type: exporter::types::ProbeType, _metric_data: MetricData) {}
-}
+use crate::resolver::resolve_discovery;
 
 fn base_defaults() -> Defaults {
     Defaults {
@@ -77,12 +59,6 @@ async fn start_one_shot_http_server(
     });
 
     (addr, handle)
-}
-
-fn exporters_with(reference: &str) -> ExportersMap {
-    let mut exporters: ExportersMap = HashMap::new();
-    exporters.insert(reference.to_string(), Arc::new(NoopExporter));
-    exporters
 }
 
 #[tokio::test]
@@ -231,27 +207,4 @@ async fn resolve_api_discovery_invalid_reference_returns_none() {
     assert!(
         resolve_discovery::<HttpTarget>("discovery.api.dynamic.extra", &config).await.is_none()
     );
-}
-
-#[test]
-fn resolve_exporters_resolves_and_strips_wrapper() {
-    let forward_ref = "${exporter.otlp.main}".to_string();
-    let exporters = exporters_with("exporter.otlp.main");
-
-    let resolved = resolve_exporters(&[forward_ref], &exporters);
-    assert_eq!(resolved.len(), 1);
-}
-
-#[test]
-#[should_panic]
-fn resolve_exporters_panics_on_empty_forward_to() {
-    let exporters: ExportersMap = HashMap::new();
-    let _ = resolve_exporters(&[], &exporters);
-}
-
-#[test]
-#[should_panic]
-fn resolve_exporters_panics_on_unknown_exporter() {
-    let exporters: ExportersMap = HashMap::new();
-    let _ = resolve_exporters(&["exporter.otlp.missing".to_string()], &exporters);
 }
