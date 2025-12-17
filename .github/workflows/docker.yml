@@ -35,12 +35,15 @@ jobs:
           - dockerfile: .docker/deb.dockerfile
             suffix: ""
             latest_tag: "latest"
+            nightly_tag: "nightly"
           - dockerfile: .docker/alpine.dockerfile
             suffix: "-alpine"
             latest_tag: "latest-alpine"
+            nightly_tag: "nightly-alpine"
           - dockerfile: .docker/ubuntu.dockerfile
             suffix: "-ubuntu"
             latest_tag: "latest-ubuntu"
+            nightly_tag: "nightly-ubuntu"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,7 +60,22 @@ jobs:
           username: neryolo
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+      # Build and push - nightly - latest and versioned builded at every push on main (like unstable versions), ahead of a LTS release
+      - name: Build and push - nightly
+        uses: docker/build-push-action@v6
+        with:
+          context: ./
+          file: ${{ matrix.dockerfile }}
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ env.IMAGE_NAME }}:${{ matrix.nightly_tag }}
+          cache-from: type=gha,scope=${{ matrix.nightly_tag }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.nightly_tag }}
+
+      # Build and push - latest and versioned only if tag is present - override the 
+      # previous latest and versioned builded at every push on main with the new one
       - name: Build and push - latest
+        if: needs.prepare.outputs.tag != ''
         uses: docker/build-push-action@v6
         with:
           context: ./
@@ -68,6 +86,7 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.latest_tag }}
           cache-to: type=gha,mode=max,scope=${{ matrix.latest_tag }}
 
+      # Build and push - versioned only if tag is present with the specific tag as tag
       - name: Build and push - versioned
         if: needs.prepare.outputs.tag != ''
         uses: docker/build-push-action@v6
