@@ -129,7 +129,8 @@ impl PipelineBuilder {
 
         // Resolve exporters
         let span = info_span!("fetching_targets_from_discovery");
-        let resolved_exporters = resolve_exporters(probe_config.forward_to(), exporters).instrument(span);
+        let resolved_exporters =
+            resolve_exporters(probe_config.forward_to(), exporters).instrument(span);
         log::info!(
             "event=pipeline_created pipeline={} targets={} interval={:?}",
             label,
@@ -169,7 +170,7 @@ impl PipelineBuilder {
         if let Some(ref probe_wrapper) = config.probe {
             tracing::Span::current().record("http_pipelines", probe_wrapper.http.len());
             tracing::Span::current().record("icmp_pipelines", probe_wrapper.icmp.len());
-            
+
             for (label, http_config) in &probe_wrapper.http {
                 let http_pipelines = Self::build_pipelines::<
                     configuration::model::target::HttpTarget,
