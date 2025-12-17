@@ -59,7 +59,7 @@ impl Probe for IcmpProbe {
     async fn scrape(&self) {
         let targets = self.targets.as_ref().unwrap();
 
-        let futures = targets.iter().cloned().map(|target| {
+        let futures = targets.iter().map(|target| {
             let metrics = Arc::clone(&self.metrics);
 
             let ipv4 = target.ipv4.clone().unwrap_or_else(|| "unset".to_string());
