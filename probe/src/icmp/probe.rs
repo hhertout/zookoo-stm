@@ -73,7 +73,7 @@ impl Probe for IcmpProbe {
             );
 
             async move {
-                let (up, duration_ms) = match ping_target(&target).await {
+                let (up, duration_ms) = match ping_target(target).await {
                     Ok((ip, duration)) => {
                         log::info!(
                             "event=ping_success target={} up=1 duration_ms={}",
