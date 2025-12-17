@@ -8,6 +8,7 @@ use discovery::{Discovery, resolver::resolve_discovery};
 use exporter::resolvers::resolve_exporters;
 use probe::{HttpProbe, IcmpProbe, Probe};
 use tokio::sync::RwLock;
+use tracing::{Instrument, error_span, info_span};
 
 use crate::{
     ExportersMap,
@@ -95,8 +96,10 @@ impl PipelineBuilder {
         let mut targets: Vec<T> = Vec::new();
         let mut discovery: Option<Arc<RwLock<dyn Discovery<Target = T> + Send + Sync>>> = None;
         if let Some(target_discovery) = probe_config.target_from() {
-            discovery = resolve_discovery::<T>(target_discovery, config).await;
+            let span = info_span!("resolving_discovery", target_from = %target_discovery);
+            discovery = resolve_discovery::<T>(target_discovery, config).instrument(span).await;
             if discovery.is_none() {
+                error_span!("could_not_resolve_target_from", target_from = %target_discovery);
                 log::error!(
                     "event=error pipeline={} msg=could_not_resolve_target_from target_from={}",
                     label,
@@ -106,7 +109,8 @@ impl PipelineBuilder {
             }
 
             if let Some(ref discovery) = discovery {
-                targets = discovery.read().await.get_targets().await;
+                let span = info_span!("fetching_targets_from_discovery");
+                targets = discovery.read().await.get_targets().instrument(span).await;
             }
         }
 
@@ -124,7 +128,8 @@ impl PipelineBuilder {
         }
 
         // Resolve exporters
-        let resolved_exporters = resolve_exporters(probe_config.forward_to(), exporters);
+        let span = info_span!("fetching_targets_from_discovery");
+        let resolved_exporters = resolve_exporters(probe_config.forward_to(), exporters).instrument(span);
         log::info!(
             "event=pipeline_created pipeline={} targets={} interval={:?}",
             label,
@@ -133,12 +138,13 @@ impl PipelineBuilder {
         );
 
         // Create pipeline
+        info_span!("creating_pipeline");
         let mut pipeline = Pipeline::new(
             label.to_string(),
             probe_type,
             discovery.clone(),
             probe_init(),
-            resolved_exporters,
+            resolved_exporters.inner().to_vec(),
             probe_config.scrape_interval().to_duration(),
         );
         pipeline.targets = Some(targets);
@@ -163,6 +169,7 @@ impl PipelineBuilder {
         if let Some(ref probe_wrapper) = config.probe {
             tracing::Span::current().record("http_pipelines", probe_wrapper.http.len());
             tracing::Span::current().record("icmp_pipelines", probe_wrapper.icmp.len());
+            
             for (label, http_config) in &probe_wrapper.http {
                 let http_pipelines = Self::build_pipelines::<
                     configuration::model::target::HttpTarget,

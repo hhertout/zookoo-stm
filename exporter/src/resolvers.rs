@@ -6,6 +6,7 @@ use crate::{Exporter, types::ExportersMap};
 
 /// Resolve exporters from forward_to references
 /// References can be like "exporter.otlp.main" or "${exporter.otlp.main}"
+#[tracing::instrument(skip_all)]
 pub fn resolve_exporters(
     forward_to: &[String],
     all_exporters: &ExportersMap,

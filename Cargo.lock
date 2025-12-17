@@ -786,6 +786,7 @@ dependencies = [
  "snap",
  "sqlx",
  "tokio",
+ "tracing",
  "urlencoding",
 ]
 

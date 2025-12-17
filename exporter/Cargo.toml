@@ -24,3 +24,4 @@ prost = "0.14.1"
 prost-types = "0.14.1"
 snap = "1.1.1"
 chrono = { version = "0.4", features = ["serde"] }
+tracing = { version = "0.1", features = ["attributes"] }
