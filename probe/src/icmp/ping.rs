@@ -5,17 +5,15 @@ use std::{
 };
 
 use configuration::model::target::IcmpTarget;
-use opentelemetry::{
-    Context, KeyValue,
-    trace::{Status, TraceContextExt},
-};
 use serde::Serialize;
 use tokio::{net::lookup_host, process::Command};
+use tracing::field;
 
-use crate::{ScrapeError, observability::child_span_from_context};
+use crate::ScrapeError;
 
 /// Sanitize IP address to prevent command injection
 /// Only allows valid IPv4 format: digits and dots
+#[tracing::instrument(level = "debug", skip(ip), fields(ip_len = ip.len()))]
 pub(super) fn sanitize_ip(ip: &str) -> Result<String, ScrapeError> {
     if ip.is_empty() {
         return Err(ScrapeError::InvalidInput("IP address cannot be empty".to_string()));
@@ -30,6 +28,7 @@ pub(super) fn sanitize_ip(ip: &str) -> Result<String, ScrapeError> {
 
 /// Sanitize timeout value to prevent command injection
 /// Only allows positive integers between 1 and 3600 (1 hour max)
+#[tracing::instrument(level = "debug", fields(timeout_sec = timeout))]
 pub(super) fn sanitize_timeout(timeout: u16) -> Result<String, ScrapeError> {
     if timeout > 0 && timeout <= 3600 {
         Ok(timeout.to_string())
@@ -49,34 +48,34 @@ pub struct IcmpMetrics {
 }
 
 impl IcmpMetrics {
+    #[tracing::instrument(level = "debug", skip(self))]
     pub fn to_logfmt(&self) -> String {
         format!("up={} duration={:?}", self.up, self.duration)
     }
 }
 
+#[tracing::instrument(
+    level = "info",
+    skip(target),
+    fields(ipv4 = field::Empty, fqdn = field::Empty, timeout_sec = target.timeout_sec)
+)]
 pub async fn ping_target(
     target: &IcmpTarget,
-    ctx: Context,
 ) -> Result<(Ipv4Addr, Duration), Box<dyn std::error::Error>> {
-    let cx_with_span = child_span_from_context("ping_target", ctx.clone(), vec![]);
-    let span_ref = cx_with_span.span();
+    let span = tracing::Span::current();
 
     let ip = if let Some(ipv4) = &target.ipv4 {
-        span_ref.set_attribute(KeyValue::new("ipv4", ipv4.clone()));
+        span.record("ipv4", tracing::field::display(ipv4));
 
-        let ip = Ipv4Addr::from_str(ipv4)?;
-
-        span_ref.set_status(Status::Ok);
-        ip
+        Ipv4Addr::from_str(ipv4)?
     } else if let Some(fqdn) = &target.fqdn {
-        span_ref.set_attribute(KeyValue::new("fqdn", fqdn.clone()));
+        span.record("fqdn", tracing::field::display(fqdn));
 
         let ip = resolve_ip_from_url(fqdn).await?;
-        span_ref.set_attribute(KeyValue::new("ipv4", ip.to_string()));
+        span.record("ipv4", tracing::field::display(ip));
 
         ip
     } else {
-        span_ref.set_status(Status::Error { description: "ipv4 & fqdn are unset".into() });
         return Err(Box::new(ScrapeError::TypeError("ipv4 & fqdn are unset".to_string())));
     };
 
@@ -93,19 +92,16 @@ pub async fn ping_target(
     match output {
         Ok(_) => {
             log::debug!("event=ping_complete host={:?} status=success", ip);
-            span_ref.set_status(Status::Ok);
             Ok((ip, start.elapsed()))
         }
         Err(err) => {
             log::error!("event=ping_complete status=failed err={:?}", err.to_string());
-            span_ref.set_status(Status::Error {
-                description: format!("host {:?} not reachable", target).into(),
-            });
             Err(Box::new(ScrapeError::NetworkError(format!("host {:?} not reachable", target))))
         }
     }
 }
 
+#[tracing::instrument(level = "debug", fields(fqdn = %fqdn))]
 async fn resolve_ip_from_url(fqdn: &str) -> Result<Ipv4Addr, ScrapeError> {
     let lookup_result = lookup_host((fqdn, 0)).await.map_err(|err| {
         log::error!("{}", err);

@@ -16,6 +16,7 @@ use configuration::model::exporter::{AuthConfiguration, OtelGrpcExporterConfigur
 use std::fs;
 
 pub mod exporter;
+pub mod meter_provider;
 pub mod metrics;
 
 #[cfg(test)]
@@ -53,6 +54,19 @@ fn get_resource() -> Resource {
 pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterProvider {
     log::info!("event=init_otel_exporter endpoint={}", config.url);
 
+    let meter_provider = build_metrics_provider(config, get_resource());
+    global::set_meter_provider(meter_provider.clone());
+    meter_provider
+}
+
+/// Build a metrics provider for a specific OTLP exporter configuration.
+///
+/// This does NOT set the global meter provider: call sites that need global behavior
+/// can still use `init_metrics_exporter`, while per-exporter routing should use this.
+pub fn build_metrics_provider(
+    config: OtelGrpcExporterConfiguration,
+    resource: Resource,
+) -> SdkMeterProvider {
     let mut builder = MetricExporter::builder().with_tonic().with_endpoint(config.url.clone());
 
     // Configure TLS if needed
@@ -65,23 +79,19 @@ pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterP
             tls_config = tls_config.with_native_roots();
         }
 
-        // Apply tls
         builder = builder.with_tls_config(tls_config);
     }
 
     // Configure authentication if needed
     if let Some(auth) = auth_header(&config.auth) {
-        log::warn!("otel authentication enable");
         builder = builder.with_metadata(auth.to_metadata());
     }
 
     // Configure custom certificate if needed
     if let Some(cert_path) = config.cert_path {
-        log::warn!("otel custom certificate enable");
         if let Ok(pem) = fs::read_to_string(&cert_path) {
             let ca_certificate = Certificate::from_pem(pem);
             let tls_config = ClientTlsConfig::new().ca_certificate(ca_certificate);
-
             builder = builder.with_tls_config(tls_config)
         } else {
             log::error!("FAIL TO GET CUSTOM CERT FILE FROM PATH {}", cert_path);
@@ -91,13 +101,7 @@ pub fn init_metrics_exporter(config: OtelGrpcExporterConfiguration) -> SdkMeterP
 
     let exporter = builder.build().expect("fail to create metric exporter");
 
-    let meter_provider = SdkMeterProvider::builder()
-        .with_periodic_exporter(exporter)
-        .with_resource(get_resource())
-        .build();
-
-    global::set_meter_provider(meter_provider.clone());
-    meter_provider
+    SdkMeterProvider::builder().with_periodic_exporter(exporter).with_resource(resource).build()
 }
 
 fn auth_header(auth: &Option<AuthConfiguration>) -> Option<AuthHeader> {

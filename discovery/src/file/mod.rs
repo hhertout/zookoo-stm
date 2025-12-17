@@ -47,16 +47,16 @@ where
     }
 
     /// Load targets synchronously (used at startup)
+    #[tracing::instrument(level = "debug", skip(self), fields(path = %self.file_path.display()))]
     fn load_targets_sync(&self) -> Vec<T> {
         match fs::read_to_string(&self.file_path) {
             Ok(content) => match serde_json::from_str(&content) {
                 Ok(targets) => targets,
                 Err(e) => {
-                    log::error!("event=error msg=INVALID_CONFIGURATION");
-                    log::error!(
-                        "event=error msg=failed_to_parse_targets remediation=ignoring... path={} err={}",
-                        self.file_path.display(),
-                        e
+                    tracing::error!(
+                        path = %self.file_path.display(),
+                        error = %e,
+                        "discovery_file_invalid_json"
                     );
                     panic!(
                         "Error while parsing the file... please ensure the file contains valid JSON targets"
@@ -64,8 +64,11 @@ where
                 }
             },
             Err(e) => {
-                log::error!("INVALID CONFIGURATION");
-                log::error!("{}", e);
+                tracing::error!(
+                    path = %self.file_path.display(),
+                    error = %e,
+                    "discovery_file_read_failed"
+                );
                 panic!("Error while reading file... please check the file discovery configuration");
             }
         }
@@ -79,10 +82,17 @@ where
 {
     type Target = T;
 
+    #[tracing::instrument(
+        level = "info",
+        skip(self),
+        fields(path = %self.file_path.display(), targets = tracing::field::Empty, version = tracing::field::Empty)
+    )]
     async fn discover(&self) {
         let targets = self.load_targets_sync();
+        tracing::Span::current().record("targets", targets.len());
         self.targets.write().await.clone_from(&targets);
         self.version.fetch_add(1, Ordering::Relaxed);
+        tracing::Span::current().record("version", self.version());
         let _ = self.update_tx.send(self.version());
     }
 

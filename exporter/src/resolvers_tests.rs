@@ -1,5 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
+use tokio::sync::RwLock;
+
 use crate::resolvers::resolve_exporters;
 use crate::types::{ExportersMap, ProbeType};
 use crate::{Exporter, MetricData};
@@ -14,12 +16,16 @@ impl Exporter for NoopExporter {
     {
     }
 
+    fn get_exporter_type(&self) -> crate::types::ExporterType {
+        crate::types::ExporterType::Otel
+    }
+
     fn export(&self, _probe_type: ProbeType, _metric_data: MetricData) {}
 }
 
 fn exporters_with(key: &str) -> ExportersMap {
     let mut exporters: ExportersMap = HashMap::new();
-    exporters.insert(key.to_string(), Arc::new(NoopExporter));
+    exporters.insert(key.to_string(), Arc::new(RwLock::new(NoopExporter)));
     exporters
 }
 

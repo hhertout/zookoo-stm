@@ -2,20 +2,17 @@
 //!
 //! Provides TLS connection handling with certificate inspection using rustls.
 
-use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use opentelemetry::trace::{Span, TraceContextExt};
 use rustls::pki_types::ServerName;
 use rustls::{ClientConfig, RootCertStore};
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
 use tokio_rustls::TlsConnector;
 use tokio_rustls::client::TlsStream;
+use tracing::instrument;
 use x509_parser::prelude::*;
-
-use crate::observability::get_empty_attributes;
 
 /// TLS certificate information extracted during handshake
 #[derive(Debug, Clone)]
@@ -63,11 +60,8 @@ pub struct TlsHandler {
 
 impl TlsHandler {
     /// Create a new TLS handler with system root certificates
+    #[instrument(name = "tls_handler_new", fields(skip_verify = skip_verify))]
     pub fn new(skip_verify: bool) -> Result<Self, String> {
-        let mut attr = HashMap::new();
-        attr.insert("skip_verify", skip_verify.to_string());
-        crate::span!("tls_handler_new".to_string(), attr);
-
         // Install the default crypto provider if not already installed
         let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
 
@@ -105,15 +99,12 @@ impl TlsHandler {
     /// # Returns
     /// * `Ok(TlsResult)` - Contains TLS stream, timing, and cert info
     /// * `Err(String)` - Error message if handshake fails
+    #[instrument(name = "tls_handshake_execute", skip(self, stream), fields(server_name = %server_name))]
     pub async fn handshake(
         &self,
         stream: TcpStream,
         server_name: &str,
     ) -> Result<TlsResult<TcpStream>, String> {
-        let mut attr = HashMap::new();
-        attr.insert("server_name", server_name.to_string());
-        let _ctx = crate::span!("tls_handshake_execute".to_string(), attr);
-
         let start = Instant::now();
 
         let server_name = ServerName::try_from(server_name.to_string())
@@ -134,12 +125,11 @@ impl TlsHandler {
     }
 
     /// Extract certificate information from a TLS stream
+    #[instrument(name = "tls_extract_cert_info", skip(self, stream))]
     fn extract_cert_info<S: AsyncRead + AsyncWrite + Unpin>(
         &self,
         stream: &TlsStream<S>,
     ) -> CertInfo {
-        crate::span!("tls_extract_cert_info".to_string(), get_empty_attributes());
-
         let (_, conn) = stream.get_ref();
 
         let tls_version = match conn.protocol_version() {

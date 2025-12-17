@@ -1,23 +1,61 @@
 use std::{collections::HashMap, sync::Arc};
 
-use configuration::model::Configuration;
+use configuration::model::{Configuration, exporter::OtelGrpcExporterConfiguration};
+use tokio::sync::RwLock;
 
 use crate::{
     Exporter, ExportersMap, MetricData, ProbeType, labels,
-    otlp::metrics::{HttpMetricsParams, MetricsExporter},
+    otlp::{
+        meter_provider::init_meter_provider,
+        metrics::{HttpMetricsParams, MetricsExporter},
+    },
+    types::ExporterType,
 };
 
 pub struct OtelExporter {
+    config: OtelGrpcExporterConfiguration,
     metric_exporter: MetricsExporter,
 }
 
 impl OtelExporter {
-    pub fn new(labels: HashMap<String, String>, metric_prefix: Option<String>) -> Self {
-        OtelExporter { metric_exporter: MetricsExporter::new(labels, metric_prefix) }
+    pub fn new(
+        config: OtelGrpcExporterConfiguration,
+        labels: HashMap<String, String>,
+        metric_prefix: Option<String>,
+    ) -> Self {
+        OtelExporter { config, metric_exporter: MetricsExporter::new(labels, metric_prefix, None) }
+    }
+
+    /// Initialize observability (tracing and metrics providers)
+    fn init_meter_exporter(&mut self) {
+        let metric_provider = init_meter_provider(
+            self.config.clone(),
+            "zookoo".to_string(),
+            "dev".to_string(),
+            Some("gbl".to_string()),
+        );
+        self.metric_exporter.set_meter_provider(metric_provider);
+    }
+}
+
+impl Drop for OtelExporter {
+    fn drop(&mut self) {
+        if let Some(meter_provider) = &self.metric_exporter.meter_provider {
+            let _ = meter_provider.shutdown();
+        }
     }
 }
 
 impl Exporter for OtelExporter {
+    fn get_exporter_type(&self) -> ExporterType {
+        ExporterType::Otel
+    }
+
+    fn initialize(&mut self) {
+        log::info!("inializing OTEL exporter");
+        self.init_meter_exporter();
+    }
+
     fn build(config: &Configuration, exporters: &mut ExportersMap) {
         let exporter_wrapper = match config.exporter {
             Some(ref wrapper) => wrapper,
@@ -26,6 +64,7 @@ impl Exporter for OtelExporter {
                 return;
             }
         };
+
         for (label, otel_config) in &exporter_wrapper.otlp {
             let key = format!("exporter.otlp.{}", label);
             log::info!("event=create_exporter type=otlp key={} endpoint={}", key, otel_config.url);
@@ -39,8 +78,14 @@ impl Exporter for OtelExporter {
             let prefix =
                 otel_config.metric_prefix.clone().or_else(|| config.defaults.metric_prefix.clone());
 
-            let exporter = OtelExporter::new(labels, prefix);
-            exporters.insert(key, Arc::new(exporter));
+            log::info!(
+                "event=otlp_meter_provider_created exporter={} endpoint={}",
+                label,
+                otel_config.url
+            );
+
+            let exporter = OtelExporter::new(otel_config.clone(), labels, prefix);
+            exporters.insert(key, Arc::new(RwLock::new(exporter)));
         }
     }
 

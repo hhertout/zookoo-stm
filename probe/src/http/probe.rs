@@ -8,11 +8,8 @@ use std::sync::Arc;
 
 use configuration::model::target::HttpTarget;
 use futures::future::join_all;
-use opentelemetry::global::ObjectSafeSpan;
-use opentelemetry::trace::{Status, TraceContextExt};
 use tokio::sync::Mutex;
 
-use crate::observability::get_empty_attributes;
 use crate::{MetricData, Probe};
 
 use super::client::{AuthConfig, HttpClient, HttpRequestConfig};
@@ -79,8 +76,6 @@ impl Probe for HttpProbe {
     type Target = HttpTarget;
 
     fn init() -> Self {
-        crate::span!("init".to_string(), get_empty_attributes());
-
         HttpProbe {
             targets: Vec::new(),
             client: Arc::new(HttpClient::new()),
@@ -89,13 +84,10 @@ impl Probe for HttpProbe {
     }
 
     fn set_targets(&mut self, targets: Vec<Self::Target>) {
-        crate::span!("set_targets".to_string(), get_empty_attributes());
         self.targets = targets;
     }
 
     fn get_metrics(&self) -> impl std::future::Future<Output = Vec<MetricData>> + Send {
-        crate::span!("get_metrics".to_string(), get_empty_attributes());
-
         let metrics = Arc::clone(&self.metrics);
         async move {
             let mut guard = metrics.lock().await;
@@ -106,22 +98,12 @@ impl Probe for HttpProbe {
     }
 
     async fn scrape(&self) {
-        let ctx = crate::span!("scrape_target".to_string(), get_empty_attributes());
-        let guard = ctx.clone().attach();
-
         let futures = self.targets.iter().map(|target| {
             let target = target.clone();
-            let ctx = ctx.clone();
             let client = Arc::clone(&self.client);
             let metrics_store = Arc::clone(&self.metrics);
 
             async move {
-                let mut attr = HashMap::new();
-                attr.insert("url", target.url.clone());
-                attr.insert("http_method", target.method.clone());
-                attr.insert("expected_status_code", target.expected_status_code.to_string());
-                let ctx_with_span = crate::child_span!(ctx, "scrape_http_target".to_string(), attr);
-
                 let kind = if target.url.starts_with("https") {
                     TargetType::HTTPS
                 } else {
@@ -133,22 +115,6 @@ impl Probe for HttpProbe {
                 // Execute the probe with unified timing
                 let config = Self::to_request_config(&target);
                 let probe_metrics = client.execute(&config).await;
-
-                // Set span status based on probe result
-                let span_ref = ctx_with_span.span();
-                if probe_metrics.success {
-                    span_ref.set_status(Status::Ok);
-                } else if probe_metrics.up {
-                    span_ref.set_status(Status::Error {
-                        description: format!(
-                            "status_code={} expected={}",
-                            probe_metrics.status_code, config.expected_status_code
-                        )
-                        .into(),
-                    });
-                } else {
-                    span_ref.set_status(Status::Error { description: "target unreachable".into() });
-                }
 
                 log::info!(
                     "event=metrics target={} job=zookoo {}",
@@ -165,7 +131,6 @@ impl Probe for HttpProbe {
             }
         });
 
-        drop(guard);
         let _ = join_all(futures).await;
     }
 }

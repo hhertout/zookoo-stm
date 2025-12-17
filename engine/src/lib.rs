@@ -3,12 +3,11 @@
 //! This crate is responsible for the scraping process of the different targets defined in the configuration file
 //!
 
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
 
 use configuration::model::Configuration;
-use exporter::Exporter;
-use opentelemetry_sdk::{metrics::SdkMeterProvider, trace::SdkTracerProvider};
-use probe::observability::{init_meter_provider, init_tracer_provider};
+use exporter::types::ExportersMap;
+use opentelemetry_sdk::metrics::SdkMeterProvider;
 
 use crate::pipeline::RunnablePipeline;
 
@@ -23,14 +22,10 @@ mod pipeline_tests;
 #[cfg(test)]
 mod factory_tests;
 
-/// Type alias for labeled exporters map
-pub type ExportersMap = HashMap<String, Arc<dyn Exporter + Send + Sync>>;
-
 pub struct Engine {
     config: Option<Configuration>,
     pipelines: Vec<Box<dyn RunnablePipeline>>,
     exporters: ExportersMap,
-    tracer_provider: Option<SdkTracerProvider>,
     meter_provider: Option<SdkMeterProvider>,
 }
 
@@ -40,12 +35,12 @@ impl Engine {
             pipelines: Vec::new(),
             config: None,
             exporters: HashMap::new(),
-            tracer_provider: None,
             meter_provider: None,
         }
     }
 
     /// Load and validate configuration
+    #[tracing::instrument(level = "info", skip(self, config))]
     pub fn load_configuration(
         &mut self,
         config: Configuration,
@@ -55,38 +50,8 @@ impl Engine {
         Ok(())
     }
 
-    /// Initialize observability (tracing and metrics providers)
-    fn init_observability(&mut self) {
-        let config = self.config.as_ref().expect("Configuration must be loaded first");
-
-        // Initialize meter provider from first OTEL exporter
-        if let Some(ref exporter_wrapper) = config.exporter
-            && let Some((label, otel_config)) = exporter_wrapper.otlp.iter().next()
-        {
-            log::info!("event=init_meter_provider exporter={} endpoint={}", label, otel_config.url);
-            self.meter_provider = Some(init_meter_provider(
-                otel_config.url.clone(),
-                "zookoo".to_string(),
-                "production".to_string(),
-                config.defaults.probe_zone.clone(),
-            ));
-        }
-
-        // Initialize tracer provider if self-monitoring is enabled
-        if let Some(ref self_monitoring) = config.defaults.self_monitoring
-            && self_monitoring.enable
-        {
-            log::info!("event=init_tracer_provider");
-            self.tracer_provider = Some(init_tracer_provider(
-                self_monitoring.otel_endpoint.clone(),
-                self_monitoring.service_name.clone(),
-                self_monitoring.env.clone(),
-                config.defaults.probe_zone.clone(),
-            ));
-        }
-    }
-
     /// Build exporters from configuration
+    #[tracing::instrument(level = "info", skip(self))]
     fn build_exporters(&mut self) {
         let config = self.config.as_ref().expect("Configuration must be loaded first");
         let mut exporters: ExportersMap = HashMap::new();
@@ -97,6 +62,7 @@ impl Engine {
     }
 
     /// Build pipelines from configuration
+    #[tracing::instrument(level = "info", skip(self))]
     async fn build_pipelines(&mut self) {
         let config = self.config.as_ref().expect("Configuration must be loaded first");
         self.pipelines =
@@ -105,14 +71,12 @@ impl Engine {
     }
 
     /// Run the engine - initializes providers, builds components, and spawns pipelines
+    #[tracing::instrument(level = "info", skip(self))]
     pub async fn run(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         if self.config.is_none() {
             log::error!("event=error msg=no_configuration_loaded");
             return Err("No configuration".into());
         }
-
-        // Phase 1: Initialize observability (meter & tracer providers)
-        self.init_observability();
 
         // Phase 2: Build exporters
         self.build_exporters();
@@ -151,10 +115,6 @@ impl Engine {
     pub fn shutdown(&mut self) {
         if let Some(provider) = self.meter_provider.take() {
             log::info!("event=shutdown component=meter_provider");
-            let _ = provider.shutdown();
-        }
-        if let Some(provider) = self.tracer_provider.take() {
-            log::info!("event=shutdown component=tracer_provider");
             let _ = provider.shutdown();
         }
     }

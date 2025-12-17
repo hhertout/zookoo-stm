@@ -1,5 +1,7 @@
 use std::{collections::HashMap, fmt, sync::Arc};
 
+use tokio::sync::RwLock;
+
 use crate::Exporter;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -17,7 +19,7 @@ impl fmt::Display for ProbeType {
     }
 }
 
-pub type ExportersMap = HashMap<String, Arc<dyn Exporter + Send + Sync>>;
+pub type ExportersMap = HashMap<String, Arc<RwLock<dyn Exporter + Send + Sync>>>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExporterType {

@@ -3,8 +3,9 @@
 #![allow(clippy::unwrap_used)]
 
 use clap::Parser;
-use configuration::{ConfigParser, HCL, Parse};
+use configuration::{ConfigParser, HCL, Parse, model::defaults::SelfMonitoringConfig};
 use dotenvy::dotenv;
+use exporter::otlp::meter_provider::init_tracer_provider;
 use pyroscope::{
     PyroscopeAgent,
     pyroscope::{PyroscopeAgentReady, PyroscopeAgentRunning},
@@ -14,6 +15,8 @@ use std::{env, io::Error, vec};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, fmt};
+
+use opentelemetry::trace::TracerProvider;
 
 mod ascii_art;
 mod cli;
@@ -30,10 +33,6 @@ async fn main() {
         Ok("production") => "/etc/zookoo/config.toml",
         _ => "dev/config.toml",
     };
-
-    // Initialize logging with CLI log level (or default to info)
-    let log_level = args.log_level.as_deref().unwrap_or("info");
-    init_logging(log_level);
 
     // TODO: create a helper for this
     if args.check_config {
@@ -57,14 +56,24 @@ async fn main() {
     let config = match ConfigParser.parse_from_file::<HCL>(&config_file) {
         Ok(cfg) => cfg,
         Err(e) => {
-            tracing::error!(
-                "event=error msg=failed_to_parse_config file={} err={}",
-                config_file,
-                e
-            );
-            return;
+            panic!("event=error msg=failed_to_parse_config file={} err={}", config_file, e);
         }
     };
+
+    let config_log_level = &config.defaults.log_level;
+    // Initialize logging with CLI log level (or default to info)
+    let log_level = args.log_level.as_deref().unwrap_or(config_log_level.as_str());
+
+    // If self-monitoring is enabled, init OTLP tracer provider *before* installing the subscriber,
+    // so the tracing-opentelemetry layer can export spans.
+    let mut tracer_provider = None;
+    if let Some(self_monitoring) = config.defaults.self_monitoring.as_ref()
+        && self_monitoring.enable
+    {
+        tracer_provider = Some(init_tracer_provider(self_monitoring.clone()));
+    }
+
+    init_logging(log_level, tracer_provider.as_ref());
 
     // Enable pyroscope monitoring
     let mut pyroscope_agent: Option<PyroscopeAgent<PyroscopeAgentRunning>> = None;
@@ -73,7 +82,7 @@ async fn main() {
     {
         tracing::warn!("event=pyroscope_start endpoint={}", scrape_config.pyroscope_endpoint);
 
-        match start_pyrsocope(&scrape_config.pyroscope_endpoint, &scrape_config.service_name) {
+        match start_pyrsocope(scrape_config.clone()) {
             Ok(agent) => match agent.start() {
                 Ok(started_agent) => {
                     pyroscope_agent = Some(started_agent);
@@ -117,7 +126,10 @@ async fn main() {
 /// The OTEL log level is derived from RUST_LOG:
 /// - debug/trace -> opentelemetry_otlp=debug (shows export errors)
 /// - info/warn/error -> opentelemetry_otlp=warn (quieter)
-fn init_logging(log_level: &str) {
+fn init_logging(
+    log_level: &str,
+    tracer_provider: Option<&opentelemetry_sdk::trace::SdkTracerProvider>,
+) {
     let log_level_to_apply = match log_level {
         "error" | "warn" | "debug" | "info" | "trace" => log_level,
         _ => "info",
@@ -137,12 +149,19 @@ fn init_logging(log_level: &str) {
         log_level_to_apply, otel_level, otel_level, otel_level
     );
 
-    // Initialize tracing subscriber with env filter and fmt layer
-    // RUST_LOG env var takes precedence if set
-    tracing_subscriber::registry()
+    let registry = tracing_subscriber::registry()
         .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(&filter)))
-        .with(fmt::layer().with_target(true))
-        .init();
+        .with(fmt::layer().with_target(true));
+
+    if let Some(provider) = tracer_provider {
+        // Bridge tracing spans/events to OpenTelemetry.
+        // Use the concrete SDK tracer so it satisfies PreSampledTracer.
+        let tracer = provider.tracer("zookoo");
+        let otel_layer = tracing_opentelemetry::layer().with_tracer(tracer);
+        registry.with(otel_layer).init();
+    } else {
+        registry.init();
+    }
 }
 
 fn check_config() -> Result<(), Error> {
@@ -151,14 +170,22 @@ fn check_config() -> Result<(), Error> {
 }
 
 fn start_pyrsocope(
-    endpoint: &str,
-    application_name: &str,
+    config: SelfMonitoringConfig,
 ) -> Result<PyroscopeAgent<PyroscopeAgentReady>, Box<dyn std::error::Error>> {
     let pprof_config = PprofConfig::new().report_thread_id().report_thread_name().sample_rate(100);
     let backend_impl = pprof_backend(pprof_config);
 
-    let mut pyroscope = PyroscopeAgent::builder(endpoint, application_name).backend(backend_impl);
+    let mut pyroscope = PyroscopeAgent::builder(config.pyroscope_endpoint, config.service_name)
+        .backend(backend_impl);
     let hostname = hostname::get().unwrap_or_default().to_string_lossy().to_string();
+
+    if let Some(basic_auth) = config.basic_auth {
+        pyroscope = pyroscope.basic_auth(basic_auth.username, basic_auth.password);
+    }
+
+    if let Some(bearer) = config.bearer {
+        pyroscope = pyroscope.auth_token(bearer);
+    }
 
     pyroscope = pyroscope.tags(vec![("host", &hostname)]);
 

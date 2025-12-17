@@ -7,6 +7,7 @@ use configuration::model::{
 use discovery::{Discovery, resolver::resolve_discovery};
 use exporter::resolvers::resolve_exporters;
 use probe::{HttpProbe, IcmpProbe, Probe};
+use tokio::sync::RwLock;
 
 use crate::{
     ExportersMap,
@@ -61,6 +62,20 @@ impl PipelineConfig<IcmpTarget> for IcmpConfiguration {
 }
 
 impl PipelineBuilder {
+    #[tracing::instrument(
+        level = "info",
+        skip(probe_config, config, exporters, probe_init),
+        fields(
+            pipeline_label = %label,
+            probe_type = ?probe_type,
+            scrape_interval = ?probe_config.scrape_interval(),
+            forward_to_len = probe_config.forward_to().len(),
+            has_target_from = probe_config.target_from().is_some(),
+            configured_targets = probe_config.targets().as_ref().map(|t| t.len()).unwrap_or(0),
+            resolved_targets = tracing::field::Empty,
+            final_targets = tracing::field::Empty,
+        )
+    )]
     pub async fn build_pipelines<T, P, C>(
         label: &str,
         probe_config: &C,
@@ -78,7 +93,7 @@ impl PipelineBuilder {
 
         // Resolve discovery
         let mut targets: Vec<T> = Vec::new();
-        let mut discovery: Option<Arc<dyn Discovery<Target = T> + Send + Sync>> = None;
+        let mut discovery: Option<Arc<RwLock<dyn Discovery<Target = T> + Send + Sync>>> = None;
         if let Some(target_discovery) = probe_config.target_from() {
             discovery = resolve_discovery::<T>(target_discovery, config).await;
             if discovery.is_none() {
@@ -91,15 +106,18 @@ impl PipelineBuilder {
             }
 
             if let Some(ref discovery) = discovery {
-                targets = discovery.get_targets().await;
+                targets = discovery.read().await.get_targets().await;
             }
         }
 
+        tracing::Span::current().record("resolved_targets", targets.len());
         // Override if targets are directly specified
         if let Some(conf_targets) = probe_config.targets() {
+            tracing::warn!("overriden targets from configuration");
             targets = conf_targets.clone();
         }
 
+        tracing::Span::current().record("final_targets", targets.len());
         if targets.is_empty() {
             log::error!("event=error pipeline={} msg=no_targets_or_target_from_specified", label);
             return pipelines;
@@ -131,6 +149,11 @@ impl PipelineBuilder {
 
     /// Build all pipelines from the configuration
     /// Returns a Vec of boxed RunnablePipeline trait objects
+    #[tracing::instrument(
+        level = "info",
+        skip(config, exporters),
+        fields(http_pipelines = tracing::field::Empty, icmp_pipelines = tracing::field::Empty)
+    )]
     pub async fn from_config(
         config: &Configuration,
         exporters: ExportersMap,
@@ -138,6 +161,8 @@ impl PipelineBuilder {
         let mut pipelines: Vec<Box<dyn RunnablePipeline>> = Vec::new();
 
         if let Some(ref probe_wrapper) = config.probe {
+            tracing::Span::current().record("http_pipelines", probe_wrapper.http.len());
+            tracing::Span::current().record("icmp_pipelines", probe_wrapper.icmp.len());
             for (label, http_config) in &probe_wrapper.http {
                 let http_pipelines = Self::build_pipelines::<
                     configuration::model::target::HttpTarget,
