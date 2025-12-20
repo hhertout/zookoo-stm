@@ -95,9 +95,8 @@ impl probe::Probe for NoopProbe {
 
 #[tokio::test]
 async fn pipeline_processes_discovery_updates_even_when_starting_empty() {
-    let discovery = Arc::new(MockDiscovery::new(Vec::new()));
-    let discovery_dyn: Arc<dyn discovery::Discovery<Target = String> + Send + Sync> =
-        discovery.clone();
+    let discovery = Arc::new(RwLock::new(MockDiscovery::new(Vec::new())));
+    let discovery_dyn = discovery.clone();
 
     let mut pipeline = Pipeline::new(
         "p".to_string(),
@@ -120,16 +119,16 @@ async fn pipeline_processes_discovery_updates_even_when_starting_empty() {
     tokio::task::yield_now().await;
     tokio::task::yield_now().await;
 
-    let calls_after_start = discovery.get_targets_calls();
+    let calls_after_start = discovery.read().await.get_targets_calls();
     assert!(calls_after_start >= 1, "pipeline should refresh targets at startup");
 
     // Trigger a discovery update without advancing time; pipeline must react immediately.
-    discovery.set_targets_and_notify(vec!["https://new".to_string()]).await;
+    discovery.read().await.set_targets_and_notify(vec!["https://new".to_string()]).await;
     tokio::task::yield_now().await;
     tokio::task::yield_now().await;
 
     assert!(
-        discovery.get_targets_calls() > calls_after_start,
+        discovery.read().await.get_targets_calls() > calls_after_start,
         "pipeline should refresh targets in response to discovery update"
     );
 

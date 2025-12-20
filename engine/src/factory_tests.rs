@@ -14,6 +14,7 @@ use configuration::model::{
     target::{HttpConfiguration, HttpTarget, IcmpConfiguration, IcmpTarget},
 };
 use exporter::{Exporter, MetricData};
+use tokio::sync::RwLock;
 
 use crate::{ExportersMap, factory::PipelineBuilder, types::ProbeType};
 
@@ -25,6 +26,10 @@ impl Exporter for NoopExporter {
     where
         Self: Sized,
     {
+    }
+
+    fn get_exporter_type(&self) -> exporter::types::ExporterType {
+        exporter::types::ExporterType::Otel
     }
 
     fn export(&self, _probe_type: exporter::types::ProbeType, _metric_data: MetricData) {}
@@ -67,7 +72,7 @@ fn icmp_target(ipv4: &str) -> IcmpTarget {
 
 fn exporters_with(reference: &str) -> ExportersMap {
     let mut exporters: ExportersMap = HashMap::new();
-    exporters.insert(reference.to_string(), Arc::new(NoopExporter));
+    exporters.insert(reference.to_string(), Arc::new(RwLock::new(NoopExporter)));
     exporters
 }
 

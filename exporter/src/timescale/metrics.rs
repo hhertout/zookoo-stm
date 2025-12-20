@@ -2,10 +2,12 @@ use crate::Exporter;
 use crate::ExportersMap;
 use crate::MetricData;
 use crate::timescale::repository::{HttpMetricRow, IcmpMetricRow, TimescaleRepository};
+use crate::types::ExporterType;
 use configuration::model::Configuration;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::sync::RwLock;
 
 /// Safe conversion from u128 to i64 for duration metrics
 ///
@@ -205,6 +207,10 @@ impl TimescaleExporter {
 }
 
 impl Exporter for TimescaleExporter {
+    fn get_exporter_type(&self) -> ExporterType {
+        ExporterType::Timescale
+    }
+
     fn build(config: &Configuration, exporters: &mut ExportersMap) {
         let exporter_wrapper = match config.exporter {
             Some(ref wrapper) => wrapper,
@@ -248,7 +254,7 @@ impl Exporter for TimescaleExporter {
                 TimescaleExporter::new(pool, labels)
             };
 
-            exporters.insert(key, Arc::new(exporter));
+            exporters.insert(key, Arc::new(RwLock::new(exporter)));
         }
     }
 

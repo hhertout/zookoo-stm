@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 fn default_log_level() -> String {
-    String::from("info")
+    String::from("warn")
 }
 
 fn default_tls_ignore() -> bool {
@@ -70,4 +70,13 @@ pub struct SelfMonitoringConfig {
     pub env: String,
     #[serde(default = "default_tls_ignore")]
     pub tls_ignore: bool,
+    pub zone: Option<String>,
+    pub basic_auth: Option<BasicAuthConfig>,
+    pub bearer: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct BasicAuthConfig {
+    pub username: String,
+    pub password: String,
 }

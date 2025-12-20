@@ -1,0 +1,77 @@
+name: 📦 Release - Binary
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & publish (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive_ext: tar.gz
+            bin_ext: ""
+          - os: macos-14
+            target: aarch64-apple-darwin
+            archive_ext: tar.gz
+            bin_ext: ""
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive_ext: zip
+            bin_ext: .exe
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+          components: clippy,rustfmt
+
+      - name: Build (release)
+        run: cargo build --release --locked --target ${{ matrix.target }}
+
+      - name: Package (unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          BIN_NAME="zookoo"
+          OUT="${BIN_NAME}-${{ matrix.target }}.${{ matrix.archive_ext }}"
+          BIN_PATH="target/${{ matrix.target }}/release/${BIN_NAME}${{ matrix.bin_ext }}"
+          chmod +x "$BIN_PATH"
+          tar -czf "$OUT" -C "target/${{ matrix.target }}/release" "${BIN_NAME}${{ matrix.bin_ext }}"
+          echo "ASSET=$OUT" >> "$GITHUB_ENV"
+
+      - name: Package (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $BinName = "zookoo"
+          $Out = "$BinName-${{ matrix.target }}.${{ matrix.archive_ext }}"
+          $BinPath = "target/${{ matrix.target }}/release/$BinName${{ matrix.bin_ext }}"
+          if (-not (Test-Path $BinPath)) { throw "Binary not found: $BinPath" }
+          Compress-Archive -Path $BinPath -DestinationPath $Out -Force
+          "ASSET=$Out" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Create GitHub Release + upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: ${{ env.ASSET }}

@@ -12,6 +12,7 @@ use reqwest::header;
 use serde::de::DeserializeOwned;
 use tokio::sync::RwLock;
 use tokio::sync::watch;
+use tracing::{Instrument, info_span};
 
 use crate::Discovery;
 
@@ -36,6 +37,17 @@ impl<T> ApiDiscovery<T>
 where
     T: Clone + std::fmt::Debug + Send + Sync + DeserializeOwned + 'static,
 {
+    #[tracing::instrument(
+        level = "debug",
+        skip(conf),
+        fields(
+            url = %conf.url,
+            refresh_interval = ?conf.refresh_interval,
+            header_count = conf.headers.as_ref().map(|h| h.len()).unwrap_or(0),
+            has_basic_auth = conf.basic_auth.is_some(),
+            has_bearer = conf.bearer.is_some(),
+        )
+    )]
     pub fn new(conf: DiscoveryApi) -> Self {
         let (update_tx, update_rx) = watch::channel(0u64);
         // TODO: Use conf object
@@ -56,6 +68,7 @@ where
     /// Fetch and update targets from the API
     /// If fetching fails (url_not_reachable), keep existing targets
     /// If parsing fails, log error and keep existing targets
+    #[tracing::instrument(level = "debug", skip(self), fields(url = %self.url))]
     async fn get_targets_from_api(
         &self,
     ) -> Result<Vec<T>, Box<dyn std::error::Error + Send + Sync>> {
@@ -68,6 +81,15 @@ where
         Ok(data)
     }
 
+    #[tracing::instrument(
+        level = "debug",
+        skip(self),
+        fields(
+            header_count = self.headers.as_ref().map(|h| h.len()).unwrap_or(0),
+            has_basic_auth = self.basic_auth.is_some(),
+            has_bearer = self.bearer.is_some(),
+        )
+    )]
     fn to_headers_map(&self) -> reqwest::header::HeaderMap {
         let mut headers_map = reqwest::header::HeaderMap::new();
 
@@ -76,10 +98,10 @@ where
                 let name = match reqwest::header::HeaderName::from_bytes(key.as_bytes()) {
                     Ok(name) => name,
                     Err(e) => {
-                        log::warn!(
-                            "event=warn msg=API_DISCOVERY_INVALID_HEADER_NAME remediation=skipping name={} err={}",
-                            key,
-                            e
+                        tracing::warn!(
+                            header_name = %key,
+                            error = %e,
+                            "api_discovery_invalid_header_name remediation=skipping"
                         );
                         continue;
                     }
@@ -88,10 +110,10 @@ where
                 let value = match reqwest::header::HeaderValue::from_str(value) {
                     Ok(value) => value,
                     Err(e) => {
-                        log::warn!(
-                            "event=warn msg=API_DISCOVERY_INVALID_HEADER_VALUE remediation=skipping name={} err={}",
-                            key,
-                            e
+                        tracing::warn!(
+                            header_name = %key,
+                            error = %e,
+                            "api_discovery_invalid_header_value remediation=skipping"
                         );
                         continue;
                     }
@@ -107,9 +129,9 @@ where
                     headers_map.insert(header::AUTHORIZATION, auth_value);
                 }
                 Err(e) => {
-                    log::warn!(
-                        "event=warn msg=API_DISCOVERY_INVALID_AUTHORIZATION remediation=skipping err={}",
-                        e
+                    tracing::warn!(
+                        error = %e,
+                        "api_discovery_invalid_authorization remediation=skipping"
                     );
                 }
             }
@@ -121,9 +143,9 @@ where
                     headers_map.insert(header::AUTHORIZATION, bearer_value);
                 }
                 Err(e) => {
-                    log::warn!(
-                        "event=warn msg=API_DISCOVERY_INVALID_BEARER remediation=skipping err={}",
-                        e
+                    tracing::warn!(
+                        error = %e,
+                        "api_discovery_invalid_bearer remediation=skipping"
                     );
                 }
             }
@@ -140,57 +162,81 @@ where
 {
     type Target = T;
 
+    #[tracing::instrument(
+        level = "info",
+        skip(self),
+        fields(url = %self.url, targets = tracing::field::Empty, version = tracing::field::Empty)
+    )]
     async fn discover(&self) {
         // Keep last known state if the API is unreachable or returns invalid data.
         match self.get_targets_from_api().await {
             Ok(data) => {
-                log::info!("event=info msg=api_discovery_success url={}", self.url);
+                tracing::info!(targets = data.len(), "api_discovery_success");
+                tracing::Span::current().record("targets", data.len());
                 self.targets.write().await.clone_from(&data);
                 self.version.fetch_add(1, Ordering::Relaxed);
+                tracing::Span::current().record("version", self.version());
                 let _ = self.update_tx.send(self.version());
             }
             Err(e) => {
-                log::error!(
-                    "event=error msg=API_DISCOVERY_FAILED recovery=keep_last_state err={}",
-                    e
+                tracing::error!(
+                    error = %e,
+                    recovery = "keep_last_state",
+                    "api_discovery_failed"
                 );
             }
         }
     }
 
+    #[tracing::instrument(
+        level = "info",
+        skip(self),
+        fields(url = %self.url, interval_ms = (self.refresh_interval.to_duration().as_millis() as u64))
+    )]
     fn update(&self) {
         // Prevent spawning multiple concurrent update loops if several pipelines share
         // the same discovery instance (e.g. grouped by scrape interval).
         if self.update_started.swap(true, Ordering::SeqCst) {
-            log::debug!("event=debug msg=api_discovery_update_already_started url={}", self.url);
+            tracing::debug!("api_discovery_update_already_started");
             return;
         }
 
         let this = self.clone();
-        tokio::spawn(async move {
-            log::warn!(
-                "event=warn msg=starting_api_discovery_update_task interval_ms={}",
-                this.refresh_interval.to_duration().as_millis()
-            );
-            loop {
-                match this.get_targets_from_api().await {
-                    Ok(data) => {
-                        log::info!("event=info msg=api_discovery_update_success url={}", this.url);
-                        this.targets.write().await.clone_from(&data);
-                        this.version.fetch_add(1, Ordering::Relaxed);
-                        let _ = this.update_tx.send(this.version());
-                    }
-                    Err(e) => {
-                        log::error!(
-                            "event=error msg=API_DISCOVERY_UPDATE_FAILED recovery=keep_last_state err={}",
-                            e
-                        );
-                    }
-                }
 
-                tokio::time::sleep(this.refresh_interval.to_duration()).await;
+        let update_span = info_span!(
+            "api_discovery.update_task",
+            url = %this.url,
+            interval_ms = (this.refresh_interval.to_duration().as_millis() as u64)
+        );
+
+        tokio::spawn(
+            async move {
+                tracing::warn!(
+                    interval_ms = (this.refresh_interval.to_duration().as_millis() as u64),
+                    "starting_api_discovery_update_task"
+                );
+                loop {
+                    match this.get_targets_from_api().await {
+                        Ok(data) => {
+                            tracing::info!(targets = data.len(), "api_discovery_update_success");
+                            this.targets.write().await.clone_from(&data);
+                            this.version.fetch_add(1, Ordering::Relaxed);
+                            let _ = this.update_tx.send(this.version());
+                        }
+                        Err(e) => {
+                            tracing::error!(
+                                error = %e,
+                                recovery = "keep_last_state",
+                                "api_discovery_update_failed"
+                            );
+                        }
+                    }
+
+                    tokio::time::sleep(this.refresh_interval.to_duration()).await;
+                }
             }
-        });
+            .instrument(update_span),
+        );
     }
 
     fn version(&self) -> u64 {

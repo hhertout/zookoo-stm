@@ -1,7 +1,7 @@
 pub mod http;
 pub mod icmp;
 
-pub mod observability;
+pub use tracing::instrument;
 
 use std::{collections::HashMap, fmt::Display};
 

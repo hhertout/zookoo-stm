@@ -3,8 +3,9 @@ use std::{fmt::Debug, future::pending, sync::Arc, time::Duration};
 use async_trait::async_trait;
 use discovery::Discovery;
 use exporter::Exporter;
+use opentelemetry_sdk::metrics::SdkMeterProvider;
 use probe::Probe;
-use tokio::sync::watch;
+use tokio::sync::{RwLock, watch};
 
 use crate::types::{ProbeType, convert_metric_data};
 
@@ -22,11 +23,12 @@ where
 {
     label: String,
     probe_type: ProbeType,
-    discovery: Option<Arc<dyn Discovery<Target = T> + Send + Sync>>,
+    discovery: Option<Arc<RwLock<dyn Discovery<Target = T> + Send + Sync>>>,
     pub targets: Option<Vec<T>>,
     probe: P,
-    forwarder: Vec<Arc<dyn Exporter + Send + Sync>>,
+    forwarder: Vec<Arc<RwLock<dyn Exporter + Send + Sync>>>,
     scrape_interval: Duration,
+    meter_provider: Option<SdkMeterProvider>,
     discovery_updates: Option<watch::Receiver<u64>>,
 }
 
@@ -45,6 +47,7 @@ where
             forwarder: self.forwarder.clone(),
             scrape_interval: self.scrape_interval,
             discovery_updates: self.discovery_updates.clone(),
+            meter_provider: self.meter_provider.clone(),
         }
     }
 }
@@ -54,14 +57,46 @@ where
     T: Clone + Debug + Send + Sync + 'static,
     P: Probe<Target = T> + Send + Sync + Clone + 'static,
 {
-    fn start_discovery_updates(&mut self) {
+    #[tracing::instrument(
+        level = "debug",
+        skip(discovery, probe, forwarder),
+        fields(
+            pipeline_label = %label,
+            probe_type = ?probe_type,
+            has_discovery = discovery.is_some(),
+            exporters = forwarder.len(),
+            scrape_interval_ms = (scrape_interval.as_millis() as u64),
+        )
+    )]
+    pub fn new(
+        label: String,
+        probe_type: ProbeType,
+        discovery: Option<Arc<RwLock<dyn Discovery<Target = T> + Send + Sync>>>,
+        probe: P,
+        forwarder: Vec<Arc<RwLock<dyn Exporter + Send + Sync>>>,
+        scrape_interval: Duration,
+    ) -> Self {
+        Self {
+            label,
+            probe_type,
+            discovery,
+            targets: None,
+            probe,
+            forwarder,
+            scrape_interval,
+            discovery_updates: None,
+            meter_provider: None,
+        }
+    }
+
+    async fn start_discovery_updates(&mut self) {
         let Some(discovery) = &self.discovery else {
             return;
         };
 
         // Subscribe first so we don't miss a fast initial notification.
-        self.discovery_updates = discovery.subscribe();
-        discovery.update();
+        self.discovery_updates = discovery.read().await.subscribe();
+        discovery.read().await.update();
     }
 
     async fn refresh_targets_from_discovery(&mut self) {
@@ -70,7 +105,7 @@ where
         };
 
         // No per-target scrape interval overrides: a pipeline always runs at its probe interval.
-        self.targets = Some(discovery.get_targets().await);
+        self.targets = Some(discovery.read().await.get_targets().await);
     }
 
     async fn scrape_once(&mut self) {
@@ -100,7 +135,7 @@ where
         for metric_data in metrics {
             let export_data = convert_metric_data(metric_data);
             for exporter in &self.forwarder {
-                exporter.export(self.probe_type.into(), export_data.clone());
+                exporter.read().await.export(self.probe_type.into(), export_data.clone());
             }
         }
 
@@ -112,26 +147,6 @@ where
                 elapsed.as_millis(),
                 self.scrape_interval.as_millis()
             );
-        }
-    }
-
-    pub fn new(
-        label: String,
-        probe_type: ProbeType,
-        discovery: Option<Arc<dyn Discovery<Target = T> + Send + Sync>>,
-        probe: P,
-        forwarder: Vec<Arc<dyn Exporter + Send + Sync>>,
-        scrape_interval: Duration,
-    ) -> Self {
-        Self {
-            label,
-            probe_type,
-            discovery,
-            targets: None,
-            probe,
-            forwarder,
-            scrape_interval,
-            discovery_updates: None,
         }
     }
 }
@@ -154,7 +169,11 @@ where
             return;
         }
 
-        self.start_discovery_updates();
+        for exporter in &self.forwarder {
+            exporter.write().await.initialize();
+        }
+
+        self.start_discovery_updates().await;
         self.refresh_targets_from_discovery().await;
 
         let mut ticker = tokio::time::interval(self.scrape_interval);

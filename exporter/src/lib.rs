@@ -12,7 +12,7 @@ use std::collections::HashMap;
 
 use configuration::model::Configuration;
 
-use crate::types::{ExportersMap, ProbeType};
+use crate::types::{ExporterType, ExportersMap, ProbeType};
 
 mod labels;
 pub mod otlp;
@@ -31,6 +31,10 @@ pub trait Exporter: Send + Sync {
     fn build(config: &Configuration, exporters: &mut ExportersMap)
     where
         Self: Sized;
+
+    fn get_exporter_type(&self) -> ExporterType;
+
+    fn initialize(&mut self) {}
 
     /// Export metrics for a given probe type.
     fn export(&self, probe_type: ProbeType, metric_data: MetricData);

@@ -16,11 +16,12 @@ pub struct HttpMetricsParams {
 }
 
 use configuration::model::Configuration;
+use tokio::sync::RwLock;
 
 use super::remote_write::PrometheusRemoteWrite;
 use crate::{
     DEFAULT_METRIC_PREFIX, Exporter, ExportersMap, MetricData, labels,
-    prometheus::PrometheusRemoteWriteConfig,
+    prometheus::PrometheusRemoteWriteConfig, types::ExporterType,
 };
 
 /// Prometheus metrics exporter that uses the remote_write API.
@@ -102,6 +103,10 @@ impl PrometheusRemoteWriteExporter {
 }
 
 impl Exporter for PrometheusRemoteWriteExporter {
+    fn get_exporter_type(&self) -> ExporterType {
+        ExporterType::PrometheusRemoteWrite
+    }
+
     fn build(config: &Configuration, exporters: &mut ExportersMap) {
         let exporter_wrapper = match config.exporter {
             Some(ref wrapper) => wrapper,
@@ -142,7 +147,7 @@ impl Exporter for PrometheusRemoteWriteExporter {
 
                     let exporter =
                         PrometheusRemoteWriteExporter::new(labels, Arc::new(remote_write), prefix);
-                    exporters.insert(key, Arc::new(exporter));
+                    exporters.insert(key, Arc::new(RwLock::new(exporter)));
                 }
                 Err(e) => {
                     log::error!(

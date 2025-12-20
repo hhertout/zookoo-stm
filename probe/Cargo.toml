@@ -19,7 +19,7 @@ opentelemetry = { version = "0.31.0", features = ["internal-logs"] }
 opentelemetry_sdk = { version = "0.31.0", features = ["internal-logs"] }
 opentelemetry-stdout = { version = "0.31.0", features = ["trace"] }
 opentelemetry-otlp = { version = "0.31.0", features = ["grpc-tonic", "tls", "internal-logs"] }
-tracing = "0.1"
+tracing = { version = "0.1", features = ["attributes"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # HTTP client low-level stack

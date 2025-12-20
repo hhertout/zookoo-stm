@@ -98,7 +98,7 @@ async fn resolve_file_discovery_returns_some_and_reads_targets() {
         .await
         .expect("expected file discovery to resolve");
 
-    let targets = discovery.get_targets().await;
+    let targets = discovery.read().await.get_targets().await;
     assert_eq!(targets.len(), 2);
 }
 
@@ -178,7 +178,7 @@ async fn resolve_api_discovery_returns_some_and_reads_targets() {
         .await
         .expect("expected api discovery to resolve");
 
-    let targets = discovery.get_targets().await;
+    let targets = discovery.read().await.get_targets().await;
     assert_eq!(targets.len(), 2);
 
     // Ensure the server task finished (it only serves one request).

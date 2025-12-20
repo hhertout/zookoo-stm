@@ -1,12 +1,15 @@
 use std::collections::HashMap;
 
-use opentelemetry::{InstrumentationScope, KeyValue, global};
+use opentelemetry::metrics::MeterProvider as _;
+use opentelemetry::{InstrumentationScope, KeyValue};
+use opentelemetry_sdk::metrics::SdkMeterProvider;
 
 use crate::DEFAULT_METRIC_PREFIX;
 
 pub struct MetricsExporter {
     prefix: String,
     default_labels: HashMap<String, String>,
+    pub meter_provider: Option<SdkMeterProvider>,
 }
 
 #[derive(Debug, Clone)]
@@ -27,7 +30,11 @@ pub struct HttpMetricsParams {
 }
 
 impl MetricsExporter {
-    pub fn new(labels: HashMap<String, String>, prefix: Option<String>) -> Self {
+    pub fn new(
+        labels: HashMap<String, String>,
+        prefix: Option<String>,
+        meter_provider: Option<SdkMeterProvider>,
+    ) -> Self {
         let mut prefix = prefix.unwrap_or_else(|| DEFAULT_METRIC_PREFIX.to_string());
 
         if prefix.is_empty() {
@@ -38,7 +45,11 @@ impl MetricsExporter {
             prefix.push('_');
         }
 
-        MetricsExporter { prefix, default_labels: labels }
+        MetricsExporter { prefix, default_labels: labels, meter_provider }
+    }
+
+    pub fn set_meter_provider(&mut self, meter_provider: SdkMeterProvider) {
+        self.meter_provider = Some(meter_provider);
     }
 
     pub fn get_prefix(&self) -> &String {
@@ -60,6 +71,13 @@ impl MetricsExporter {
         duration: u128,
         target_labels: &HashMap<String, String>,
     ) {
+        if self.meter_provider.is_none() {
+            log::error!(
+                "error=meter_provider_not_initialized msg=\"Meter provider is not initialized, cannot export HTTP metrics\""
+            );
+            return;
+        }
+
         let labels = self.merge_labels(target_labels);
 
         self.set_gauge_metrics(
@@ -79,7 +97,7 @@ impl MetricsExporter {
         );
 
         self.record_histogram(
-            format!("{}ping_duration", self.prefix),
+            format!("{}ping_duration_histogram", self.prefix),
             Some(String::from("ms")),
             String::from("ping duration repartition"),
             duration as f64,
@@ -88,6 +106,13 @@ impl MetricsExporter {
     }
 
     pub fn export_http_metrics(&self, params: HttpMetricsParams) {
+        if self.meter_provider.is_none() {
+            log::error!(
+                "error=meter_provider_not_initialized msg=\"Meter provider is not initialized, cannot export HTTP metrics\""
+            );
+            return;
+        }
+
         let labels = self.merge_labels(&params.target_labels);
 
         self.set_http_request_metrics(&labels);
@@ -109,7 +134,7 @@ impl MetricsExporter {
         );
 
         self.record_histogram(
-            format!("{}dns_lookup_duration", self.prefix),
+            format!("{}dns_lookup_duration_histogram", self.prefix),
             Some(String::from("ms")),
             String::from("dns lookup duration repartition"),
             params.dns_lookup_duration as f64,
@@ -126,7 +151,7 @@ impl MetricsExporter {
         );
 
         self.record_histogram(
-            format!("{}tcp_connect_duration", self.prefix),
+            format!("{}tcp_connect_duration_histogram", self.prefix),
             Some(String::from("ms")),
             String::from("tcp connect duration repartition"),
             params.tcp_connect_duration as f64,
@@ -143,7 +168,7 @@ impl MetricsExporter {
         );
 
         self.record_histogram(
-            format!("{}time_to_first_byte", self.prefix),
+            format!("{}time_to_first_byte_histogram", self.prefix),
             Some(String::from("ms")),
             String::from("time to first byte repartition"),
             params.time_to_first_byte as f64,
@@ -160,7 +185,7 @@ impl MetricsExporter {
         );
 
         self.record_histogram(
-            format!("{}content_transfer_duration", self.prefix),
+            format!("{}content_transfer_duration_histogram", self.prefix),
             Some(String::from("ms")),
             String::from("content transfer duration repartition"),
             params.content_transfer_duration as f64,
@@ -192,7 +217,7 @@ impl MetricsExporter {
         );
 
         self.record_histogram(
-            format!("{}http_request_duration", self.prefix),
+            format!("{}http_request_duration_histogram", self.prefix),
             Some(String::from("ms")),
             String::from("http request total duration repartition"),
             params.http_request_duration as f64,
@@ -209,7 +234,7 @@ impl MetricsExporter {
             );
 
             self.record_histogram(
-                format!("{}http_tls_lookup_duration", self.prefix),
+                format!("{}http_tls_lookup_duration_histogram", self.prefix),
                 Some(String::from("ms")),
                 String::from("tls lookup duration repartition"),
                 http_tls_lookup_duration as f64,
@@ -227,7 +252,7 @@ impl MetricsExporter {
             );
 
             self.record_histogram(
-                format!("{}http_tls_handshake_duration", self.prefix),
+                format!("{}http_tls_handshake_duration_histogram", self.prefix),
                 Some(String::from("ms")),
                 String::from("http tls handshake duration during the request repartition"),
                 http_tls_handshake_duration as f64,
@@ -257,32 +282,40 @@ impl MetricsExporter {
     }
 
     pub fn set_up_metrics(&self, value: u8, labels: &HashMap<String, String>) {
-        let scope = InstrumentationScope::builder("basic").with_version("1.0").build();
+        if let Some(meter_provider) = &self.meter_provider {
+            let scope = InstrumentationScope::builder("basic").with_version("1.0").build();
 
-        let meter = global::meter_with_scope(scope);
+            let meter = meter_provider.meter_with_scope(scope);
 
-        let gauge = meter.u64_gauge("up").with_description("the target is up or down").build();
+            let gauge = meter.u64_gauge("up").with_description("the target is up or down").build();
 
-        let attr: Vec<KeyValue> =
-            labels.iter().map(|(key, value)| KeyValue::new(key.clone(), value.clone())).collect();
+            let attr: Vec<KeyValue> = labels
+                .iter()
+                .map(|(key, value)| KeyValue::new(key.clone(), value.clone()))
+                .collect();
 
-        gauge.record(value as u64, &attr);
+            gauge.record(value as u64, &attr);
+        }
     }
 
     fn set_http_request_metrics(&self, labels: &HashMap<String, String>) {
-        let scope = InstrumentationScope::builder("basic").with_version("1.0").build();
+        if let Some(meter_provider) = &self.meter_provider {
+            let scope = InstrumentationScope::builder("basic").with_version("1.0").build();
 
-        let meter = global::meter_with_scope(scope);
+            let meter = meter_provider.meter_with_scope(scope);
 
-        let counter = meter
-            .u64_counter(format!("{}http_request", self.prefix))
-            .with_description("total http request")
-            .build();
+            let counter = meter
+                .u64_counter(format!("{}http_request", self.prefix))
+                .with_description("total http request")
+                .build();
 
-        let attr: Vec<KeyValue> =
-            labels.iter().map(|(key, value)| KeyValue::new(key.clone(), value.clone())).collect();
+            let attr: Vec<KeyValue> = labels
+                .iter()
+                .map(|(key, value)| KeyValue::new(key.clone(), value.clone()))
+                .collect();
 
-        counter.add(1, &attr)
+            counter.add(1, &attr)
+        }
     }
 
     pub fn set_gauge_metrics(
@@ -293,20 +326,24 @@ impl MetricsExporter {
         value: u64,
         labels: &HashMap<String, String>,
     ) {
-        let scope = InstrumentationScope::builder("basic").with_version("1.0").build();
+        if let Some(meter_provider) = &self.meter_provider {
+            let scope = InstrumentationScope::builder("basic").with_version("1.0").build();
 
-        let meter = global::meter_with_scope(scope);
+            let meter = meter_provider.meter_with_scope(scope);
 
-        let attr: Vec<KeyValue> =
-            labels.iter().map(|(key, value)| KeyValue::new(key.clone(), value.clone())).collect();
+            let attr: Vec<KeyValue> = labels
+                .iter()
+                .map(|(key, value)| KeyValue::new(key.clone(), value.clone()))
+                .collect();
 
-        let gauge = if let Some(unit) = unit {
-            meter.u64_gauge(name).with_description(description).with_unit(unit).build()
-        } else {
-            meter.u64_gauge(name).with_description(description).build()
-        };
+            let gauge = if let Some(unit) = unit {
+                meter.u64_gauge(name).with_description(description).with_unit(unit).build()
+            } else {
+                meter.u64_gauge(name).with_description(description).build()
+            };
 
-        gauge.record(value, &attr);
+            gauge.record(value, &attr);
+        }
     }
 
     pub fn record_histogram(
@@ -317,19 +354,27 @@ impl MetricsExporter {
         value: f64,
         labels: &HashMap<String, String>,
     ) {
-        let scope = InstrumentationScope::builder("basic").with_version("1.0").build();
+        if let Some(meter_provider) = &self.meter_provider {
+            let scope = InstrumentationScope::builder("basic").with_version("1.0").build();
 
-        let meter = global::meter_with_scope(scope);
+            let meter = meter_provider.meter_with_scope(scope);
 
-        let attr: Vec<KeyValue> =
-            labels.iter().map(|(key, value)| KeyValue::new(key.clone(), value.clone())).collect();
+            let attr: Vec<KeyValue> = labels
+                .iter()
+                .map(|(key, value)| KeyValue::new(key.clone(), value.clone()))
+                .collect();
 
-        let histogram = if let Some(unit) = unit {
-            meter.f64_histogram(name.clone()).with_description(description).with_unit(unit).build()
-        } else {
-            meter.f64_histogram(name.clone()).with_description(description).build()
-        };
+            let histogram = if let Some(unit) = unit {
+                meter
+                    .f64_histogram(name.clone())
+                    .with_description(description)
+                    .with_unit(unit)
+                    .build()
+            } else {
+                meter.f64_histogram(name.clone()).with_description(description).build()
+            };
 
-        histogram.record(value, &attr);
+            histogram.record(value, &attr);
+        }
     }
 }
