@@ -24,6 +24,8 @@ impl Display for TargetType {
 
 #[derive(Clone)]
 pub struct IcmpProbe {
+    name: String,
+    job: String,
     targets: Option<Vec<IcmpTarget>>,
     metrics: Arc<Mutex<Vec<MetricData>>>,
 }
@@ -34,8 +36,8 @@ impl Probe for IcmpProbe {
     type Target = IcmpTarget;
 
     #[tracing::instrument(level = "debug")]
-    fn init() -> Self {
-        IcmpProbe { targets: None, metrics: Arc::new(Mutex::new(Vec::new())) }
+    fn init(name: String, job: String) -> Self {
+        IcmpProbe { name, job, targets: None, metrics: Arc::new(Mutex::new(Vec::new())) }
     }
 
     /// Set or update the target data for this probe.
@@ -62,31 +64,36 @@ impl Probe for IcmpProbe {
         let futures = targets.iter().map(|target| {
             let metrics = Arc::clone(&self.metrics);
 
-            let ipv4 = target.ipv4.clone().unwrap_or_else(|| "unset".to_string());
-            let fqdn = target.fqdn.clone().unwrap_or_else(|| "unset".to_string());
-            let timeout_sec = target.timeout_sec;
-            let span = info_span!(
-                "icmp.scrape_target",
-                ipv4 = %ipv4,
-                fqdn = %fqdn,
-                timeout_sec = timeout_sec,
+            let target_dest = target
+                .ipv4
+                .clone()
+                .unwrap_or_else(|| target.fqdn.clone().unwrap_or_else(|| "unset".to_string()));
+
+            log::info!(
+                "event=request_start name={} job={} type={} target={}",
+                self.name,
+                self.job,
+                "icmp".to_string(),
+                target_dest
             );
 
             async move {
                 let (up, duration_ms) = match ping_target(target).await {
-                    Ok((ip, duration)) => {
-                        log::info!(
-                            "event=ping_success target={} up=1 duration_ms={}",
-                            ip,
-                            duration.as_millis()
-                        );
-                        (1, duration.as_millis())
-                    }
+                    Ok((_, duration)) => (1, duration.as_millis()),
                     Err(e) => {
                         log::error!("event=ping_failed err={}", e);
                         (0, 0)
                     }
                 };
+
+                log::info!(
+                    "event=request_complete name={} job={} type={} target={} duration={}ms",
+                    self.name,
+                    self.job,
+                    "icmp".to_string(),
+                    target_dest,
+                    duration_ms
+                );
 
                 let instance = if let Some(fqdn) = &target.fqdn {
                     fqdn.clone()
@@ -109,7 +116,6 @@ impl Probe for IcmpProbe {
                 let mut metrics_lock = metrics.lock().await;
                 metrics_lock.push(metric_data);
             }
-            .instrument(span)
         });
 
         let _ = join_all(futures).await;

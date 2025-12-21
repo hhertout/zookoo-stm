@@ -82,7 +82,7 @@ pub async fn ping_target(
     // Sanitize inputs before passing to command
     let sanitized_ip = sanitize_ip(&ip.to_string())?;
     let sanitized_timeout = sanitize_timeout(target.timeout_sec)?;
-
+    
     let start = Instant::now();
     let output = Command::new("ping")
         .args(["-c", "1", "-W", "1", "-t", &sanitized_timeout, &sanitized_ip])

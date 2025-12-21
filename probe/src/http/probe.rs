@@ -33,6 +33,8 @@ impl Display for TargetType {
 /// HTTP Probe with unified phase timing
 #[derive(Clone)]
 pub struct HttpProbe {
+    name: String,
+    job: String,
     targets: Vec<HttpTarget>,
     client: Arc<HttpClient>,
     metrics: Arc<Mutex<Vec<MetricData>>>,
@@ -75,8 +77,10 @@ impl HttpProbe {
 impl Probe for HttpProbe {
     type Target = HttpTarget;
 
-    fn init() -> Self {
+    fn init(name: String, job: String) -> Self {
         HttpProbe {
+            name,
+            job,
             targets: Vec::new(),
             client: Arc::new(HttpClient::new()),
             metrics: Arc::new(Mutex::new(Vec::new())),
@@ -110,16 +114,24 @@ impl Probe for HttpProbe {
                     TargetType::HTTP
                 };
 
-                log::info!("event=request type={} target={}", kind, target.url);
+                log::info!(
+                    "event=request_start name={} job={} type={} target={}",
+                    self.name,
+                    self.job,
+                    kind,
+                    target.url
+                );
 
                 // Execute the probe with unified timing
                 let config = Self::to_request_config(&target);
                 let probe_metrics = client.execute(&config).await;
 
                 log::info!(
-                    "event=metrics target={} job=zookoo {}",
+                    "event=request_complete name={} job={} target={} duration={}ms",
+                    self.name,
+                    self.job,
                     target.url,
-                    probe_metrics.to_logfmt()
+                    probe_metrics.total_duration.as_millis()
                 );
 
                 // Store metrics for export

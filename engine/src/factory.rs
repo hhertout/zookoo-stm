@@ -83,7 +83,7 @@ impl PipelineBuilder {
         config: &Configuration,
         exporters: &ExportersMap,
         probe_type: ProbeType,
-        probe_init: fn() -> P,
+        probe_init: fn(String, String) -> P,
     ) -> Vec<Pipeline<T, P>>
     where
         T: Clone + std::fmt::Debug + Send + Sync + serde::de::DeserializeOwned + 'static, // Target Type
@@ -144,7 +144,7 @@ impl PipelineBuilder {
             label.to_string(),
             probe_type,
             discovery.clone(),
-            probe_init(),
+            probe_init("test".to_string(), "test-job".to_string()), // name and job
             resolved_exporters.inner().to_vec(),
             probe_config.scrape_interval().to_duration(),
         );
