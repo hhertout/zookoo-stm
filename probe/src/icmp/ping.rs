@@ -4,7 +4,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use configuration::{model::target::IcmpTarget, DEFAULT_SOURCE};
+use configuration::{DEFAULT_SOURCE, model::target::IcmpTarget};
 use serde::Serialize;
 use tokio::{net::lookup_host, process::Command};
 use tracing::field;
@@ -82,7 +82,7 @@ pub async fn ping_target(
     // Sanitize inputs before passing to command
     let sanitized_ip = sanitize_ip(&ip.to_string())?;
     let sanitized_timeout = sanitize_timeout(target.timeout_sec)?;
-    
+
     let start = Instant::now();
     let output = Command::new("ping")
         .args(["-c", "1", "-W", "1", "-t", &sanitized_timeout, &sanitized_ip])
@@ -95,7 +95,7 @@ pub async fn ping_target(
             Ok((ip, start.elapsed()))
         }
         Err(err) => {
-            log::error!("source={} event=ping_complete status=failed err={}", DEFAULT_SOURCE, err.to_string());
+            log::error!("source={} event=ping_complete status=failed err={}", DEFAULT_SOURCE, err);
             Err(Box::new(ScrapeError::NetworkError(format!("host {:?} not reachable", target))))
         }
     }

@@ -45,10 +45,11 @@ async fn main() {
     // If self-monitoring is enabled, init OTLP tracer provider *before* installing the subscriber,
     // so the tracing-opentelemetry layer can export spans.
 
-    let _observability_guard = if let Some(self_monitoring) = config.defaults.self_monitoring.as_ref()
+    let _observability_guard = if let Some(self_monitoring) =
+        config.defaults.self_monitoring.as_ref()
         && self_monitoring.enable
     {
-        Some(init_observability(&log_level, self_monitoring.clone()))
+        Some(init_observability(log_level, self_monitoring.clone()))
     } else {
         None
     };

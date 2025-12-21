@@ -6,8 +6,8 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::sync::Arc;
 
-use configuration::model::target::HttpTarget;
 use configuration::DEFAULT_SOURCE;
+use configuration::model::target::HttpTarget;
 use futures::future::join_all;
 use tokio::sync::Mutex;
 

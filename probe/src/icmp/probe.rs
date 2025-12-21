@@ -1,6 +1,6 @@
 use std::{fmt::Display, sync::Arc};
 
-use configuration::{model::target::IcmpTarget, DEFAULT_SOURCE};
+use configuration::{DEFAULT_SOURCE, model::target::IcmpTarget};
 use futures::future::join_all;
 use tokio::sync::Mutex;
 use tracing::{Instrument, info_span};
@@ -72,32 +72,32 @@ impl Probe for IcmpProbe {
                 "source={} probe={} type={} target={} event=request_start",
                 DEFAULT_SOURCE,
                 self.name,
-                "icmp".to_string(),
+                "icmp",
                 target_dest
             );
 
             async move {
                 let (up, duration_ms) = match ping_target(target).await {
                     Ok((_, duration)) => (1, duration.as_millis()),
-                        Err(e) => {
-                            log::error!(
-                                "probe={} target={} event=ping_failed err={}",
-                                self.name,
-                                target_dest,
-                                e
-                            );
-                            (0, 0)
-                        }
+                    Err(e) => {
+                        log::error!(
+                            "probe={} target={} event=ping_failed err={}",
+                            self.name,
+                            target_dest,
+                            e
+                        );
+                        (0, 0)
+                    }
                 };
 
-                    let duration_seconds = (duration_ms as f64) / 1000.0;
-                    log::info!(
-                        "probe={} type={} target={} event=request_complete duration_seconds={}",
-                        self.name,
-                        "icmp".to_string(),
-                        target_dest,
-                        duration_seconds
-                    );
+                let duration_seconds = (duration_ms as f64) / 1000.0;
+                log::info!(
+                    "probe={} type={} target={} event=request_complete duration_seconds={}",
+                    self.name,
+                    "icmp",
+                    target_dest,
+                    duration_seconds
+                );
 
                 let instance = if let Some(fqdn) = &target.fqdn {
                     fqdn.clone()

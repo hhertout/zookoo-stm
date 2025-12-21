@@ -9,6 +9,7 @@ use std::time::{Duration, Instant};
 
 use base64::Engine;
 use bytes::Bytes;
+use configuration::DEFAULT_SOURCE;
 use http_body_util::{BodyExt, Empty};
 use hyper::header::{AUTHORIZATION, HOST};
 use hyper::{Method, Request};
@@ -16,7 +17,6 @@ use hyper_util::rt::TokioIo;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
 use tracing::{Instrument, info_span};
-use configuration::DEFAULT_SOURCE;
 
 use super::metrics::HttpProbeMetrics;
 use super::resolver::{DnsResolver, extract_host, extract_port};
@@ -66,7 +66,12 @@ impl HttpClient {
         let host = match extract_host(&config.url) {
             Ok(h) => h,
             Err(e) => {
-                log::error!("source={} event=invalid_url url={} err={}", DEFAULT_SOURCE, config.url, e);
+                log::error!(
+                    "source={} event=invalid_url url={} err={}",
+                    DEFAULT_SOURCE,
+                    config.url,
+                    e
+                );
                 return metrics;
             }
         };
@@ -74,7 +79,12 @@ impl HttpClient {
         let port = match extract_port(&config.url) {
             Ok(p) => p,
             Err(e) => {
-                log::error!("source={} event=invalid_port url={} err={}", DEFAULT_SOURCE, config.url, e);
+                log::error!(
+                    "source={} event=invalid_port url={} err={}",
+                    DEFAULT_SOURCE,
+                    config.url,
+                    e
+                );
                 return metrics;
             }
         };
@@ -83,15 +93,19 @@ impl HttpClient {
 
         // === Phase 1: DNS Resolution ===
         let dns_span = info_span!("dns_resolution", host = %host);
-        let (ip_addr, dns_duration) =
-            match self.resolver.resolve_first_ipv4(&host).instrument(dns_span).await {
-                Ok((ip, dur)) => (ip, dur),
-                    Err(e) => {
-                    log::error!("source={} event=dns_failed host={} err={}", DEFAULT_SOURCE, host, e);
-                    metrics.dns_duration = total_start.elapsed();
-                    return metrics;
-                }
-            };
+        let (ip_addr, dns_duration) = match self
+            .resolver
+            .resolve_first_ipv4(&host)
+            .instrument(dns_span)
+            .await
+        {
+            Ok((ip, dur)) => (ip, dur),
+            Err(e) => {
+                log::error!("source={} event=dns_failed host={} err={}", DEFAULT_SOURCE, host, e);
+                metrics.dns_duration = total_start.elapsed();
+                return metrics;
+            }
+        };
         metrics.dns_duration = dns_duration;
         metrics.resolved_ip = Some(ip_addr.to_string());
 
@@ -109,12 +123,21 @@ impl HttpClient {
         {
             Ok(Ok(stream)) => stream,
             Ok(Err(e)) => {
-                log::error!("source={} event=tcp_connect_failed addr={} err={}", DEFAULT_SOURCE, socket_addr, e);
+                log::error!(
+                    "source={} event=tcp_connect_failed addr={} err={}",
+                    DEFAULT_SOURCE,
+                    socket_addr,
+                    e
+                );
                 metrics.tcp_connect_duration = tcp_start.elapsed();
                 return metrics;
             }
             Err(_) => {
-                log::error!("source={} event=tcp_connect_timeout addr={}", DEFAULT_SOURCE, socket_addr);
+                log::error!(
+                    "source={} event=tcp_connect_timeout addr={}",
+                    DEFAULT_SOURCE,
+                    socket_addr
+                );
                 metrics.tcp_connect_duration = tcp_start.elapsed();
                 return metrics;
             }
@@ -137,7 +160,12 @@ impl HttpClient {
                 match tls_handler.handshake(tcp_stream, &host).instrument(tls_span).await {
                     Ok(r) => r,
                     Err(e) => {
-                        log::error!("source={} event=tls_handshake_failed host={} err={}", DEFAULT_SOURCE, host, e);
+                        log::error!(
+                            "source={} event=tls_handshake_failed host={} err={}",
+                            DEFAULT_SOURCE,
+                            host,
+                            e
+                        );
                         return metrics;
                     }
                 };
