@@ -15,9 +15,16 @@ dist/
 # Optional: ignore local dev configs
 .env
 .env.*
-# docs / static sites
-documentation/node_modules/
-documentation/build/
 
 # Keep Dockerfiles and packaging
 !.docker/
+
+.ai/
+AGENT.md
+CLAUDE.md
+
+documentation/
+dashboard/
+benchmark/
+.github/
+.docker/
