@@ -7,6 +7,7 @@ use std::fmt::Display;
 use std::sync::Arc;
 
 use configuration::model::target::HttpTarget;
+use configuration::DEFAULT_SOURCE;
 use futures::future::join_all;
 use tokio::sync::Mutex;
 
@@ -34,7 +35,6 @@ impl Display for TargetType {
 #[derive(Clone)]
 pub struct HttpProbe {
     name: String,
-    job: String,
     targets: Vec<HttpTarget>,
     client: Arc<HttpClient>,
     metrics: Arc<Mutex<Vec<MetricData>>>,
@@ -77,10 +77,9 @@ impl HttpProbe {
 impl Probe for HttpProbe {
     type Target = HttpTarget;
 
-    fn init(name: String, job: String) -> Self {
+    fn init(name: String) -> Self {
         HttpProbe {
             name,
-            job,
             targets: Vec::new(),
             client: Arc::new(HttpClient::new()),
             metrics: Arc::new(Mutex::new(Vec::new())),
@@ -115,9 +114,9 @@ impl Probe for HttpProbe {
                 };
 
                 log::info!(
-                    "event=request_start name={} job={} type={} target={}",
+                    "source={} probe={} type={} target={} event=request_start",
+                    DEFAULT_SOURCE,
                     self.name,
-                    self.job,
                     kind,
                     target.url
                 );
@@ -127,11 +126,11 @@ impl Probe for HttpProbe {
                 let probe_metrics = client.execute(&config).await;
 
                 log::info!(
-                    "event=request_complete name={} job={} target={} duration={}ms",
+                    "source={} probe={} target={} event=request_complete duration_seconds={}",
+                    DEFAULT_SOURCE,
                     self.name,
-                    self.job,
                     target.url,
-                    probe_metrics.total_duration.as_millis()
+                    probe_metrics.total_duration.as_secs_f64()
                 );
 
                 // Store metrics for export

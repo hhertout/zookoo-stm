@@ -4,7 +4,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use configuration::model::target::IcmpTarget;
+use configuration::{model::target::IcmpTarget, DEFAULT_SOURCE};
 use serde::Serialize;
 use tokio::{net::lookup_host, process::Command};
 use tracing::field;
@@ -91,11 +91,11 @@ pub async fn ping_target(
 
     match output {
         Ok(_) => {
-            log::debug!("event=ping_complete host={:?} status=success", ip);
+            log::debug!("source={} event=ping_complete host={} status=success", DEFAULT_SOURCE, ip);
             Ok((ip, start.elapsed()))
         }
         Err(err) => {
-            log::error!("event=ping_complete status=failed err={:?}", err.to_string());
+            log::error!("source={} event=ping_complete status=failed err={}", DEFAULT_SOURCE, err.to_string());
             Err(Box::new(ScrapeError::NetworkError(format!("host {:?} not reachable", target))))
         }
     }
@@ -104,7 +104,7 @@ pub async fn ping_target(
 #[tracing::instrument(level = "debug", fields(fqdn = %fqdn))]
 async fn resolve_ip_from_url(fqdn: &str) -> Result<Ipv4Addr, ScrapeError> {
     let lookup_result = lookup_host((fqdn, 0)).await.map_err(|err| {
-        log::error!("{}", err);
+        log::error!("source={} event=dns_lookup_failed fqdn={} err={}", DEFAULT_SOURCE, fqdn, err);
         ScrapeError::LookupFailed
     })?;
 

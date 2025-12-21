@@ -90,7 +90,7 @@ impl Default for MetricData {
 /// Probe trait: manage targets and forward results to exporters or other components.
 pub trait Probe {
     type Target: Clone + std::fmt::Debug + Send + Sync + 'static;
-    fn init(name: String, job: String) -> Self;
+    fn init(name: String) -> Self;
 
     /// Set or update the target data for this probe.
     fn set_targets(&mut self, data: Vec<Self::Target>);

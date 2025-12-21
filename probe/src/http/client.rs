@@ -16,6 +16,7 @@ use hyper_util::rt::TokioIo;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
 use tracing::{Instrument, info_span};
+use configuration::DEFAULT_SOURCE;
 
 use super::metrics::HttpProbeMetrics;
 use super::resolver::{DnsResolver, extract_host, extract_port};
@@ -65,7 +66,7 @@ impl HttpClient {
         let host = match extract_host(&config.url) {
             Ok(h) => h,
             Err(e) => {
-                log::error!("event=error msg=invalid_url url={} err={}", config.url, e);
+                log::error!("source={} event=invalid_url url={} err={}", DEFAULT_SOURCE, config.url, e);
                 return metrics;
             }
         };
@@ -73,7 +74,7 @@ impl HttpClient {
         let port = match extract_port(&config.url) {
             Ok(p) => p,
             Err(e) => {
-                log::error!("event=error msg=invalid_port url={} err={}", config.url, e);
+                log::error!("source={} event=invalid_port url={} err={}", DEFAULT_SOURCE, config.url, e);
                 return metrics;
             }
         };
@@ -85,8 +86,8 @@ impl HttpClient {
         let (ip_addr, dns_duration) =
             match self.resolver.resolve_first_ipv4(&host).instrument(dns_span).await {
                 Ok((ip, dur)) => (ip, dur),
-                Err(e) => {
-                    log::error!("event=error msg=dns_failed host={} err={}", host, e);
+                    Err(e) => {
+                    log::error!("source={} event=dns_failed host={} err={}", DEFAULT_SOURCE, host, e);
                     metrics.dns_duration = total_start.elapsed();
                     return metrics;
                 }
@@ -108,12 +109,12 @@ impl HttpClient {
         {
             Ok(Ok(stream)) => stream,
             Ok(Err(e)) => {
-                log::error!("event=error msg=tcp_connect_failed addr={} err={}", socket_addr, e);
+                log::error!("source={} event=tcp_connect_failed addr={} err={}", DEFAULT_SOURCE, socket_addr, e);
                 metrics.tcp_connect_duration = tcp_start.elapsed();
                 return metrics;
             }
             Err(_) => {
-                log::error!("event=error msg=tcp_connect_timeout addr={}", socket_addr);
+                log::error!("source={} event=tcp_connect_timeout addr={}", DEFAULT_SOURCE, socket_addr);
                 metrics.tcp_connect_duration = tcp_start.elapsed();
                 return metrics;
             }
@@ -126,7 +127,7 @@ impl HttpClient {
             let tls_handler = match TlsHandler::new(config.skip_tls) {
                 Ok(h) => h,
                 Err(e) => {
-                    log::error!("event=error msg=tls_init_failed err={}", e);
+                    log::error!("source={} event=tls_init_failed err={}", DEFAULT_SOURCE, e);
                     return metrics;
                 }
             };
@@ -136,7 +137,7 @@ impl HttpClient {
                 match tls_handler.handshake(tcp_stream, &host).instrument(tls_span).await {
                     Ok(r) => r,
                     Err(e) => {
-                        log::error!("event=error msg=tls_handshake_failed host={} err={}", host, e);
+                        log::error!("source={} event=tls_handshake_failed host={} err={}", DEFAULT_SOURCE, host, e);
                         return metrics;
                     }
                 };
@@ -240,7 +241,7 @@ impl HttpClient {
             let request = match req_builder.body(Empty::<Bytes>::new()) {
                 Ok(r) => r,
                 Err(e) => {
-                    log::error!("event=error msg=request_build_failed err={}", e);
+                    log::error!("source={} event=request_build_failed err={}", DEFAULT_SOURCE, e);
                     return;
                 }
             };
@@ -249,7 +250,7 @@ impl HttpClient {
             let response = match sender.send_request(request).await {
                 Ok(r) => r,
                 Err(e) => {
-                    log::error!("event=error msg=request_failed err={}", e);
+                    log::error!("source={} event=request_failed err={}", DEFAULT_SOURCE, e);
                     return;
                 }
             };
@@ -272,7 +273,7 @@ impl HttpClient {
             let body = response.into_body();
             let content_span = info_span!("content_transfer");
             if let Err(e) = body.collect().instrument(content_span).await {
-                log::warn!("event=warning msg=body_read_error err={}", e);
+                log::warn!("source={} event=body_read_error err={}", DEFAULT_SOURCE, e);
             }
 
             metrics.content_transfer_duration = content_start.elapsed();

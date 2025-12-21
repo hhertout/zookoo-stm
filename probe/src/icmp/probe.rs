@@ -1,6 +1,6 @@
 use std::{fmt::Display, sync::Arc};
 
-use configuration::model::target::IcmpTarget;
+use configuration::{model::target::IcmpTarget, DEFAULT_SOURCE};
 use futures::future::join_all;
 use tokio::sync::Mutex;
 use tracing::{Instrument, info_span};
@@ -25,7 +25,6 @@ impl Display for TargetType {
 #[derive(Clone)]
 pub struct IcmpProbe {
     name: String,
-    job: String,
     targets: Option<Vec<IcmpTarget>>,
     metrics: Arc<Mutex<Vec<MetricData>>>,
 }
@@ -36,8 +35,8 @@ impl Probe for IcmpProbe {
     type Target = IcmpTarget;
 
     #[tracing::instrument(level = "debug")]
-    fn init(name: String, job: String) -> Self {
-        IcmpProbe { name, job, targets: None, metrics: Arc::new(Mutex::new(Vec::new())) }
+    fn init(name: String) -> Self {
+        IcmpProbe { name, targets: None, metrics: Arc::new(Mutex::new(Vec::new())) }
     }
 
     /// Set or update the target data for this probe.
@@ -70,9 +69,9 @@ impl Probe for IcmpProbe {
                 .unwrap_or_else(|| target.fqdn.clone().unwrap_or_else(|| "unset".to_string()));
 
             log::info!(
-                "event=request_start name={} job={} type={} target={}",
+                "source={} probe={} type={} target={} event=request_start",
+                DEFAULT_SOURCE,
                 self.name,
-                self.job,
                 "icmp".to_string(),
                 target_dest
             );
@@ -80,20 +79,25 @@ impl Probe for IcmpProbe {
             async move {
                 let (up, duration_ms) = match ping_target(target).await {
                     Ok((_, duration)) => (1, duration.as_millis()),
-                    Err(e) => {
-                        log::error!("event=ping_failed err={}", e);
-                        (0, 0)
-                    }
+                        Err(e) => {
+                            log::error!(
+                                "probe={} target={} event=ping_failed err={}",
+                                self.name,
+                                target_dest,
+                                e
+                            );
+                            (0, 0)
+                        }
                 };
 
-                log::info!(
-                    "event=request_complete name={} job={} type={} target={} duration={}ms",
-                    self.name,
-                    self.job,
-                    "icmp".to_string(),
-                    target_dest,
-                    duration_ms
-                );
+                    let duration_seconds = (duration_ms as f64) / 1000.0;
+                    log::info!(
+                        "probe={} type={} target={} event=request_complete duration_seconds={}",
+                        self.name,
+                        "icmp".to_string(),
+                        target_dest,
+                        duration_seconds
+                    );
 
                 let instance = if let Some(fqdn) = &target.fqdn {
                     fqdn.clone()

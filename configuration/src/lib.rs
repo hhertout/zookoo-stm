@@ -11,6 +11,8 @@ pub mod model;
 
 pub struct HCL;
 
+pub const DEFAULT_SOURCE: &str = "zookoo";
+
 /// Trait to define parser behavior
 pub trait ParserType {
     fn parse(content: &str) -> Result<Configuration, Box<dyn Error>>;
