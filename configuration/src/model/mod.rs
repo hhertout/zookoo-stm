@@ -28,6 +28,8 @@ pub struct ProbeWrapper {
     pub http: HashMap<String, target::HttpConfiguration>,
     #[serde(default)]
     pub icmp: HashMap<String, target::IcmpConfiguration>,
+    #[serde(default)]
+    pub tcp: HashMap<String, target::TcpConfiguration>,
 }
 
 #[derive(Debug, Deserialize)]

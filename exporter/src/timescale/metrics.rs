@@ -340,6 +340,34 @@ impl Exporter for TimescaleExporter {
                     }
                 });
             }
+            ProbeType::Tcp => {
+                // TCP metrics treated like ICMP (up + rtt)
+                let up = metrics.get("up").copied().unwrap_or(0) as u8;
+                let rtt_ms = metrics.get("rtt_ms").copied().unwrap_or(0) as u128;
+
+                tokio::spawn(async move {
+                    let repository = TimescaleRepository::new(pool);
+                    let labels_json =
+                        serde_json::to_value(&labels).unwrap_or(serde_json::Value::Null);
+
+                    let target = labels.get("target").map(|s| s.as_str()).unwrap_or("unknown");
+                    let zone = labels.get("zone").map(|s| s.as_str());
+                    let job = labels.get("job").map(|s| s.as_str());
+
+                    let to_insert = IcmpMetricRow {
+                        time: chrono::Utc::now(),
+                        target: target.to_string(),
+                        zone: zone.map(|s| s.to_string()),
+                        job: job.map(|s| s.to_string()),
+                        up: up as i16,
+                        rtt_ms: duration_to_i64(rtt_ms),
+                        labels: Some(labels_json.clone()),
+                    };
+                    if let Err(e) = repository.insert_icmp_metrics(to_insert).await {
+                        log::error!("Failed to export ICMP metrics to TimescaleDB: {}", e);
+                    }
+                });
+            }
         }
     }
 }

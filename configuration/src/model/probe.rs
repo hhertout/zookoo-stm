@@ -7,4 +7,5 @@ use crate::model::target;
 pub struct ProbeConfiguration {
     pub http: Option<HashMap<String, target::HttpConfiguration>>,
     pub icmp: Option<HashMap<String, target::IcmpConfiguration>>,
+    pub tcp: Option<HashMap<String, target::TcpConfiguration>>,
 }

@@ -79,3 +79,20 @@ pub struct IcmpTarget {
     #[serde(default = "default_timeout")]
     pub timeout_sec: u16,
 }
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct TcpConfiguration {
+    pub targets: Option<Vec<TcpTarget>>,
+    pub target_from: Option<String>,
+    pub forward_to: Vec<String>,
+    #[serde(default = "default_scrape_interval")]
+    pub scrape_interval: ScrapeInterval,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct TcpTarget {
+    pub target: String,
+    pub labels: Option<HashMap<String, String>>,
+    #[serde(default = "default_timeout")]
+    pub timeout_sec: u16,
+}
