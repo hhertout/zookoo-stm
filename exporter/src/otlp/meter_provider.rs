@@ -2,73 +2,21 @@ use std::net::{TcpStream, ToSocketAddrs};
 use std::time::Duration;
 
 use base64::Engine;
-use configuration::model::defaults::SelfMonitoringConfig;
+
 use configuration::model::exporter::{AuthConfiguration, OtelGrpcExporterConfiguration};
 use opentelemetry::KeyValue;
-use opentelemetry::global;
 use opentelemetry_otlp::tonic_types::{
     metadata::MetadataMap,
     transport::{Certificate, ClientTlsConfig},
 };
-use opentelemetry_otlp::{MetricExporter, SpanExporter, WithExportConfig, WithTonicConfig};
+use opentelemetry_otlp::{MetricExporter, WithExportConfig, WithTonicConfig};
 use opentelemetry_sdk::Resource;
 use opentelemetry_sdk::metrics::SdkMeterProvider;
-use opentelemetry_sdk::trace::SdkTracerProvider;
 use std::fs;
 use tokio::time::sleep;
 
 pub type BoxedTracer = opentelemetry::global::BoxedTracer;
 pub type BoxedSpan = opentelemetry::global::BoxedSpan;
-
-/// Initialize the OpenTelemetry tracer provider with the given configuration.
-/// This function sets up the OpenTelemetry tracer provider with the specified endpoint, service name, environment, and zone.
-/// It configures the span exporter to use gRPC with the provided endpoint and TLS configuration if applicable.
-/// The tracer provider is then built and set as the global tracer provider, allowing for tracing across the application.
-/// The function returns the initialized tracer provider for further use.
-pub fn init_tracer_provider(config: SelfMonitoringConfig) -> SdkTracerProvider {
-    let endpoint = config.otel_endpoint.clone();
-    let mut builder = SpanExporter::builder().with_tonic().with_endpoint(endpoint.clone());
-
-    if endpoint.starts_with("https") {
-        builder = builder.with_tls_config(ClientTlsConfig::new().with_enabled_roots())
-    }
-
-    // Auth: configure gRPC metadata (do not log token content).
-    // If both are set, bearer wins by overwriting the metadata key.
-    let mut metadata = MetadataMap::new();
-    if let Some(basic_auth) = config.basic_auth.as_ref() {
-        let credentials = base64::engine::general_purpose::STANDARD
-            .encode(format!("{}:{}", basic_auth.username, basic_auth.password));
-        metadata.insert("authorization", format!("Basic {}", credentials).parse().unwrap());
-    }
-    if let Some(bearer) = config.bearer.as_ref() {
-        metadata.insert("authorization", format!("Bearer {}", bearer).parse().unwrap());
-    }
-
-    if !metadata.is_empty() {
-        builder = builder.with_metadata(metadata);
-    }
-
-    let exporter = builder.build().expect("Failed to create span exporter");
-
-    let provider = SdkTracerProvider::builder()
-        .with_resource(
-            Resource::builder()
-                .with_service_name(config.service_name)
-                .with_attribute(KeyValue::new("env", config.env))
-                .with_attribute(KeyValue::new(
-                    "zone",
-                    config.zone.unwrap_or("world_wide".to_string()),
-                ))
-                .build(),
-        )
-        .with_batch_exporter(exporter);
-
-    let builded = provider.build();
-    global::set_tracer_provider(builded.clone());
-
-    builded
-}
 
 fn build_auth_metadata(auth: &Option<AuthConfiguration>) -> MetadataMap {
     let mut metadata = MetadataMap::new();
