@@ -2,11 +2,11 @@ use std::sync::Arc;
 
 use configuration::model::{
     Configuration, ScrapeInterval,
-    target::{HttpConfiguration, HttpTarget, IcmpConfiguration, IcmpTarget},
+    target::{HttpConfiguration, HttpTarget, IcmpConfiguration, IcmpTarget, TcpTarget},
 };
 use discovery::{Discovery, resolver::resolve_discovery};
 use exporter::resolvers::resolve_exporters;
-use probe::{HttpProbe, IcmpProbe, Probe};
+use probe::{HttpProbe, IcmpProbe, Probe, TcpProbe};
 use tokio::sync::RwLock;
 use tracing::{Instrument, error_span, info_span};
 
@@ -62,6 +62,24 @@ impl PipelineConfig<IcmpTarget> for IcmpConfiguration {
     }
 }
 
+impl PipelineConfig<TcpTarget> for configuration::model::target::TcpConfiguration {
+    fn targets(&self) -> &Option<Vec<TcpTarget>> {
+        &self.targets
+    }
+
+    fn target_from(&self) -> &Option<String> {
+        &self.target_from
+    }
+
+    fn forward_to(&self) -> &[String] {
+        &self.forward_to
+    }
+
+    fn scrape_interval(&self) -> ScrapeInterval {
+        self.scrape_interval
+    }
+}
+
 impl PipelineBuilder {
     #[tracing::instrument(
         level = "info",
@@ -83,7 +101,7 @@ impl PipelineBuilder {
         config: &Configuration,
         exporters: &ExportersMap,
         probe_type: ProbeType,
-        probe_init: fn() -> P,
+        probe_init: fn(String) -> P,
     ) -> Vec<Pipeline<T, P>>
     where
         T: Clone + std::fmt::Debug + Send + Sync + serde::de::DeserializeOwned + 'static, // Target Type
@@ -144,7 +162,7 @@ impl PipelineBuilder {
             label.to_string(),
             probe_type,
             discovery.clone(),
-            probe_init(),
+            probe_init(label.to_string()), // name and job
             resolved_exporters.inner().to_vec(),
             probe_config.scrape_interval().to_duration(),
         );
@@ -172,11 +190,7 @@ impl PipelineBuilder {
             tracing::Span::current().record("icmp_pipelines", probe_wrapper.icmp.len());
 
             for (label, http_config) in &probe_wrapper.http {
-                let http_pipelines = Self::build_pipelines::<
-                    configuration::model::target::HttpTarget,
-                    HttpProbe,
-                    _,
-                >(
+                let http_pipelines = Self::build_pipelines::<HttpTarget, HttpProbe, _>(
                     label,
                     http_config,
                     config,
@@ -201,6 +215,21 @@ impl PipelineBuilder {
                 )
                 .await;
                 for pipeline in icmp_pipelines {
+                    pipelines.push(Box::new(pipeline));
+                }
+            }
+
+            for (label, tcp_config) in &probe_wrapper.tcp {
+                let tcp_pipelines = Self::build_pipelines::<TcpTarget, TcpProbe, _>(
+                    label,
+                    tcp_config,
+                    config,
+                    &exporters,
+                    ProbeType::Tcp,
+                    TcpProbe::init,
+                )
+                .await;
+                for pipeline in tcp_pipelines {
                     pipelines.push(Box::new(pipeline));
                 }
             }

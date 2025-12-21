@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::sync::Arc;
 
+use configuration::DEFAULT_SOURCE;
 use configuration::model::target::HttpTarget;
 use futures::future::join_all;
 use tokio::sync::Mutex;
@@ -33,6 +34,7 @@ impl Display for TargetType {
 /// HTTP Probe with unified phase timing
 #[derive(Clone)]
 pub struct HttpProbe {
+    name: String,
     targets: Vec<HttpTarget>,
     client: Arc<HttpClient>,
     metrics: Arc<Mutex<Vec<MetricData>>>,
@@ -75,8 +77,9 @@ impl HttpProbe {
 impl Probe for HttpProbe {
     type Target = HttpTarget;
 
-    fn init() -> Self {
+    fn init(name: String) -> Self {
         HttpProbe {
+            name,
             targets: Vec::new(),
             client: Arc::new(HttpClient::new()),
             metrics: Arc::new(Mutex::new(Vec::new())),
@@ -110,16 +113,24 @@ impl Probe for HttpProbe {
                     TargetType::HTTP
                 };
 
-                log::info!("event=request type={} target={}", kind, target.url);
+                log::info!(
+                    "source={} probe={} type={} target={} event=request_start",
+                    DEFAULT_SOURCE,
+                    self.name,
+                    kind,
+                    target.url
+                );
 
                 // Execute the probe with unified timing
                 let config = Self::to_request_config(&target);
                 let probe_metrics = client.execute(&config).await;
 
                 log::info!(
-                    "event=metrics target={} job=zookoo {}",
+                    "source={} probe={} target={} event=request_complete duration_seconds={}",
+                    DEFAULT_SOURCE,
+                    self.name,
                     target.url,
-                    probe_metrics.to_logfmt()
+                    probe_metrics.total_duration.as_secs_f64()
                 );
 
                 // Store metrics for export

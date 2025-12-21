@@ -69,14 +69,15 @@ impl discovery::Discovery for MockDiscovery {
 
 #[derive(Clone)]
 struct NoopProbe {
+    _name: String,
     _seen: Arc<tokio::sync::Mutex<Vec<Vec<String>>>>,
 }
 
 impl probe::Probe for NoopProbe {
     type Target = String;
 
-    fn init() -> Self {
-        Self { _seen: Arc::new(tokio::sync::Mutex::new(Vec::new())) }
+    fn init(name: String) -> Self {
+        Self { _name: name, _seen: Arc::new(tokio::sync::Mutex::new(Vec::new())) }
     }
 
     fn set_targets(&mut self, data: Vec<Self::Target>) {
@@ -102,7 +103,7 @@ async fn pipeline_processes_discovery_updates_even_when_starting_empty() {
         "p".to_string(),
         ProbeType::Http,
         Some(discovery_dyn),
-        NoopProbe::init(),
+        NoopProbe::init("test".to_string()),
         Vec::new(),
         Duration::from_secs(3600),
     );

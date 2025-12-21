@@ -276,14 +276,14 @@ async fn test_probe_content_length() {
 
 #[tokio::test]
 async fn test_http_probe_init() {
-    let probe = HttpProbe::init();
+    let probe = HttpProbe::init("test-probe".to_string());
     // Should create without error
     drop(probe);
 }
 
 #[tokio::test]
 async fn test_http_probe_set_targets() {
-    let mut probe = HttpProbe::init();
+    let mut probe = HttpProbe::init("test-probe".to_string());
 
     let targets = vec![
         HttpTarget {
@@ -318,7 +318,7 @@ async fn test_http_probe_set_targets() {
 async fn test_http_probe_scrape_and_get_metrics() {
     let server = MockHttpServer::start(200, "OK").await;
 
-    let mut probe = HttpProbe::init();
+    let mut probe = HttpProbe::init("test-probe".to_string());
 
     let targets = vec![HttpTarget {
         url: server.url(),
@@ -362,7 +362,7 @@ async fn test_http_probe_multiple_targets() {
     let server1 = MockHttpServer::start(200, "OK").await;
     let server2 = MockHttpServer::start(201, "Created").await;
 
-    let mut probe = HttpProbe::init();
+    let mut probe = HttpProbe::init("test-probe".to_string());
 
     let targets = vec![
         HttpTarget {
@@ -407,7 +407,7 @@ async fn test_http_probe_multiple_targets() {
 async fn test_http_probe_metrics_cleared_after_get() {
     let server = MockHttpServer::start(200, "OK").await;
 
-    let mut probe = HttpProbe::init();
+    let mut probe = HttpProbe::init("test-probe".to_string());
 
     let targets = vec![HttpTarget {
         url: server.url(),
@@ -437,7 +437,7 @@ async fn test_http_probe_metrics_cleared_after_get() {
 
 #[tokio::test]
 async fn test_probe_empty_targets() {
-    let mut probe = HttpProbe::init();
+    let mut probe = HttpProbe::init("test-probe".to_string());
     probe.set_targets(vec![]);
     probe.scrape().await;
 
@@ -449,7 +449,7 @@ async fn test_probe_empty_targets() {
 async fn test_probe_concurrent_scrapes() {
     let server = MockHttpServer::start(200, "OK").await;
 
-    let probe = Arc::new(tokio::sync::Mutex::new(HttpProbe::init()));
+    let probe = Arc::new(tokio::sync::Mutex::new(HttpProbe::init("test-probe".to_string())));
 
     let targets = vec![HttpTarget {
         url: server.url(),

@@ -272,6 +272,23 @@ impl Exporter for PrometheusRemoteWriteExporter {
                     }
                 });
             }
+            ProbeType::Tcp => {
+                // TCP metrics treated like ICMP (up + rtt)
+                let up = metrics.get("up").copied().unwrap_or(0) as f64;
+                let rtt_seconds = metrics.get("rtt_ms").copied().unwrap_or(0) as f64 / 1000.0;
+
+                let metric_vec = vec![
+                    (self.metric_name("icmp_target_up"), up, labels.clone()),
+                    (self.metric_name("icmp_rtt_seconds"), rtt_seconds, labels),
+                ];
+
+                let remote_write = Arc::clone(&self.remote_write);
+                tokio::spawn(async move {
+                    if let Err(e) = remote_write.push_metrics(metric_vec, None).await {
+                        log::error!("Failed to export ICMP metrics to Prometheus: {}", e);
+                    }
+                });
+            }
         }
     }
 }

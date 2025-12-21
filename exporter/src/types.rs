@@ -8,6 +8,7 @@ use crate::Exporter;
 pub enum ProbeType {
     Http,
     Icmp,
+    Tcp,
 }
 
 impl fmt::Display for ProbeType {
@@ -15,6 +16,7 @@ impl fmt::Display for ProbeType {
         match self {
             ProbeType::Http => write!(f, "HTTP"),
             ProbeType::Icmp => write!(f, "ICMP"),
+            ProbeType::Tcp => write!(f, "TCP"),
         }
     }
 }

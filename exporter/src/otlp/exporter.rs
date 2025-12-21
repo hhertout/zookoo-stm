@@ -95,7 +95,6 @@ impl Exporter for OtelExporter {
 
         match probe_type {
             ProbeType::Http => {
-                // Extract HTTP metrics from the HashMap
                 let up = metrics.get("up").copied().unwrap_or(0) as u8;
                 let success = metrics.get("success").copied().unwrap_or(0) as u8;
                 let dns_duration = metrics.get("dns_duration_ms").copied().unwrap_or(0) as u128;
@@ -130,10 +129,14 @@ impl Exporter for OtelExporter {
                 self.metric_exporter.export_http_metrics(to_export);
             }
             ProbeType::Icmp => {
-                // Extract ICMP metrics from the HashMap
                 let up = metrics.get("up").copied().unwrap_or(0) as u8;
                 let rtt_ms = metrics.get("rtt_ms").copied().unwrap_or(0) as u128;
 
+                self.metric_exporter.export_icmp_metrics(up, rtt_ms, target_labels);
+            }
+            ProbeType::Tcp => {
+                let up = metrics.get("up").copied().unwrap_or(0) as u8;
+                let rtt_ms = metrics.get("rtt_ms").copied().unwrap_or(0) as u128;
                 self.metric_exporter.export_icmp_metrics(up, rtt_ms, target_labels);
             }
         }

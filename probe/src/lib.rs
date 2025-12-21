@@ -1,5 +1,6 @@
 pub mod http;
 pub mod icmp;
+pub mod tcp;
 
 pub use tracing::instrument;
 
@@ -8,6 +9,7 @@ use std::{collections::HashMap, fmt::Display};
 // Re-export probes for easy access
 pub use http::HttpProbe;
 pub use icmp::IcmpProbe;
+pub use tcp::TcpProbe;
 
 #[derive(Debug)]
 pub enum ScrapeError {
@@ -34,6 +36,7 @@ impl std::error::Error for ScrapeError {}
 pub enum ProbeType {
     Http,
     Icmp,
+    Tcp,
 }
 
 impl Display for ProbeType {
@@ -41,6 +44,7 @@ impl Display for ProbeType {
         match self {
             ProbeType::Http => write!(f, "http"),
             ProbeType::Icmp => write!(f, "icmp"),
+            ProbeType::Tcp => write!(f, "tcp"),
         }
     }
 }
@@ -90,7 +94,7 @@ impl Default for MetricData {
 /// Probe trait: manage targets and forward results to exporters or other components.
 pub trait Probe {
     type Target: Clone + std::fmt::Debug + Send + Sync + 'static;
-    fn init() -> Self;
+    fn init(name: String) -> Self;
 
     /// Set or update the target data for this probe.
     fn set_targets(&mut self, data: Vec<Self::Target>);

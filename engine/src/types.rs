@@ -2,6 +2,7 @@
 pub(crate) enum ProbeType {
     Http,
     Icmp,
+    Tcp,
 }
 
 impl From<ProbeType> for exporter::types::ProbeType {
@@ -9,6 +10,7 @@ impl From<ProbeType> for exporter::types::ProbeType {
         match pt {
             ProbeType::Http => exporter::types::ProbeType::Http,
             ProbeType::Icmp => exporter::types::ProbeType::Icmp,
+            ProbeType::Tcp => exporter::types::ProbeType::Tcp,
         }
     }
 }

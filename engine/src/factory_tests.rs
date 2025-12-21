@@ -11,7 +11,9 @@ use configuration::model::{
     defaults::Defaults,
     discovery::DiscoveryFile,
     scrape_interval::ScrapeInterval,
-    target::{HttpConfiguration, HttpTarget, IcmpConfiguration, IcmpTarget},
+    target::{
+        HttpConfiguration, HttpTarget, IcmpConfiguration, IcmpTarget, TcpConfiguration, TcpTarget,
+    },
 };
 use exporter::{Exporter, MetricData};
 use tokio::sync::RwLock;
@@ -68,6 +70,10 @@ fn http_target(url: &str) -> HttpTarget {
 
 fn icmp_target(ipv4: &str) -> IcmpTarget {
     IcmpTarget { ipv4: Some(ipv4.to_string()), fqdn: None, labels: None, timeout_sec: 15 }
+}
+
+fn tcp_target(target: &str) -> TcpTarget {
+    TcpTarget { target: target.to_string(), labels: None, timeout_sec: 5 }
 }
 
 fn exporters_with(reference: &str) -> ExportersMap {
@@ -264,15 +270,26 @@ async fn from_config_builds_http_and_icmp_pipelines() {
         },
     );
 
+    let mut tcp = HashMap::new();
+    tcp.insert(
+        "t".to_string(),
+        TcpConfiguration {
+            targets: Some(vec![tcp_target("2.2.2.2")]),
+            target_from: None,
+            forward_to: vec![forward_ref.to_string()],
+            scrape_interval: ScrapeInterval::S30,
+        },
+    );
+
     let config = Configuration {
         defaults: base_defaults(),
-        probe: Some(ProbeWrapper { http, icmp }),
+        probe: Some(ProbeWrapper { http, icmp, tcp }),
         exporter: None,
         discovery: None,
     };
 
     let pipelines = PipelineBuilder::from_config(&config, exporters_with(forward_ref)).await;
-    assert_eq!(pipelines.len(), 2);
+    assert_eq!(pipelines.len(), 3);
 
     let labels: HashSet<String> = pipelines.into_iter().map(|p| p.label().to_string()).collect();
     assert!(labels.contains("h"));
