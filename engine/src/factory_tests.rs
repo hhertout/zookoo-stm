@@ -289,7 +289,7 @@ async fn from_config_builds_http_and_icmp_pipelines() {
     };
 
     let pipelines = PipelineBuilder::from_config(&config, exporters_with(forward_ref)).await;
-    assert_eq!(pipelines.len(), 2);
+    assert_eq!(pipelines.len(), 3);
 
     let labels: HashSet<String> = pipelines.into_iter().map(|p| p.label().to_string()).collect();
     assert!(labels.contains("h"));
