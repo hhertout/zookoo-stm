@@ -77,7 +77,8 @@ impl Probe for IcmpProbe {
             );
 
             async move {
-                let (up, duration_ms) = match ping_target(target).await {
+                let span = info_span!("icmp.ping", target = %target_dest);
+                let (up, duration_ms) = match ping_target(target).instrument(span).await {
                     Ok((_, duration)) => (1, duration.as_millis()),
                     Err(e) => {
                         log::error!(

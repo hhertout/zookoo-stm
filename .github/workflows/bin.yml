@@ -2,8 +2,7 @@ name: 📦 Release - Binary
 
 on:
   push:
-    tags:
-      - "*"
+    branches: ["main"]
 
 permissions:
   contents: write
@@ -24,10 +23,10 @@ jobs:
             target: aarch64-apple-darwin
             archive_ext: tar.gz
             bin_ext: ""
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            archive_ext: zip
-            bin_ext: .exe
+          # - os: windows-latest
+          #   target: x86_64-pc-windows-msvc
+          #   archive_ext: zip
+          #   bin_ext: .exe
 
     steps:
       - name: Checkout
@@ -35,17 +34,37 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Extract version from PR or create tag
+        id: version
+        run: |
+          # Option 1 : extract version from Cargo.toml
+          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          echo "version=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          git fetch --tags
+          if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag already exists, skipping release"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Install Rust
+        if: steps.check_tag.outputs.exists == 'false'
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
           components: clippy,rustfmt
 
       - name: Build (release)
+        if: steps.check_tag.outputs.exists == 'false'
         run: cargo build --release --locked --target ${{ matrix.target }}
 
       - name: Package (unix)
-        if: runner.os != 'Windows'
+        if: runner.os != 'Windows' && steps.check_tag.outputs.exists == 'false'
         shell: bash
         run: |
           set -euo pipefail
@@ -56,22 +75,23 @@ jobs:
           tar -czf "$OUT" -C "target/${{ matrix.target }}/release" "${BIN_NAME}${{ matrix.bin_ext }}"
           echo "ASSET=$OUT" >> "$GITHUB_ENV"
 
-      - name: Package (windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $BinName = "zookoo"
-          $Out = "$BinName-${{ matrix.target }}.${{ matrix.archive_ext }}"
-          $BinPath = "target/${{ matrix.target }}/release/$BinName${{ matrix.bin_ext }}"
-          if (-not (Test-Path $BinPath)) { throw "Binary not found: $BinPath" }
-          Compress-Archive -Path $BinPath -DestinationPath $Out -Force
-          "ASSET=$Out" | Out-File -FilePath $env:GITHUB_ENV -Append
+      # - name: Package (windows)
+      #   if: runner.os == 'Windows' && steps.check_tag.outputs.exists == 'false'
+      #   shell: pwsh
+      #   run: |
+      #     $BinName = "zookoo"
+      #     $Out = "$BinName-${{ matrix.target }}.${{ matrix.archive_ext }}"
+      #     $BinPath = "target/${{ matrix.target }}/release/$BinName${{ matrix.bin_ext }}"
+      #     if (-not (Test-Path $BinPath)) { throw "Binary not found: $BinPath" }
+      #     Compress-Archive -Path $BinPath -DestinationPath $Out -Force
+      #     "ASSET=$Out" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Create GitHub Release + upload asset
+        if: steps.check_tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
           files: ${{ env.ASSET }}
