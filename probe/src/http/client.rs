@@ -202,8 +202,13 @@ impl HttpClient {
         S: AsyncRead + AsyncWrite + Unpin + Send + 'static,
     {
         let request_span = info_span!("http_request", host = %host, method = %config.method);
-        log::info!("source={} event=request_start url={} method={}", DEFAULT_SOURCE, config.url, config.method);
-        
+        log::info!(
+            "source={} event=request_start url={} method={}",
+            DEFAULT_SOURCE,
+            config.url,
+            config.method
+        );
+
         async {
             let ttfb_start = Instant::now();
 
@@ -287,13 +292,16 @@ impl HttpClient {
                 }
             };
 
-            
             metrics.time_to_first_byte = ttfb_start.elapsed();
             metrics.status_code = response.status().as_u16();
             metrics.http_version = format!("{:?}", response.version());
-            
-            log::info!("source={} event=request_complete status_code={}", DEFAULT_SOURCE, response.status().as_u16());
-            
+
+            log::info!(
+                "source={} event=request_complete status_code={}",
+                DEFAULT_SOURCE,
+                response.status().as_u16()
+            );
+
             // Get content length if available
             metrics.content_length = response
                 .headers()
