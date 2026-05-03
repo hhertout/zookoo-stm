@@ -1,45 +1,26 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
+import type { ReactNode } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import Heading from '@theme/Heading';
-
-import styles from './index.module.css';
-
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
-  return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <img src="/img/zookoo_backgroundless.png" alt="Zookoo Logo" width={300} height={300} />
-        <Heading as="h1" className="hero__title">   
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/category/quick-start">
-            Zookoo quick start
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
+import Hero from '@site/src/components/landing/Hero';
+import WhyZookoo from '@site/src/components/landing/WhyZookoo';
+import FeatureCards from '@site/src/components/landing/FeatureCards';
+import ConfigShowcase from '@site/src/components/landing/ConfigShowcase';
+import PortalCards from '@site/src/components/landing/PortalCards';
+import GrafanaSection from '@site/src/components/landing/GrafanaSection';
 
 export default function Home(): ReactNode {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      title={`${siteConfig.title} Documentation`}
-      description="Description will go into a meta tag in <head />">
-      <HomepageHeader />
-      <main>
-        <HomepageFeatures />
-      </main>
+      title={siteConfig.title}
+      description="A lightweight, OpenTelemetry-native monitoring agent written in Rust."
+    >
+      <Hero />
+      <WhyZookoo />
+      <FeatureCards />
+      <GrafanaSection />
+      <ConfigShowcase />
+      <PortalCards />
     </Layout>
   );
 }
