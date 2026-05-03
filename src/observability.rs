@@ -8,9 +8,9 @@ use opentelemetry_otlp::{
     tonic_types::{metadata::MetadataMap, transport::ClientTlsConfig},
 };
 use opentelemetry_sdk::{Resource, logs::SdkLoggerProvider, trace::SdkTracerProvider};
+use pyroscope::PyroscopeAgent;
 use pyroscope::backend::{BackendConfig, PprofConfig, pprof_backend};
 use pyroscope::pyroscope::{PyroscopeAgentBuilder, PyroscopeAgentReady};
-use pyroscope::PyroscopeAgent;
 use tracing_subscriber::{EnvFilter, fmt};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
