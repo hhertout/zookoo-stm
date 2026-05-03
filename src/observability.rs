@@ -17,7 +17,8 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 pub fn start_pyroscope(
     config: SelfMonitoringConfig,
 ) -> Result<PyroscopeAgent<PyroscopeAgentReady>, Box<dyn std::error::Error>> {
-    let backend_config = BackendConfig { report_thread_id: true, report_thread_name: true, report_pid: false };
+    let backend_config =
+        BackendConfig { report_thread_id: true, report_thread_name: true, report_pid: false };
     let backend_impl = pprof_backend(PprofConfig::default(), backend_config);
     let hostname = hostname::get().unwrap_or_default().to_string_lossy().to_string();
 
