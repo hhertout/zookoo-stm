@@ -6,9 +6,9 @@ use std::net::IpAddr;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use hickory_resolver::Resolver;
+use hickory_resolver::TokioResolver;
 use hickory_resolver::config::{ResolverConfig, ResolverOpts};
-use hickory_resolver::name_server::TokioConnectionProvider;
+use hickory_resolver::net::runtime::TokioRuntimeProvider;
 
 use tracing::instrument;
 
@@ -23,30 +23,30 @@ pub struct DnsResult {
 
 /// DNS Resolver with caching and timing
 pub struct DnsResolver {
-    resolver: Arc<Resolver<TokioConnectionProvider>>,
+    resolver: Arc<TokioResolver>,
 }
 
 impl DnsResolver {
     /// Create a new DNS resolver with system configuration
     #[instrument(name = "dns_resolver_new")]
     pub fn new() -> Self {
-        let resolver = Resolver::builder_with_config(
+        let resolver = TokioResolver::builder_with_config(
             ResolverConfig::default(),
-            TokioConnectionProvider::default(),
+            TokioRuntimeProvider::default(),
         )
         .with_options(ResolverOpts::default())
         .build();
 
-        Self { resolver: Arc::new(resolver) }
+        Self { resolver: Arc::new(resolver.expect("failed to build DNS resolver")) }
     }
 
     /// Create a new DNS resolver with custom configuration
     pub fn with_config(config: ResolverConfig, opts: ResolverOpts) -> Self {
-        let resolver = Resolver::builder_with_config(config, TokioConnectionProvider::default())
+        let resolver = TokioResolver::builder_with_config(config, TokioRuntimeProvider::default())
             .with_options(opts)
             .build();
 
-        Self { resolver: Arc::new(resolver) }
+        Self { resolver: Arc::new(resolver.expect("failed to build DNS resolver")) }
     }
 
     /// Resolve a hostname to IP addresses with timing

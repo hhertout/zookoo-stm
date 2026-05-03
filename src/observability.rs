@@ -8,33 +8,41 @@ use opentelemetry_otlp::{
     tonic_types::{metadata::MetadataMap, transport::ClientTlsConfig},
 };
 use opentelemetry_sdk::{Resource, logs::SdkLoggerProvider, trace::SdkTracerProvider};
-use pyroscope::{PyroscopeAgent, pyroscope::PyroscopeAgentReady};
-use pyroscope_pprofrs::{PprofConfig, pprof_backend};
+use pyroscope::PyroscopeAgent;
+use pyroscope::backend::{BackendConfig, PprofConfig, pprof_backend};
+use pyroscope::pyroscope::{PyroscopeAgentBuilder, PyroscopeAgentReady};
 use tracing_subscriber::{EnvFilter, fmt};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 pub fn start_pyroscope(
     config: SelfMonitoringConfig,
 ) -> Result<PyroscopeAgent<PyroscopeAgentReady>, Box<dyn std::error::Error>> {
-    let pprof_config = PprofConfig::new().report_thread_id().report_thread_name().sample_rate(100);
-    let backend_impl = pprof_backend(pprof_config);
-
-    let mut pyroscope = PyroscopeAgent::builder(config.pyroscope_endpoint, config.service_name)
-        .backend(backend_impl);
+    let backend_config =
+        BackendConfig { report_thread_id: true, report_thread_name: true, report_pid: false };
+    let backend_impl = pprof_backend(PprofConfig::default(), backend_config);
     let hostname = hostname::get().unwrap_or_default().to_string_lossy().to_string();
 
+    let mut builder = PyroscopeAgentBuilder::new(
+        config.pyroscope_endpoint,
+        config.service_name,
+        100,
+        "pyroscope-rs",
+        env!("CARGO_PKG_VERSION"),
+        backend_impl,
+    )
+    .tags(vec![("host", &hostname)]);
+
     if let Some(basic_auth) = config.basic_auth {
-        pyroscope = pyroscope.basic_auth(basic_auth.username, basic_auth.password);
+        builder = builder.basic_auth(basic_auth.username, basic_auth.password);
     }
 
     if let Some(bearer) = config.bearer {
-        pyroscope = pyroscope.auth_token(bearer);
+        let mut headers = std::collections::HashMap::new();
+        headers.insert("Authorization".to_string(), format!("Bearer {}", bearer));
+        builder = builder.http_headers(headers);
     }
 
-    pyroscope = pyroscope.tags(vec![("host", &hostname)]);
-
-    let agent = pyroscope.build()?;
-
+    let agent = builder.build()?;
     Ok(agent)
 }
 
