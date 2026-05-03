@@ -1,30 +1,320 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+/* ─── Fonts ──────────────────────────────────────────────────────────── */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
 
-/* You can override the default Infima variables here. */
+/* ─── Tailwind (no preflight — Infima handles the reset) ─────────────── */
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Infima variables ───────────────────────────────────────────────── */
 :root {
-  --ifm-color-primary: #333;
-  --ifm-color-primary-dark: #333;
-  --ifm-color-primary-darker: #333;
-  --ifm-color-primary-darkest: #333;
-  --ifm-color-primary-light: #333;
-  --ifm-color-primary-lighter: #333;
-  --ifm-color-primary-lightest: #333;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-color-primary: #f97316;
+  --ifm-color-primary-dark: #ea6a0a;
+  --ifm-color-primary-darker: #de6309;
+  --ifm-color-primary-darkest: #b75108;
+  --ifm-color-primary-light: #fa8637;
+  --ifm-color-primary-lighter: #fb8f45;
+  --ifm-color-primary-lightest: #fca96d;
+
+  --ifm-background-color: #0a0a0a;
+  --ifm-background-surface-color: #111111;
+  --ifm-navbar-background-color: rgba(10, 10, 10, 0.8);
+  --ifm-footer-background-color: #0a0a0a;
+  --ifm-toc-border-color: #1e1e1e;
+  --ifm-hr-border-color: #1e1e1e;
+
+  --ifm-font-family-base: 'Inter', system-ui, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', monospace;
+  --ifm-font-color-base: #ededed;
+  --ifm-font-color-secondary: #888888;
+  --ifm-line-height-base: 1.7;
+
+  --ifm-link-color: #f97316;
+  --ifm-link-hover-color: #fb923c;
+  --ifm-link-hover-decoration: underline;
+
+  --ifm-code-font-size: 90%;
+  --ifm-navbar-height: 60px;
+  --docusaurus-highlighted-code-line-bg: rgba(249, 115, 22, 0.1);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme="dark"] {
-  --ifm-color-primary: #f3f3f3;
-  --ifm-color-primary-dark: #f3f3f3;
-  --ifm-color-primary-darker: #f3f3f3;
-  --ifm-color-primary-darkest: #f3f3f3;
-  --ifm-color-primary-light: #f3f3f3;
-  --ifm-color-primary-lighter: #f3f3f3;
-  --ifm-color-primary-lightest: #f3f3f3;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+html[data-theme='dark'] {
+  --ifm-color-primary: #f97316;
+  --ifm-background-color: #0a0a0a;
+  --ifm-background-surface-color: #111111;
+  --ifm-font-color-base: #ededed;
+}
+
+html {
+  color-scheme: dark;
+}
+
+/* ─── Navbar ─────────────────────────────────────────────────────────── */
+.navbar {
+  background: rgba(10, 10, 10, 0.8) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #1e1e1e;
+  box-shadow: none;
+}
+
+.navbar__title {
+  font-weight: 600;
+  color: #ededed;
+}
+
+.navbar__link {
+  font-size: 0.875rem;
+  color: #888888;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.navbar__link:hover,
+.navbar__link--active {
+  color: #f97316;
+  background: transparent;
+}
+
+/* GitHub icon in navbar */
+.navbar-github-icon {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0 !important;
+}
+
+.navbar-github-icon::after {
+  display: none !important;
+}
+
+.navbar-github-icon::before {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  background-color: #888888;
+  transition: background-color 0.15s ease;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.navbar-github-icon:hover::before {
+  background-color: #ededed;
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────────────── */
+.theme-doc-sidebar-container {
+  background-color: #0a0a0a;
+  border-right: 1px solid #1e1e1e !important;
+}
+
+.menu {
+  background-color: #0a0a0a;
+}
+
+.menu__link {
+  color: #888888;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.menu__link:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  color: #ededed;
+}
+
+.menu__link--active {
+  color: #f97316 !important;
+  background-color: rgba(249, 115, 22, 0.08) !important;
+  border-left: 3px solid #f97316;
+  padding-left: calc(var(--ifm-menu-link-padding-horizontal) - 3px);
+  font-weight: 600;
+}
+
+.menu__list-item-collapsible:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ─── Doc content ────────────────────────────────────────────────────── */
+.theme-doc-markdown {
+  max-width: 720px;
+}
+
+.markdown h2 {
+  border-left: 3px solid #f97316;
+  padding-left: 12px;
+  margin-left: -15px;
+}
+
+.markdown a {
+  color: #f97316;
+  text-decoration: none;
+}
+
+.markdown a:hover {
+  color: #fb923c;
+  text-decoration: underline;
+}
+
+/* ─── Code blocks ────────────────────────────────────────────────────── */
+.prism-code {
+  background-color: #0d0d0d !important;
+}
+
+div[class^='codeBlockContainer'] {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+}
+
+div[class^='codeBlockTitle'] {
+  background-color: #111111;
+  border-bottom-color: #2a2a2a;
+  color: #888888;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+}
+
+/* ─── Admonitions ────────────────────────────────────────────────────── */
+.alert--info {
+  --ifm-alert-background-color: rgba(136, 136, 136, 0.06);
+  --ifm-alert-border-color: #888888;
+  color: #ededed;
+}
+
+.alert--warning {
+  --ifm-alert-background-color: rgba(249, 115, 22, 0.06);
+  --ifm-alert-border-color: #f97316;
+  color: #ededed;
+}
+
+.alert--danger {
+  --ifm-alert-background-color: rgba(239, 68, 68, 0.06);
+  --ifm-alert-border-color: #ef4444;
+  color: #ededed;
+}
+
+.alert--success {
+  --ifm-alert-background-color: rgba(34, 197, 94, 0.06);
+  --ifm-alert-border-color: #22c55e;
+  color: #ededed;
+}
+
+/* ─── Table of contents ──────────────────────────────────────────────── */
+.table-of-contents__link {
+  color: #888888;
+  font-size: 0.875rem;
+}
+
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: #f97316;
+}
+
+/* ─── Breadcrumbs ────────────────────────────────────────────────────── */
+.breadcrumbs__link {
+  color: #888888;
+}
+
+.breadcrumbs__link:hover {
+  color: #ededed;
+}
+
+/* ─── Pagination ─────────────────────────────────────────────────────── */
+.pagination-nav__link {
+  border-color: #1e1e1e;
+  background-color: #111111;
+  color: #ededed;
+  transition: border-color 0.15s ease;
+}
+
+.pagination-nav__link:hover {
+  border-color: #f97316;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+/* ─── Landing page components ────────────────────────────────────────── */
+.landing-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  background-color: #f97316;
+  color: #ffffff !important;
+  transition: background-color 0.15s ease;
+  border: none;
+}
+
+.landing-btn-primary:hover {
+  background-color: #fb923c;
+  color: #ffffff !important;
+  text-decoration: none;
+}
+
+.landing-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  border: 1px solid #1e1e1e;
+  color: #888888 !important;
+  background-color: transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.landing-btn-secondary:hover {
+  border-color: #f97316;
+  color: #ededed !important;
+  text-decoration: none;
+}
+
+.feature-card {
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #1e1e1e;
+  background-color: #111111;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feature-card:hover {
+  border-color: rgba(249, 115, 22, 0.3);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.15);
+}
+
+.portal-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #1e1e1e;
+  background-color: #0a0a0a;
+  text-decoration: none !important;
+  color: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.portal-card:hover {
+  border-color: rgba(249, 115, 22, 0.4);
+  text-decoration: none !important;
 }

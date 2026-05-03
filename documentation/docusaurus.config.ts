@@ -51,7 +51,11 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
+    colorMode: {
+      defaultMode: 'dark',
+      disableSwitch: true,
+      respectPrefersColorScheme: false,
+    },
     image: "img/zookoo_tight.png",
     navbar: {
       title: "Zookoo",
@@ -67,8 +71,9 @@ const config: Config = {
         },
         {
           href: "https://github.com/hhertout/zookoo-stm",
-          label: "GitHub",
           position: "right",
+          className: "navbar-github-icon",
+          "aria-label": "GitHub repository",
         },
       ],
     },
