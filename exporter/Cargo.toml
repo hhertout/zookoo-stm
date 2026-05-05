@@ -13,7 +13,7 @@ opentelemetry-otlp = { version = "0.31.0", features = [
     "tls-roots",
 ] }
 hyper = "1.6.0"
-tokio = "1.45.1"
+tokio = "1.52.2"
 log = "0.4.27"
 base64 = "0.22.1"
 reqwest = { version = "0.13", features = ["json"] }
