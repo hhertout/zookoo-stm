@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 configuration ={ path = "../configuration" }
 opentelemetry = { version = "0.31.0" }
-opentelemetry_sdk = { version = "0.31.0", features = ["rt-tokio"] }
+opentelemetry_sdk = { version = "0.32.0", features = ["rt-tokio"] }
 sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio", "tls-native-tls", "chrono"] }
 opentelemetry-otlp = { version = "0.31.0", features = [
     "grpc-tonic",

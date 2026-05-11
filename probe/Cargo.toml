@@ -16,7 +16,7 @@ url = "2.5.4"
 
 # OpenTelemetry for tracing
 opentelemetry = { version = "0.31.0", features = ["internal-logs"] }
-opentelemetry_sdk = { version = "0.31.0", features = ["internal-logs"] }
+opentelemetry_sdk = { version = "0.32.0", features = ["internal-logs"] }
 opentelemetry-stdout = { version = "0.31.0", features = ["trace"] }
 opentelemetry-otlp = { version = "0.31.0", features = ["grpc-tonic", "tls", "internal-logs"] }
 tracing = { version = "0.1", features = ["attributes"] }
