@@ -11,7 +11,7 @@ probe = { path = "../probe" }
 tokio = { version = "1.52.2", features = ["full"] }
 opentelemetry = "0.31.0"
 opentelemetry_sdk = "0.31.0"
-opentelemetry-stdout = { version = "0.31.0", features = ["trace"] }
+opentelemetry-stdout = { version = "0.32.0", features = ["trace"] }
 opentelemetry-otlp = { version = "0.31.0", features = ["grpc-tonic", "tls"] }
 sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio"] }
 log = "0.4.27"
