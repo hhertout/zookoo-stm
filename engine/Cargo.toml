@@ -8,7 +8,7 @@ configuration = { path = "../configuration" }
 discovery = { path = "../discovery" }
 exporter = { path = "../exporter" }
 probe = { path = "../probe" }
-tokio = { version = "1.52.2", features = ["full"] }
+tokio = { version = "1.52.3", features = ["full"] }
 opentelemetry = "0.31.0"
 opentelemetry_sdk = "0.31.0"
 opentelemetry-stdout = { version = "0.31.0", features = ["trace"] }
