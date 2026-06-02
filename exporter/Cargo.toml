@@ -12,7 +12,7 @@ opentelemetry-otlp = { version = "0.31.0", features = [
     "grpc-tonic",
     "tls-roots",
 ] }
-hyper = "1.6.0"
+hyper = "1.10.1"
 tokio = "1.52.3"
 log = "0.4.30"
 base64 = "0.22.1"
