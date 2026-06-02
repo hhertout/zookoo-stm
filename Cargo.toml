@@ -21,10 +21,10 @@ exporter = { path = "exporter" }
 env_logger = "0.11.8"
 env = "1.0.1"
 dotenvy = "0.15.7"
-log = "0.4.30"
+log = "0.4.31"
 clap = { version = "4.5.40", features = ["derive", "env"] }
 tokio = "1.52.3"
-pyroscope = { version = "2.0.4", features = ["backend-pprof-rs"] }
+pyroscope = { version = "2.0.6", features = ["backend-pprof-rs"] }
 hostname = "0.4.1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
