@@ -13,7 +13,7 @@ opentelemetry = "0.31.0"
 opentelemetry_sdk = "0.31.0"
 opentelemetry-stdout = { version = "0.32.0", features = ["trace"] }
 opentelemetry-otlp = { version = "0.31.0", features = ["grpc-tonic", "tls"] }
-sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio"] }
+sqlx = { version = "0.9.0", features = ["postgres", "runtime-tokio"] }
 log = "0.4.31"
 async-trait = "0.1"
 serde = "1.0"
