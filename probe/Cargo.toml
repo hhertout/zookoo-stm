@@ -7,7 +7,7 @@ edition = "2024"
 configuration = { path = "../configuration" }
 discovery = { path = "../discovery" }
 tokio = { version = "1.52.3", features = ["full"] }
-log = "0.4.30"
+log = "0.4.31"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.150"
 futures = "0.3.31"
